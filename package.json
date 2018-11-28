@@ -1,0 +1,17 @@
+{
+  "name": "debug-electron",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "pd4d10/debug-electron",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/pd4d10/debug-electron",
+  "dependencies": {
+    "inquirer": "^6.2.0"
+  }
+}
