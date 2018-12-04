@@ -1,7 +1,10 @@
 {
   "name": "debugtron",
   "version": "0.0.1",
-  "description": "",
+  "description": "A command line tool to debug Electron based App",
+  "bin": {
+    "debugtron": "lib/cli.js"
+  },
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,11 +14,12 @@
   ],
   "repository": "pd4d10/debugtron",
   "keywords": [],
-  "author": "",
+  "author": "Rongjian Zhang <pd4d10@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/pd4d10/debugtron",
   "dependencies": {
     "chalk": "^2.4.1",
+    "commander": "^2.19.0",
     "inquirer": "^6.2.0",
     "node-fetch": "^2.3.0"
   }
