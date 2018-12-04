@@ -1,4 +1,4 @@
-# Debugtron
+# Debugtron [![npm](https://img.shields.io/npm/v/debugtron.svg)](https://www.npmjs.com/debugtron/tiza)
 
 Debugtron is a command line tool to debug Electron based app.
 
