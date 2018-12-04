@@ -2,6 +2,8 @@
 
 Debugtron is a command line tool to debug Electron based app.
 
+<img src="https://raw.githubusercontent.com/pd4d10/debugtron/master/assets/demo.gif" width="800" />
+
 ## Usage
 
 ```sh
