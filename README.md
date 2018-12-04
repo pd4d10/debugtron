@@ -4,10 +4,18 @@ Debugtron is a command line tool to debug Electron based app.
 
 <img src="https://raw.githubusercontent.com/pd4d10/debugtron/master/assets/demo.gif" width="800" />
 
+## Installation
+
+```sh
+npm install -g debugtron
+```
+
+You can also run `npx debugtron` to use it directly.
+
 ## Usage
 
 ```sh
-npx debugtron
+debugtron
 ```
 
 This command will list all possible Electron based apps installed, then you can select which app to debug.
@@ -15,13 +23,13 @@ This command will list all possible Electron based apps installed, then you can 
 If you want to debug specific app, run
 
 ```sh
-npx debugtron [appPath]
+debugtron [appPath]
 ```
 
 For example:
 
 ```sh
-npx debugtron /Application/Slack.app
+debugtron /Application/Slack.app
 ```
 
 ## License
