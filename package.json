@@ -16,6 +16,7 @@
   "homepage": "https://github.com/pd4d10/debugtron",
   "dependencies": {
     "chalk": "^2.4.1",
-    "inquirer": "^6.2.0"
+    "inquirer": "^6.2.0",
+    "node-fetch": "^2.3.0"
   }
 }
