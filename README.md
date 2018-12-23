@@ -29,7 +29,8 @@ debugtron [appPath]
 For example:
 
 ```sh
-debugtron /Application/Slack.app
+debugtron /Application/Slack.app           # macOS
+debugtron ~/AppData/Local/slack/slack.exe  # windows
 ```
 
 ## License
