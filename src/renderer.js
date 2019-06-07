@@ -1,1 +1,1 @@
-console.log('Heya, this is coming from a webpack bundle');
+import './index.tsx'
