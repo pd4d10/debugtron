@@ -1,4 +1,10 @@
-import { app, BrowserWindow } from 'electron'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
+import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { spawn } from 'child_process'
+import fetch from 'node-fetch'
+import { DebugPayload, EventName as EventChannel } from './types'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -15,6 +21,9 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   })
 
   // and load the index.html of the app.
@@ -54,5 +63,127 @@ app.on('activate', () => {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+// read absolute directories
+function readdirAbsolute(dir: string) {
+  try {
+    return fs.readdirSync(dir).map(file => path.join(dir, file))
+  } catch (err) {
+    return []
+  }
+}
+
+function getPossibleAppPaths() {
+  switch (process.platform) {
+    case 'win32': {
+      const apps = [
+        ...readdirAbsolute(os.homedir() + '/AppData/Local'),
+        ...readdirAbsolute('c:/Program Files'),
+        ...readdirAbsolute('c:/Program Files (x86)'),
+      ]
+      return apps
+    }
+    case 'darwin':
+      return readdirAbsolute('/Applications')
+    default:
+      return []
+  }
+}
+
+function isElectronApp(appPath: string) {
+  switch (process.platform) {
+    case 'win32': {
+      try {
+        const [dir] = fs
+          .readdirSync(appPath)
+          .filter(name => name.startsWith('app-'))
+        return (
+          dir &&
+          fs.existsSync(path.join(appPath, dir, 'resources/electron.asar'))
+        )
+      } catch (err) {
+        // catch errors of readdir
+        // 1. file: ENOTDIR: not a directory
+        // 2. no permission at windows: EPERM: operation not permitted
+        // console.error(err.message)
+        return false
+      }
+    }
+    case 'darwin':
+      return fs.existsSync(
+        path.join(appPath, 'Contents/Frameworks/Electron Framework.framework'),
+      )
+  }
+}
+
+function getExecutable(appPath: string) {
+  switch (process.platform) {
+    case 'win32': {
+      const appName = path.basename(appPath)
+      return path.join(appPath, appName + '.exe')
+    }
+    case 'darwin': {
+      const exesDir = path.join(appPath, 'Contents/MacOS')
+      const [exe] = fs.readdirSync(exesDir)
+      return path.join(exesDir, exe)
+    }
+    default:
+      throw new Error('platform not supported: ' + process.platform)
+  }
+}
+
+function startDebugging(appPath: string) {
+  const nodePort = 10000
+  const windowPort = 10001
+
+  const executable =
+    path.extname(appPath) === '.exe' ? appPath : getExecutable(appPath)
+  const sp = spawn(executable, [
+    `--inspect=${nodePort}`,
+    `--remote-debugging-port=${windowPort}`,
+  ])
+
+  let fetched = false
+
+  sp.stdout.on('data', data => {
+    process.stdout.write(data)
+  })
+
+  sp.stderr.on('data', async data => {
+    // waiting for stderr output to ensure debugger port is already listening
+    if (!fetched) {
+      fetched = true
+
+      // Window port is not ready, use a timeout
+      setTimeout(async () => {
+        const [json0, json1] = (await Promise.all(
+          [nodePort, windowPort].map(port =>
+            fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
+          ),
+        )) as [DebugPayload[], DebugPayload[]]
+
+        mainWindow.webContents.send(EventChannel.appStarted, [
+          ...json0,
+          ...json1,
+        ])
+      }, 500)
+    }
+
+    process.stderr.write(data)
+  })
+
+  sp.on('close', code => {
+    console.log(`child process exited with code ${code}`)
+    mainWindow.webContents.send(EventChannel.appStarted, [])
+  })
+}
+
+ipcMain.on(EventChannel.getApps, (e: Electron.Event) => {
+  e.returnValue = getPossibleAppPaths().filter(isElectronApp)
+})
+
+ipcMain.on(
+  EventChannel.startDebugging,
+  (e: Electron.Event, appPath: string) => {
+    startDebugging(appPath)
+  },
+)
