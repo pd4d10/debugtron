@@ -165,7 +165,8 @@ function getExecutable(appPath: string) {
   }
 }
 
-function startDebugging({ appPath }: AppInfo) {
+function startDebugging(app: AppInfo) {
+  const { appPath } = app
   const nodePort = 10000
   const windowPort = 10001
 
@@ -195,10 +196,10 @@ function startDebugging({ appPath }: AppInfo) {
           ),
         )) as [DebugPayload[], DebugPayload[]]
 
-        mainWindow.webContents.send(EventChannel.appStarted, [
-          ...json0,
-          ...json1,
-        ])
+        mainWindow.webContents.send(EventChannel.appStarted, {
+          app,
+          pages: [...json0, ...json1],
+        })
       }, 500)
     }
 
@@ -207,7 +208,7 @@ function startDebugging({ appPath }: AppInfo) {
 
   sp.on('close', code => {
     console.log(`child process exited with code ${code}`)
-    mainWindow.webContents.send(EventChannel.appStarted, [])
+    // mainWindow.webContents.send(EventChannel.appStarted, [])
   })
 }
 
