@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
-import { DebugPayload, EventName } from '../types'
+import { DebugPayload, EventName, AppInfo } from '../types'
 
 export const App: React.FC = () => {
-  const [apps, setApps] = useState([] as string[])
+  const [apps, setApps] = useState([] as AppInfo[])
   const [payloads, setPayloads] = useState([] as DebugPayload[])
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export const App: React.FC = () => {
     <div>
       <div>a</div>
       {apps.map(app => (
-        <div key={app}>
+        <div key={app.id}>
           <a
             href="#"
             onClick={e => {
@@ -34,7 +34,7 @@ export const App: React.FC = () => {
               ipcRenderer.send(EventName.startDebugging, app)
             }}
           >
-            {app}
+            {app.name}
           </a>
         </div>
       ))}

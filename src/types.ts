@@ -12,3 +12,11 @@ export interface DebugPayload {
   type: 'node' | 'page' | 'webview'
   url: string
 }
+
+export interface AppInfo {
+  id: string
+  name: string
+  icon: string
+  appPath: string
+  exePath: string
+}

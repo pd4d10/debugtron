@@ -1,10 +1,11 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
+import plist from 'plist'
 import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import { spawn } from 'child_process'
 import fetch from 'node-fetch'
-import { DebugPayload, EventName as EventChannel } from './types'
+import { DebugPayload, EventName as EventChannel, AppInfo } from './types'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -115,6 +116,39 @@ function isElectronApp(appPath: string) {
   }
 }
 
+async function getAppInfo(appPath: string): Promise<AppInfo> {
+  switch (process.platform) {
+    case 'win32':
+      throw new Error('')
+    case 'darwin':
+      const infoContent = await fs.promises.readFile(
+        path.join(appPath, 'Contents/Info.plist'),
+        { encoding: 'utf8' },
+      )
+      const info = plist.parse(infoContent) as {
+        CFBundleIdentifier: string
+        CFBundleDisplayName: string
+        CFBundleExecutable: string
+        CFBundleIconFile: string
+      }
+
+      return {
+        id: info.CFBundleIdentifier,
+        name: info.CFBundleDisplayName,
+        icon: info.CFBundleIconFile,
+        appPath: appPath,
+        exePath: path.resolve(
+          appPath,
+          'Contents',
+          'MacOS',
+          info.CFBundleExecutable,
+        ),
+      }
+    default:
+      throw new Error('platform not supported: ' + process.platform)
+  }
+}
+
 function getExecutable(appPath: string) {
   switch (process.platform) {
     case 'win32': {
@@ -131,7 +165,7 @@ function getExecutable(appPath: string) {
   }
 }
 
-function startDebugging(appPath: string) {
+function startDebugging({ appPath }: AppInfo) {
   const nodePort = 10000
   const windowPort = 10001
 
@@ -177,13 +211,15 @@ function startDebugging(appPath: string) {
   })
 }
 
-ipcMain.on(EventChannel.getApps, (e: Electron.Event) => {
-  e.returnValue = getPossibleAppPaths().filter(isElectronApp)
+ipcMain.on(EventChannel.getApps, async (e: Electron.Event) => {
+  const appPaths = getPossibleAppPaths().filter(isElectronApp)
+  const infos = await Promise.all(appPaths.map(getAppInfo))
+  e.returnValue = infos
 })
 
 ipcMain.on(
   EventChannel.startDebugging,
-  (e: Electron.Event, appPath: string) => {
-    startDebugging(appPath)
+  (e: Electron.Event, appInfo: AppInfo) => {
+    startDebugging(appInfo)
   },
 )
