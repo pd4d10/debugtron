@@ -1,2 +1,3 @@
-import 'antd/dist/antd.css'
+import 'normalize.css/normalize.css'
+import '@blueprintjs/core/lib/css/blueprint.css'
 import './renderer/index.tsx'

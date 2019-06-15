@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
-import { Select, Button, Tabs } from 'antd'
+import { Tabs, Tab } from '@blueprintjs/core'
 import { DebugPayload, EventName, AppInfo } from '../types'
 
 export const App: React.FC = () => {
-  const [selected, setSelected] = useState('')
   const [apps, setApps] = useState([] as AppInfo[])
   const [activeTab, setActiveTab] = useState('0')
   const [tabs, setTabs] = useState([] as {
@@ -36,41 +35,25 @@ export const App: React.FC = () => {
   return (
     <div>
       <div>
-        <Select
-          value={selected || undefined}
-          placeholder="Choose app here"
-          onChange={(value: string) => {
-            setSelected(value)
-          }}
-          style={{ minWidth: 200 }}
-        >
-          {apps.map(app => (
-            <Select.Option value={app.id}>{app.name}</Select.Option>
-          ))}
-        </Select>
-        <Button
-          onClick={e => {
-            e.preventDefault()
-            const app = apps.find(item => item.id === selected)
-            if (!app) return alert('no app')
-
-            ipcRenderer.send(EventName.startDebugging, app)
-          }}
-        >
-          Debug
-        </Button>
+        {apps.map(app => (
+          <div
+            onClick={() => {
+              ipcRenderer.send(EventName.startDebugging, app)
+            }}
+          >
+            {app.name}
+          </div>
+        ))}
       </div>
 
       <Tabs
-        type="editable-card"
-        activeKey={activeTab}
+        selectedTabId={activeTab}
         onChange={key => {
-          setActiveTab(key)
+          setActiveTab(key as string)
         }}
-        // onEdit={}
       >
-        {tabs.map((tab, index) => (
-          <Tabs.TabPane tab={tab.app.name} key={index.toString()}>
+        {tabs.map(tab => (
+          <Tab id={tab.app.id} key={tab.app.id}>
             {tab.pages.map(page => (
               <div key={page.id}>
                 <a
@@ -90,7 +73,7 @@ export const App: React.FC = () => {
                 </a>
               </div>
             ))}
-          </Tabs.TabPane>
+          </Tab>
         ))}
       </Tabs>
     </div>
