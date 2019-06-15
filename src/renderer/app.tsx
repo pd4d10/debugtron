@@ -39,7 +39,7 @@ export const App: React.FC = () => {
         <Select
           value={selected || undefined}
           placeholder="Choose app here"
-          onChange={value => {
+          onChange={(value: string) => {
             setSelected(value)
           }}
           style={{ minWidth: 200 }}

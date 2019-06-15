@@ -15,7 +15,7 @@ if (require('electron-squirrel-startup')) {
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow: BrowserWindow
+let mainWindow: BrowserWindow | null = null
 
 const createWindow = () => {
   // Create the browser window.
@@ -196,6 +196,7 @@ function startDebugging(app: AppInfo) {
           ),
         )) as [DebugPayload[], DebugPayload[]]
 
+        if (!mainWindow) throw new Error('main window already destroyed')
         mainWindow.webContents.send(EventChannel.appStarted, {
           app,
           pages: [...json0, ...json1],
