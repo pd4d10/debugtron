@@ -1,7 +1,9 @@
 export enum EventName {
   getApps = 'getApps',
   startDebugging = 'startDebugging',
+  appPrepare = 'appPrepare',
   appStarted = 'appStarted',
+  log = 'debugtron-log',
 }
 
 export interface PageInfo {

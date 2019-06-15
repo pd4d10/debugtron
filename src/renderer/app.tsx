@@ -5,8 +5,15 @@ import { PageInfo, EventName, AppInfo } from '../types'
 import { AppContext } from './store'
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('0')
-  const { appInfo, instances } = useContext(AppContext)
+  const [activeTab, setActiveTab] = useState('')
+  const { appInfo, instanceInfo } = useContext(AppContext)
+
+  useEffect(() => {
+    const instanceIds = Object.keys(instanceInfo)
+    if (!activeTab && instanceIds.length) {
+      setActiveTab(instanceIds[0])
+    }
+  }, [activeTab, instanceInfo])
 
   return (
     <div>
@@ -33,28 +40,36 @@ export const App: React.FC = () => {
           setActiveTab(key as string)
         }}
       >
-        {instances.map(instance => (
-          <Tab id={instance.appId} key={instance.appId}>
-            {instance.pages.map(page => (
-              <div key={page.id}>
-                <a
-                  href="#"
-                  onClick={e => {
-                    e.preventDefault()
-                    const win = new remote.BrowserWindow()
-                    win.loadURL(
-                      page.devtoolsFrontendUrl.replace(
-                        /^\/devtools/,
-                        'chrome-devtools://devtools/bundled',
-                      ),
-                    )
-                  }}
-                >
-                  {page.title}
-                </a>
+        {Object.entries(instanceInfo).map(([id, instance]) => (
+          <Tab
+            id={id}
+            key={id}
+            title={appInfo[instance.appId].name}
+            panel={
+              <div>
+                {instance.pages.map(page => (
+                  <div key={page.id}>
+                    <a
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault()
+                        const win = new remote.BrowserWindow()
+                        win.loadURL(
+                          page.devtoolsFrontendUrl.replace(
+                            /^\/devtools/,
+                            'chrome-devtools://devtools/bundled',
+                          ),
+                        )
+                      }}
+                    >
+                      {page.title}
+                    </a>
+                  </div>
+                ))}
+                <div>{instance.log}</div>
               </div>
-            ))}
-          </Tab>
+            }
+          />
         ))}
       </Tabs>
     </div>

@@ -2,6 +2,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import plist from 'plist'
+import { v4 } from 'uuid'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { spawn } from 'child_process'
 import fetch from 'node-fetch'
@@ -178,9 +179,11 @@ function startDebugging(app: AppInfo) {
   ])
 
   let fetched = false
+  let instanceId = v4()
+  mainWindow!.webContents.send(EventName.appPrepare, instanceId, app.id)
 
   sp.stdout.on('data', data => {
-    process.stdout.write(data)
+    mainWindow!.webContents.send(EventName.log, instanceId, data)
   })
 
   sp.stderr.on('data', async data => {
@@ -197,14 +200,14 @@ function startDebugging(app: AppInfo) {
         )) as [PageInfo[], PageInfo[]]
 
         if (!mainWindow) throw new Error('main window already destroyed')
-        mainWindow.webContents.send(EventName.appStarted, {
-          appId: app.id,
-          pages: [...json0, ...json1],
-        })
+        mainWindow.webContents.send(EventName.appStarted, instanceId, [
+          ...json0,
+          ...json1,
+        ])
       }, 500)
     }
 
-    process.stderr.write(data)
+    mainWindow!.webContents.send(EventName.log, instanceId, data)
   })
 
   sp.on('close', code => {
