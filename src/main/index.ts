@@ -2,10 +2,10 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import plist from 'plist'
-import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { spawn } from 'child_process'
 import fetch from 'node-fetch'
-import { DebugPayload, EventName as EventChannel, AppInfo } from './types'
+import { PageInfo, EventName, AppInfo, Dict } from '../types'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -194,11 +194,11 @@ function startDebugging(app: AppInfo) {
           [nodePort, windowPort].map(port =>
             fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
           ),
-        )) as [DebugPayload[], DebugPayload[]]
+        )) as [PageInfo[], PageInfo[]]
 
         if (!mainWindow) throw new Error('main window already destroyed')
-        mainWindow.webContents.send(EventChannel.appStarted, {
-          app,
+        mainWindow.webContents.send(EventName.appStarted, {
+          appId: app.id,
           pages: [...json0, ...json1],
         })
       }, 500)
@@ -213,15 +213,18 @@ function startDebugging(app: AppInfo) {
   })
 }
 
-ipcMain.on(EventChannel.getApps, async (e: Electron.Event) => {
+ipcMain.on(EventName.getApps, async (e: Electron.Event) => {
   const appPaths = getPossibleAppPaths().filter(isElectronApp)
   const infos = await Promise.all(appPaths.map(getAppInfo))
-  e.returnValue = infos
+  e.returnValue = infos.reduce(
+    (a, b) => {
+      a[b.id] = b
+      return a
+    },
+    {} as Dict<AppInfo>,
+  )
 })
 
-ipcMain.on(
-  EventChannel.startDebugging,
-  (e: Electron.Event, appInfo: AppInfo) => {
-    startDebugging(appInfo)
-  },
-)
+ipcMain.on(EventName.startDebugging, (e: Electron.Event, appInfo: AppInfo) => {
+  startDebugging(appInfo)
+})

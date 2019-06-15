@@ -1,50 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { ipcRenderer, remote } from 'electron'
-import { Tabs, Tab } from '@blueprintjs/core'
-import { DebugPayload, EventName, AppInfo } from '../types'
+import { Tabs, Tab, Divider } from '@blueprintjs/core'
+import { PageInfo, EventName, AppInfo } from '../types'
+import { AppContext } from './store'
 
 export const App: React.FC = () => {
-  const [apps, setApps] = useState([] as AppInfo[])
   const [activeTab, setActiveTab] = useState('0')
-  const [tabs, setTabs] = useState([] as {
-    app: AppInfo
-    pages: DebugPayload[]
-  }[])
-
-  useEffect(() => {
-    setApps(ipcRenderer.sendSync(EventName.getApps))
-  }, [])
-
-  useEffect(() => {
-    const onAppStarted = (
-      e: Electron.Event,
-      payload: {
-        app: AppInfo
-        pages: DebugPayload[]
-      },
-    ) => {
-      setTabs(tabs => [...tabs, payload])
-    }
-
-    ipcRenderer.on(EventName.appStarted, onAppStarted)
-    return () => {
-      ipcRenderer.removeListener(EventName.appStarted, onAppStarted)
-    }
-  }, [])
+  const { appInfo, instances } = useContext(AppContext)
 
   return (
     <div>
       <div>
-        {apps.map(app => (
+        {Object.entries(appInfo).map(([id, payload]) => (
           <div
+            style={{
+              cursor: 'pointer',
+            }}
             onClick={() => {
-              ipcRenderer.send(EventName.startDebugging, app)
+              ipcRenderer.send(EventName.startDebugging, payload)
             }}
           >
-            {app.name}
+            {payload.name}
           </div>
         ))}
       </div>
+
+      <Divider />
 
       <Tabs
         selectedTabId={activeTab}
@@ -52,9 +33,9 @@ export const App: React.FC = () => {
           setActiveTab(key as string)
         }}
       >
-        {tabs.map(tab => (
-          <Tab id={tab.app.id} key={tab.app.id}>
-            {tab.pages.map(page => (
+        {instances.map(instance => (
+          <Tab id={instance.appId} key={instance.appId}>
+            {instance.pages.map(page => (
               <div key={page.id}>
                 <a
                   href="#"

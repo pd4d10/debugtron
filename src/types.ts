@@ -4,7 +4,7 @@ export enum EventName {
   appStarted = 'appStarted',
 }
 
-export interface DebugPayload {
+export interface PageInfo {
   description: string
   devtoolsFrontendUrl: string
   id: string
@@ -20,3 +20,5 @@ export interface AppInfo {
   appPath: string
   exePath: string
 }
+
+export type Dict<T> = { [key: string]: T }

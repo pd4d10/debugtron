@@ -1,1 +1,1 @@
-import './main.ts'
+import './main/index.ts'
