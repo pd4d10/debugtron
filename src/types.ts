@@ -3,6 +3,7 @@ export enum EventName {
   startDebugging = 'startDebugging',
   appPrepare = 'appPrepare',
   appStarted = 'appStarted',
+  appClosed = 'appClosed',
   log = 'debugtron-log',
 }
 

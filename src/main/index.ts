@@ -212,7 +212,7 @@ function startDebugging(app: AppInfo) {
 
   sp.on('close', code => {
     console.log(`child process exited with code ${code}`)
-    // mainWindow.webContents.send(EventChannel.appStarted, [])
+    mainWindow!.webContents.send(EventName.appClosed, instanceId)
   })
 }
 

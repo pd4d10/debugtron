@@ -73,6 +73,20 @@ export const AppProvider: FC = ({ children }) => {
     }
   }, [])
 
+  useEffect(() => {
+    const onClosed = (e: Electron.Event, instanceId: string) => {
+      setInstanceInfo(instanceInfo => {
+        delete instanceInfo[instanceId]
+        return { ...instanceInfo }
+      })
+    }
+
+    ipcRenderer.on(EventName.appClosed, onClosed)
+    return () => {
+      ipcRenderer.removeListener(EventName.appClosed, onClosed)
+    }
+  }, [])
+
   return (
     <AppContext.Provider value={{ appInfo, instanceInfo }}>
       {children}
