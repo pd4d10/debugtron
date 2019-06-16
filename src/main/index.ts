@@ -66,23 +66,26 @@ app.on('activate', () => {
 })
 
 // read absolute directories
-function readdirAbsolute(dir: string) {
+async function readdirAbsolute(dir: string) {
   try {
-    return fs.readdirSync(dir).map(file => path.join(dir, file))
+    const dirs = await fs.promises.readdir(dir)
+    return dirs.map(file => path.join(dir, file))
   } catch (err) {
     return []
   }
 }
 
-function getPossibleAppPaths() {
+async function getPossibleAppPaths() {
   switch (process.platform) {
     case 'win32': {
-      const apps = [
-        ...readdirAbsolute(os.homedir() + '/AppData/Local'),
-        ...readdirAbsolute('c:/Program Files'),
-        ...readdirAbsolute('c:/Program Files (x86)'),
-      ]
-      return apps
+      const apps = await Promise.all(
+        [
+          os.homedir() + '/AppData/Local',
+          'c:/Program Files',
+          'c:/Program Files (x86)',
+        ].map(dir => readdirAbsolute(dir)),
+      )
+      return apps.flat()
     }
     case 'darwin':
       return readdirAbsolute('/Applications')
@@ -91,13 +94,12 @@ function getPossibleAppPaths() {
   }
 }
 
-function isElectronApp(appPath: string) {
+async function isElectronApp(appPath: string) {
   switch (process.platform) {
     case 'win32': {
       try {
-        const [dir] = fs
-          .readdirSync(appPath)
-          .filter(name => name.startsWith('app-'))
+        const dirs = await fs.promises.readdir(appPath)
+        const [dir] = dirs.filter(name => name.startsWith('app-'))
         return (
           dir &&
           fs.existsSync(path.join(appPath, dir, 'resources/electron.asar'))
@@ -114,6 +116,8 @@ function isElectronApp(appPath: string) {
       return fs.existsSync(
         path.join(appPath, 'Contents/Frameworks/Electron Framework.framework'),
       )
+    default:
+      return false
   }
 }
 
@@ -160,7 +164,7 @@ async function getAppInfo(appPath: string): Promise<AppInfo> {
   }
 }
 
-function getExecutable(appPath: string) {
+async function getExecutable(appPath: string) {
   switch (process.platform) {
     case 'win32': {
       const appName = path.basename(appPath)
@@ -168,7 +172,7 @@ function getExecutable(appPath: string) {
     }
     case 'darwin': {
       const exesDir = path.join(appPath, 'Contents/MacOS')
-      const [exe] = fs.readdirSync(exesDir)
+      const [exe] = await fs.promises.readdir(exesDir)
       return path.join(exesDir, exe)
     }
     default:
@@ -176,13 +180,13 @@ function getExecutable(appPath: string) {
   }
 }
 
-function startDebugging(app: AppInfo) {
+async function startDebugging(app: AppInfo) {
   const { appPath } = app
   const nodePort = 10000
   const windowPort = 10001
 
   const executable =
-    path.extname(appPath) === '.exe' ? appPath : getExecutable(appPath)
+    path.extname(appPath) === '.exe' ? appPath : await getExecutable(appPath)
   const sp = spawn(executable, [
     `--inspect=${nodePort}`,
     `--remote-debugging-port=${windowPort}`,
@@ -227,8 +231,16 @@ function startDebugging(app: AppInfo) {
 }
 
 ipcMain.on(EventName.getApps, async (e: Electron.Event) => {
-  const appPaths = getPossibleAppPaths().filter(isElectronApp)
-  const infos = await Promise.all(appPaths.map(getAppInfo))
+  const appPaths = await getPossibleAppPaths()
+  const infos = [] as AppInfo[]
+  for (let p of appPaths) {
+    // TODO: parallel
+    if (await isElectronApp(p)) {
+      const info = await getAppInfo(p)
+      infos.push(info)
+    }
+  }
+
   e.returnValue = infos.reduce(
     (a, b) => {
       a[b.id] = b
