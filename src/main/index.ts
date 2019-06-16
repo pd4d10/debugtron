@@ -120,7 +120,17 @@ function isElectronApp(appPath: string) {
 async function getAppInfo(appPath: string): Promise<AppInfo> {
   switch (process.platform) {
     case 'win32':
-      throw new Error('')
+      const files = await fs.promises.readdir(appPath)
+      const exeFiles = files.filter(
+        file => file.endsWith('.exe') && !file.startsWith('Uninstall'),
+      )
+      return {
+        id: v4(), // TODO: get app id from register
+        name: path.basename(appPath),
+        icon: '',
+        appPath,
+        exePath: exeFiles[0],
+      }
     case 'darwin':
       const infoContent = await fs.promises.readFile(
         path.join(appPath, 'Contents/Info.plist'),
