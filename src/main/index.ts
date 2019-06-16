@@ -7,6 +7,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { spawn } from 'child_process'
 import fetch from 'node-fetch'
 import { PageInfo, EventName, AppInfo, Dict } from '../types'
+import { PortPool } from './utils'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -180,10 +181,12 @@ async function getExecutable(appPath: string) {
   }
 }
 
+const portPool = new PortPool()
+
 async function startDebugging(app: AppInfo) {
   const { appPath } = app
-  const nodePort = 10000
-  const windowPort = 10001
+  const nodePort = portPool.getPort()
+  const windowPort = portPool.getPort()
 
   const executable =
     path.extname(appPath) === '.exe' ? appPath : await getExecutable(appPath)
