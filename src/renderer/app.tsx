@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { ipcRenderer, remote } from 'electron'
-import { Tabs, Tab, Divider } from '@blueprintjs/core'
+import { Tabs, Tab, Divider, Tag } from '@blueprintjs/core'
 import { PageInfo, EventName, AppInfo } from '../types'
 import { AppContext } from './store'
+import { Term } from './term'
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('')
@@ -19,16 +20,18 @@ export const App: React.FC = () => {
     <div>
       <div>
         {Object.entries(appInfo).map(([id, payload]) => (
-          <div
-            style={{
-              cursor: 'pointer',
-            }}
+          <Tag
+            key={id}
+            large
+            round
+            interactive
+            minimal
             onClick={() => {
               ipcRenderer.send(EventName.startDebugging, payload)
             }}
           >
             {payload.name}
-          </div>
+          </Tag>
         ))}
       </div>
 
@@ -66,7 +69,7 @@ export const App: React.FC = () => {
                     </a>
                   </div>
                 ))}
-                <div>{instance.log}</div>
+                <Term message={instance.log} />
               </div>
             }
           />
