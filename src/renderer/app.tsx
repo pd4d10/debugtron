@@ -1,13 +1,29 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { ipcRenderer, remote } from 'electron'
+import { useDropzone } from 'react-dropzone'
+import path from 'path'
 import { Tabs, Tab, Divider, Tag } from '@blueprintjs/core'
 import { PageInfo, EventName, AppInfo } from '../types'
 import { AppContext } from './store'
 import { Term } from './term'
+import './app.css'
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('')
   const { appInfo, instanceInfo } = useContext(AppContext)
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    noClick: true,
+    onDrop(files) {
+      // Find shortest path
+      const [file] = files.sort((a, b) => a.path.length - b.path.length)
+      if (!file) return
+
+      ipcRenderer.send(
+        EventName.startDebugging,
+        path.dirname(path.dirname(file.path)),
+      )
+    },
+  })
 
   useEffect(() => {
     const instanceIds = Object.keys(instanceInfo)
@@ -18,7 +34,7 @@ export const App: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', padding: 4 }}>
         {Object.entries(appInfo).map(([id, app]) => (
           <a
             key={id}
@@ -27,7 +43,7 @@ export const App: React.FC = () => {
               e.preventDefault()
               ipcRenderer.send(EventName.startDebugging, app)
             }}
-            style={{ padding: 10 }}
+            style={{ padding: 4 }}
           >
             <img
               src={app.icon || require('./images/electron.png')}
@@ -35,6 +51,11 @@ export const App: React.FC = () => {
             />
           </a>
         ))}
+
+        <div {...getRootProps({ className: 'dropzone' })}>
+          <input {...getInputProps()} />
+          <p>App not found? Drag your app here</p>
+        </div>
       </div>
 
       <Divider />

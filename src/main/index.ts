@@ -6,6 +6,7 @@ import { v4 } from 'uuid'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { spawn } from 'child_process'
 import fetch from 'node-fetch'
+import { isString } from 'lodash-es'
 import { PageInfo, EventName, AppInfo, Dict } from '../types'
 import { PortPool, readIcnsAsImageUri } from './utils'
 
@@ -257,6 +258,12 @@ ipcMain.on(EventName.getApps, async (e: Electron.Event) => {
   )
 })
 
-ipcMain.on(EventName.startDebugging, (e: Electron.Event, appInfo: AppInfo) => {
-  startDebugging(appInfo)
-})
+ipcMain.on(
+  EventName.startDebugging,
+  async (e: Electron.Event, appPathOrInfo: AppInfo | string) => {
+    if (isString(appPathOrInfo)) {
+      appPathOrInfo = await getAppInfo(appPathOrInfo)
+    }
+    startDebugging(appPathOrInfo)
+  },
+)
