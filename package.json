@@ -87,6 +87,7 @@
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.2",
     "typescript": "^3.5.1",
+    "url-loader": "^2.0.0",
     "uuid": "^3.3.2",
     "xterm": "^3.14.2"
   }

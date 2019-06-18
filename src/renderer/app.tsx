@@ -18,20 +18,22 @@ export const App: React.FC = () => {
 
   return (
     <div>
-      <div>
-        {Object.entries(appInfo).map(([id, payload]) => (
-          <Tag
+      <div style={{ display: 'flex' }}>
+        {Object.entries(appInfo).map(([id, app]) => (
+          <a
             key={id}
-            large
-            round
-            interactive
-            minimal
-            onClick={() => {
-              ipcRenderer.send(EventName.startDebugging, payload)
+            href="#"
+            onClick={e => {
+              e.preventDefault()
+              ipcRenderer.send(EventName.startDebugging, app)
             }}
+            style={{ padding: 10 }}
           >
-            {payload.name}
-          </Tag>
+            <img
+              src={app.icon || require('./images/electron.png')}
+              style={{ width: 64, height: 64 }}
+            />
+          </a>
         ))}
       </div>
 

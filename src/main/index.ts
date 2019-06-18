@@ -7,7 +7,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { spawn } from 'child_process'
 import fetch from 'node-fetch'
 import { PageInfo, EventName, AppInfo, Dict } from '../types'
-import { PortPool } from './utils'
+import { PortPool, readIcnsAsImageUri } from './utils'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -148,11 +148,15 @@ async function getAppInfo(appPath: string): Promise<AppInfo> {
         CFBundleIconFile: string
       }
 
+      const icon = await readIcnsAsImageUri(
+        path.join(appPath, 'Contents', 'Resources', info.CFBundleIconFile),
+      )
+
       return {
         id: info.CFBundleIdentifier,
         name: info.CFBundleDisplayName,
-        icon: info.CFBundleIconFile,
-        appPath: appPath,
+        icon,
+        appPath,
         exePath: path.resolve(
           appPath,
           'Contents',
