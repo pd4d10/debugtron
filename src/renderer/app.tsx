@@ -2,10 +2,9 @@ import React, { useEffect, useState, useContext } from 'react'
 import { ipcRenderer, remote } from 'electron'
 import { useDropzone } from 'react-dropzone'
 import path from 'path'
-import { Tabs, Tab, Divider, Tag } from '@blueprintjs/core'
-import { PageInfo, EventName, AppInfo } from '../types'
+import { Tabs, Tab, Divider, Pre } from '@blueprintjs/core'
+import { EventName } from '../types'
 import { AppContext } from './store'
-import { Term } from './term'
 import './app.css'
 
 export const App: React.FC = () => {
@@ -92,7 +91,7 @@ export const App: React.FC = () => {
                     </a>
                   </div>
                 ))}
-                <Term message={instance.log} />
+                <Pre>{instance.log}</Pre>
               </div>
             }
           />
