@@ -36,12 +36,14 @@ const createWindow = () => {
 }
 
 app.on('ready', async () => {
-  const installer = require('electron-devtools-installer')
-  await Promise.all(
-    ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
-      installer.default(installer[name]),
-    ),
-  )
+  if (process.env.NODE_ENV !== 'production') {
+    const installer = require('electron-devtools-installer')
+    await Promise.all(
+      ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
+        installer.default(installer[name]),
+      ),
+    )
+  }
 
   createWindow()
 
