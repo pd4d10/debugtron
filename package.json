@@ -11,7 +11,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "test": "npx prettier --list-different src/**/*"
+    "test": "npx prettier --list-different src/**/*.ts"
   },
   "keywords": [],
   "author": "Rongjian Zhang <pd4d10@gmail.com>",
