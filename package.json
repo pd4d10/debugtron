@@ -82,6 +82,7 @@
     "@types/uuid": "^3.4.4",
     "css-loader": "^2.1.1",
     "electron": "5.0.2",
+    "electron-devtools-installer": "^2.2.4",
     "electron-redux": "^1.4.0",
     "lodash-es": "^4.17.11",
     "node-fetch": "^2.6.0",

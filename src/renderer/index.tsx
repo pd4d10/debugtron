@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { App } from './app'
 import { reducer } from '../reducer'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import {
   forwardToMain,
   replayActionRenderer,
@@ -11,6 +11,8 @@ import {
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 
+const composeEnhancers = __REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
 // For debug
 ;(window as any).electron = require('electron')
 
@@ -18,7 +20,7 @@ const initialState = getInitialStateRenderer()
 const store = createStore(
   reducer,
   initialState,
-  applyMiddleware(forwardToMain, thunk),
+  composeEnhancers(applyMiddleware(forwardToMain, thunk)),
 )
 replayActionRenderer(store)
 
