@@ -4,6 +4,7 @@
   "version": "0.0.4",
   "description": "My Electron application description",
   "main": ".webpack/main",
+  "repository": "bytedance/debugtron",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -97,6 +98,7 @@
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.2",
     "typescript": "^3.5.1",
+    "update-electron-app": "^1.5.0",
     "url-loader": "^2.0.0",
     "uuid": "^3.3.2"
   }
