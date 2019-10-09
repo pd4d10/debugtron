@@ -1,15 +1,16 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
 import { useDropzone } from 'react-dropzone'
-import path from 'path'
 import { Tabs, Tab, Divider, Pre } from '@blueprintjs/core'
-import { EventName } from '../types'
-import { AppContext } from './store'
+import path from 'path'
 import './app.css'
+import { useSelector, useDispatch } from 'react-redux'
+import { State } from '../reducer'
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('')
-  const { appInfo, instanceInfo } = useContext(AppContext)
+  const { appInfo, instanceInfo } = useSelector<State, State>(s => s)
+  const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     onDrop(files) {
@@ -17,10 +18,9 @@ export const App: React.FC = () => {
       const [file] = files.sort((a, b) => a.path.length - b.path.length)
       if (!file) return
 
-      ipcRenderer.send(
-        EventName.startDebugging,
-        path.dirname(path.dirname(file.path)),
-      )
+      ipcRenderer.send('startDebugging', {
+        path: path.dirname(path.dirname(file.path)),
+      })
     },
   })
 
@@ -33,16 +33,16 @@ export const App: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', padding: 4 }}>
+      <div style={{ display: 'flex' }}>
         {Object.entries(appInfo).map(([id, app]) => (
           <a
             key={id}
             href="#"
             onClick={e => {
               e.preventDefault()
-              ipcRenderer.send(EventName.startDebugging, app)
+              ipcRenderer.send('startDebugging', { id: app.id })
             }}
-            style={{ padding: 4 }}
+            // style={{ padding: 4 }}
           >
             <img
               src={app.icon || require('./images/electron.png')}
@@ -91,7 +91,13 @@ export const App: React.FC = () => {
                     </a>
                   </div>
                 ))}
-                <Pre>{instance.log}</Pre>
+                <Pre
+                  style={{
+                    overflow: 'auto',
+                  }}
+                >
+                  {instance.log}
+                </Pre>
               </div>
             }
           />
