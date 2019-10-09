@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { State } from '../reducer'
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('')
+  const [activeId, setActiveId] = useState('')
   const { appInfo, instanceInfo } = useSelector<State, State>(s => s)
   const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
@@ -26,10 +26,12 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const instanceIds = Object.keys(instanceInfo)
-    if (!activeTab && instanceIds.length) {
-      setActiveTab(instanceIds[0])
+
+    // Ensure there always be one tab active
+    if (!instanceIds.includes(activeId) && instanceIds.length) {
+      setActiveId(instanceIds[0])
     }
-  }, [activeTab, instanceInfo])
+  }, [activeId, instanceInfo])
 
   const instanceEntries = Object.entries(instanceInfo)
 
@@ -95,9 +97,9 @@ export const App: React.FC = () => {
       <div style={{ overflowY: 'auto' }}>
         {instanceEntries.length ? (
           <Tabs
-            selectedTabId={activeTab}
+            selectedTabId={activeId}
             onChange={key => {
-              setActiveTab(key as string)
+              setActiveId(key as string)
             }}
           >
             {instanceEntries.map(([id, instance]) => (
