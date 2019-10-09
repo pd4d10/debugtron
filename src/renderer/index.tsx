@@ -11,9 +11,10 @@ import {
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 
-const composeEnhancers = __REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const composeEnhancers =
+    (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
-// For debug
+  // For debug
 ;(window as any).electron = require('electron')
 
 const initialState = getInitialStateRenderer()
