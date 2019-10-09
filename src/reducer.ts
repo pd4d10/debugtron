@@ -52,11 +52,11 @@ const instanceInfo: Reducer<Dict<InstancePayload>> = (state = {}, action) => {
         },
       }
     }
-    case REMOVE_INSTANCE:
-      return {
-        ...state,
-        [action.payload.instanceId]: undefined,
-      }
+    case REMOVE_INSTANCE: {
+      const copy = { ...state }
+      delete copy[action.payload.instanceId]
+      return copy
+    }
     default:
       return state
   }
