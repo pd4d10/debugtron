@@ -116,7 +116,11 @@ export const App: React.FC = () => {
                           <a
                             href="#"
                             className="hoverable"
-                            style={{ display: 'block', padding: 8 }}
+                            style={{
+                              display: 'block',
+                              padding: 8,
+                              wordBreak: 'break-all',
+                            }}
                             onClick={e => {
                               e.preventDefault()
                               const win = new remote.BrowserWindow()

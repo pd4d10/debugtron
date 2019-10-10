@@ -96,7 +96,7 @@ async function isElectronApp(appPath: string) {
   }
 }
 
-async function getAppInfo(appPath: string): Promise<AppInfo> {
+export async function getAppInfo(appPath: string): Promise<AppInfo> {
   switch (process.platform) {
     case 'win32':
       const files = await fs.promises.readdir(appPath)
@@ -159,19 +159,9 @@ async function getExecutable(appPath: string) {
   }
 }
 
-export async function startDebugging(
-  payload: { id?: string; path?: string },
-  store: Store,
-) {
-  let app: AppInfo
-  if (payload.id) {
-    app = store.getState().appInfo[payload.id]
-  } else if (payload.path) {
-    app = await getAppInfo(payload.path)
-  } else {
-    throw new Error()
-  }
+const timers: Dict<NodeJS.Timeout> = {}
 
+export async function startDebugging(app: AppInfo, store: Store) {
   const { appPath } = app
 
   const executable =
@@ -202,14 +192,12 @@ export async function startDebugging(
     // Try to find listening port from log
     if (!nodePort) {
       const match = /Debugger listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
-      console.log(match, data)
       if (match) {
         nodePort = match[1]
       }
     }
     if (!windowPort) {
       const match = /DevTools listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
-      console.log(match, data)
       if (match) {
         windowPort = match[1]
       }
@@ -219,7 +207,7 @@ export async function startDebugging(
     if (!ready && nodePort && windowPort) {
       ready = true
 
-      setTimeout(async () => {
+      timers[instanceId] = setInterval(async () => {
         const payloads = await Promise.all(
           [nodePort, windowPort].map(port =>
             fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
@@ -237,7 +225,7 @@ export async function startDebugging(
           type: UPDATE_INSTANCE,
           payload: { instanceId, pages },
         })
-      }, 2000)
+      }, 3000)
     }
 
     // TODO: stderr colors
@@ -248,11 +236,18 @@ export async function startDebugging(
   })
 
   sp.on('close', code => {
-    console.log(`child process exited with code ${code}`)
+    // console.log(`child process exited with code ${code}`)
+    clearTimeout(timers[instanceId])
+    delete timers[instanceId]
+
     store.dispatch({
       type: REMOVE_INSTANCE,
       payload: { instanceId },
     })
+  })
+
+  sp.on('error', () => {
+    // TODO:
   })
 }
 

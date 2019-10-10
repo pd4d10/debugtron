@@ -3,8 +3,9 @@ import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { reducer, GET_APPS } from '../reducer'
-import { getElectronApps, startDebugging } from './utils'
+import { getElectronApps, startDebugging, getAppInfo } from './utils'
 import { setUpdater } from './updater'
+import { AppInfo } from '../types'
 
 const store = createStore(reducer, applyMiddleware(thunk, forwardToRenderer))
 replayActionMain(store)
@@ -65,6 +66,15 @@ app.on('activate', () => {
 ipcMain.on(
   'startDebugging',
   async (e: Electron.Event, payload: { id?: string; path?: string }) => {
-    startDebugging(payload, store)
+    let app: AppInfo
+    if (payload.id) {
+      app = store.getState().appInfo[payload.id]
+    } else if (payload.path) {
+      app = await getAppInfo(payload.path)
+    } else {
+      throw new Error()
+    }
+
+    startDebugging(app, store)
   },
 )

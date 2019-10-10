@@ -33,15 +33,12 @@ const instanceInfo: Reducer<Dict<InstancePayload>> = (state = {}, action) => {
         },
       }
     case UPDATE_INSTANCE: {
-      const { instanceId } = action.payload
+      const { instanceId, pages } = action.payload
       return {
         ...state,
         [instanceId]: {
           ...state[instanceId],
-          pages: {
-            ...state[instanceId].pages,
-            ...action.payload.pages,
-          },
+          pages,
         },
       }
     }
