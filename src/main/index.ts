@@ -98,19 +98,15 @@ app.on('activate', () => {
 ipcMain.on(
   'startDebugging',
   async (e: Electron.Event, payload: { id?: string; path?: string }) => {
-    try {
-      let app: AppInfo | undefined
-      if (payload.id) {
-        app = store.getState().appInfo[payload.id]
-      } else if (payload.path) {
-        app = await getAppInfo(payload.path)
-      }
+    let appInfo: AppInfo | undefined
+    if (payload.id) {
+      appInfo = store.getState().appInfo[payload.id]
+    } else if (payload.path) {
+      appInfo = await getAppInfo(payload.path)
+    }
 
-      if (app) {
-        startDebugging(app, store)
-      }
-    } catch (err) {
-      dialog.showErrorBox('Error', err.message)
+    if (appInfo) {
+      startDebugging(appInfo, store)
     }
   },
 )

@@ -14,6 +14,7 @@ import {
   removeInstance,
 } from '../reducers/instance'
 import { State } from '../reducers'
+import { dialog } from 'electron'
 
 export const readIcnsAsImageUri = async (file: string) => {
   let buf = await fs.promises.readFile(file)
@@ -158,6 +159,15 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
   const id = v4()
   store.dispatch(addInstance(id, app.id))
 
+  sp.on('error', err => {
+    dialog.showErrorBox(`Error: ${app.name}`, err.message)
+  })
+
+  sp.on('close', code => {
+    // console.log(`child process exited with code ${code}`)
+    store.dispatch(removeInstance(id))
+  })
+
   const handleStdout = (isError = false) => (chunk: Buffer) => {
     const data = chunk.toString()
     const instance = store.getState().instanceInfo[id]
@@ -180,17 +190,12 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
     store.dispatch(updateLog(id, data))
   }
 
-  sp.stdout.on('data', handleStdout())
-  sp.stderr.on('data', handleStdout(true))
-
-  sp.on('close', code => {
-    // console.log(`child process exited with code ${code}`)
-    store.dispatch(removeInstance(id))
-  })
-
-  sp.on('error', () => {
-    // TODO:
-  })
+  if (sp.stdout) {
+    sp.stdout.on('data', handleStdout())
+  }
+  if (sp.stderr) {
+    sp.stderr.on('data', handleStdout(true))
+  }
 }
 
 // Detect Electron apps
@@ -199,10 +204,10 @@ export async function getElectronApps() {
   const infos = [] as AppInfo[]
   for (let p of appPaths) {
     // TODO: parallel
-    console.log(p)
+    // console.log(p)
     const info = await getAppInfo(p)
     if (info) {
-      console.log(info.name)
+      // console.log(info.name)
       infos.push(info)
     }
   }
