@@ -66,14 +66,14 @@ const fetchPages = async () => {
 }
 
 app.on('ready', async () => {
-  if (process.env.NODE_ENV !== 'production') {
-    const installer = require('electron-devtools-installer')
-    await Promise.all(
-      ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
-        installer.default(installer[name]),
-      ),
-    )
-  }
+  // if (process.env.NODE_ENV !== 'production') {
+  //   const installer = require('electron-devtools-installer')
+  //   await Promise.all(
+  //     ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
+  //       installer.default(installer[name]),
+  //     ),
+  //   )
+  // }
 
   setUpdater()
   createWindow()
@@ -99,16 +99,16 @@ ipcMain.on(
   'startDebugging',
   async (e: Electron.Event, payload: { id?: string; path?: string }) => {
     try {
-      let app: AppInfo
+      let app: AppInfo | undefined
       if (payload.id) {
         app = store.getState().appInfo[payload.id]
       } else if (payload.path) {
         app = await getAppInfo(payload.path)
-      } else {
-        throw new Error()
       }
 
-      startDebugging(app, store)
+      if (app) {
+        startDebugging(app, store)
+      }
     } catch (err) {
       dialog.showErrorBox('Error', err.message)
     }

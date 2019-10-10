@@ -70,48 +70,56 @@ async function getPossibleAppPaths() {
   }
 }
 
-async function isElectronApp(appPath: string) {
+export async function getAppInfo(
+  appPath: string,
+): Promise<AppInfo | undefined> {
   switch (process.platform) {
     case 'win32': {
       try {
-        const dirs = await fs.promises.readdir(appPath)
-        const [dir] = dirs.filter(name => name.startsWith('app-'))
-        return (
-          dir &&
-          fs.existsSync(path.join(appPath, dir, 'resources/electron.asar'))
-        )
+        const files = await fs.promises.readdir(appPath)
+
+        const isElectronBased =
+          fs.existsSync(path.join(appPath, 'resources/electron.asar')) ||
+          files.some(dir => {
+            return fs.existsSync(
+              path.join(appPath, dir, 'resources/electron.asar'),
+            )
+          })
+
+        if (!isElectronBased) return
+
+        // TODO: The first one
+        const [exeFile] = files.filter(file => {
+          return (
+            file.endsWith('.exe') &&
+            !['uninstall', 'update'].some(keyword =>
+              file.toLowerCase().includes(keyword),
+            )
+          )
+        })
+        if (!exeFile) return
+
+        return {
+          id: v4(), // TODO: get app id from register
+          name: path.basename(exeFile, '.exe'),
+          icon: '', // TODO: icon
+          appPath,
+          exePath: path.resolve(appPath, exeFile),
+        }
       } catch (err) {
         // catch errors of readdir
         // 1. file: ENOTDIR: not a directory
         // 2. no permission at windows: EPERM: operation not permitted
         // console.error(err.message)
-        return false
+        return
       }
     }
-    case 'darwin':
-      return fs.existsSync(
+    case 'darwin': {
+      const isElectronBased = fs.existsSync(
         path.join(appPath, 'Contents/Frameworks/Electron Framework.framework'),
       )
-    default:
-      return false
-  }
-}
+      if (!isElectronBased) return
 
-export async function getAppInfo(appPath: string): Promise<AppInfo> {
-  switch (process.platform) {
-    case 'win32':
-      const files = await fs.promises.readdir(appPath)
-      const exeFiles = files.filter(
-        file => file.endsWith('.exe') && !file.startsWith('Uninstall'),
-      )
-      return {
-        id: v4(), // TODO: get app id from register
-        name: path.basename(appPath),
-        icon: '',
-        appPath,
-        exePath: exeFiles[0],
-      }
-    case 'darwin':
       const infoContent = await fs.promises.readFile(
         path.join(appPath, 'Contents/Info.plist'),
         { encoding: 'utf8' },
@@ -134,26 +142,10 @@ export async function getAppInfo(appPath: string): Promise<AppInfo> {
         appPath,
         exePath: path.resolve(
           appPath,
-          'Contents',
-          'MacOS',
+          'Contents/MacOS',
           info.CFBundleExecutable,
         ),
       }
-    default:
-      throw new Error('platform not supported: ' + process.platform)
-  }
-}
-
-async function getExecutable(appPath: string) {
-  switch (process.platform) {
-    case 'win32': {
-      const appName = path.basename(appPath)
-      return path.join(appPath, appName + '.exe')
-    }
-    case 'darwin': {
-      const exesDir = path.join(appPath, 'Contents/MacOS')
-      const [exe] = await fs.promises.readdir(exesDir)
-      return path.join(exesDir, exe)
     }
     default:
       throw new Error('platform not supported: ' + process.platform)
@@ -161,11 +153,7 @@ async function getExecutable(appPath: string) {
 }
 
 export async function startDebugging(app: AppInfo, store: Store<State>) {
-  const executable =
-    path.extname(app.appPath) === '.exe'
-      ? app.appPath
-      : await getExecutable(app.appPath)
-  const sp = spawn(executable, [`--inspect=0`, `--remote-debugging-port=0`])
+  const sp = spawn(app.exePath, [`--inspect=0`, `--remote-debugging-port=0`])
 
   const id = v4()
   store.dispatch(addInstance(id, app.id))
@@ -211,9 +199,9 @@ export async function getElectronApps() {
   const infos = [] as AppInfo[]
   for (let p of appPaths) {
     // TODO: parallel
-    if (await isElectronApp(p)) {
-      console.log(p)
-      const info = await getAppInfo(p)
+    console.log(p)
+    const info = await getAppInfo(p)
+    if (info) {
       console.log(info.name)
       infos.push(info)
     }
