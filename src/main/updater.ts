@@ -10,20 +10,22 @@ export async function setUpdater() {
     case 'darwin':
       try {
         const res = await fetch(
-          `https://update.electronjs.org/${pkg.repository}/darwin-x64/${
-            pkg.version
-          }`,
+          `https://update.electronjs.org/${pkg.repository}/darwin-x64/${pkg.version}`,
         )
         if (!res.ok) return
         const json = await res.json()
         if (json.name.slice(1) !== pkg.version) {
-          const res = await dialog.showMessageBox({
-            message: `New release: ${json.name}\n\n${json.notes}`,
-            buttons: ['Cancel', 'Download'],
-          })
-          if (res) {
-            shell.openExternal(json.url)
-          }
+          dialog.showMessageBox(
+            {
+              message: `New release: ${json.name}\n\n${json.notes}`,
+              buttons: ['Cancel', 'Download'],
+            },
+            res => {
+              if (res) {
+                shell.openExternal(json.url)
+              }
+            },
+          )
         }
       } catch (err) {
         console.error(err)
