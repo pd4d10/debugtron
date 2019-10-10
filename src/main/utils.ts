@@ -4,14 +4,15 @@ import path from 'path'
 import plist from 'plist'
 import { v4 } from 'uuid'
 import { spawn } from 'child_process'
-import fetch from 'node-fetch'
-import { PageInfo, AppInfo, Dict } from '../types'
+import { AppInfo, Dict } from '../types'
 import { Store } from 'redux'
 import {
   ADD_INSTANCE,
   UPDATE_LOG,
-  UPDATE_INSTANCE,
   REMOVE_INSTANCE,
+  State,
+  updateNodePort,
+  updateWindowPort,
 } from '../reducer'
 
 export const readIcnsAsImageUri = async (file: string) => {
@@ -159,16 +160,13 @@ async function getExecutable(appPath: string) {
   }
 }
 
-const timers: Dict<NodeJS.Timeout> = {}
-
-export async function startDebugging(app: AppInfo, store: Store) {
-  const { appPath } = app
-
+export async function startDebugging(app: AppInfo, store: Store<State>) {
   const executable =
-    path.extname(appPath) === '.exe' ? appPath : await getExecutable(appPath)
+    path.extname(app.appPath) === '.exe'
+      ? app.appPath
+      : await getExecutable(app.appPath)
   const sp = spawn(executable, [`--inspect=0`, `--remote-debugging-port=0`])
 
-  let ready = false
   const instanceId = v4()
 
   store.dispatch({
@@ -176,56 +174,22 @@ export async function startDebugging(app: AppInfo, store: Store) {
     payload: { appId: app.id, instanceId },
   })
 
-  let nodePort: string
-  let windowPort: string
-
-  sp.stdout.on('data', chunk => {
-    store.dispatch({
-      type: UPDATE_LOG,
-      payload: { instanceId, log: chunk.toString() },
-    })
-  })
-
-  sp.stderr.on('data', async chunk => {
+  const handleStdout = (isError = false) => (chunk: Buffer) => {
     const data = chunk.toString()
+    const instance = store.getState().instanceInfo[instanceId]
 
     // Try to find listening port from log
-    if (!nodePort) {
+    if (!instance.nodePort) {
       const match = /Debugger listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
       if (match) {
-        nodePort = match[1]
+        store.dispatch(updateNodePort(instanceId, match[1]))
       }
     }
-    if (!windowPort) {
+    if (!instance.windowPort) {
       const match = /DevTools listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
       if (match) {
-        windowPort = match[1]
+        store.dispatch(updateWindowPort(instanceId, match[1]))
       }
-    }
-
-    // Ensure debugger port is already listening
-    if (!ready && nodePort && windowPort) {
-      ready = true
-
-      timers[instanceId] = setInterval(async () => {
-        const payloads = await Promise.all(
-          [nodePort, windowPort].map(port =>
-            fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
-          ),
-        )
-        const pages = (payloads.flat() as PageInfo[]).reduce(
-          (a, b) => {
-            a[b.id] = b
-            return a
-          },
-          {} as Dict<PageInfo>,
-        )
-
-        store.dispatch({
-          type: UPDATE_INSTANCE,
-          payload: { instanceId, pages },
-        })
-      }, 3000)
     }
 
     // TODO: stderr colors
@@ -233,12 +197,13 @@ export async function startDebugging(app: AppInfo, store: Store) {
       type: UPDATE_LOG,
       payload: { instanceId, log: data },
     })
-  })
+  }
+
+  sp.stdout.on('data', handleStdout())
+  sp.stderr.on('data', handleStdout(true))
 
   sp.on('close', code => {
     // console.log(`child process exited with code ${code}`)
-    clearTimeout(timers[instanceId])
-    delete timers[instanceId]
 
     store.dispatch({
       type: REMOVE_INSTANCE,

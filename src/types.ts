@@ -1,3 +1,5 @@
+export type Dict<T> = { [key: string]: T }
+
 export interface PageInfo {
   description: string
   devtoolsFrontendUrl: string
@@ -19,6 +21,6 @@ export interface InstancePayload {
   appId: string
   pages: Dict<PageInfo>
   log: string
+  nodePort: string
+  windowPort: string
 }
-
-export type Dict<T> = { [key: string]: T }
