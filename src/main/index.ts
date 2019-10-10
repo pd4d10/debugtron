@@ -2,11 +2,9 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-
 import { reducer, GET_APPS } from '../reducer'
 import { getElectronApps, startDebugging } from './utils'
-
-require('update-electron-app')()
+import { setUpdater } from './updater'
 
 const store = createStore(reducer, applyMiddleware(thunk, forwardToRenderer))
 replayActionMain(store)
@@ -45,6 +43,7 @@ app.on('ready', async () => {
     )
   }
 
+  setUpdater()
   createWindow()
 
   const apps = await getElectronApps()
