@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
 import { useDropzone } from 'react-dropzone'
-import { Tabs, Tab, Divider, Pre } from '@blueprintjs/core'
+import { Tabs, Tab, Divider, Pre, Tag } from '@blueprintjs/core'
 import path from 'path'
 import './app.css'
 import { useSelector, useDispatch } from 'react-redux'
@@ -56,7 +56,7 @@ export const App: React.FC = () => {
                 ipcRenderer.send('startDebugging', { id: app.id })
               }}
               style={{ padding: 4, textAlign: 'center', width: 100 }}
-              className="app-icon"
+              className="hoverable"
             >
               <img
                 src={app.icon || require('./images/electron.png')}
@@ -115,6 +115,8 @@ export const App: React.FC = () => {
                         <div key={id}>
                           <a
                             href="#"
+                            className="hoverable"
+                            style={{ display: 'block', padding: 8 }}
                             onClick={e => {
                               e.preventDefault()
                               const win = new remote.BrowserWindow()
@@ -126,6 +128,17 @@ export const App: React.FC = () => {
                               )
                             }}
                           >
+                            <Tag
+                              intent={
+                                page.type === 'node'
+                                  ? 'success'
+                                  : page.type === 'page'
+                                  ? 'primary'
+                                  : 'none'
+                              }
+                            >
+                              {page.type}
+                            </Tag>{' '}
                             {page.title}
                           </a>
                         </div>

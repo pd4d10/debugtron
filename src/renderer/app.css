@@ -3,6 +3,6 @@ body {
   user-select: none;
 }
 
-.app-icon:hover {
+.hoverable:hover {
   background-color: #eeeeee;
 }
