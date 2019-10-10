@@ -14,18 +14,6 @@ import {
   REMOVE_INSTANCE,
 } from '../reducer'
 
-export class PortPool {
-  initialPort = 10000
-
-  getPort() {
-    // TODO: test port available
-    this.initialPort++
-    return this.initialPort
-  }
-}
-
-const portPool = new PortPool()
-
 export const readIcnsAsImageUri = async (file: string) => {
   let buf = await fs.promises.readFile(file)
   const totalSize = buf.readInt32BE(4) - 8
@@ -185,17 +173,12 @@ export async function startDebugging(
   }
 
   const { appPath } = app
-  const nodePort = portPool.getPort()
-  const windowPort = portPool.getPort()
 
   const executable =
     path.extname(appPath) === '.exe' ? appPath : await getExecutable(appPath)
-  const sp = spawn(executable, [
-    `--inspect=${nodePort}`,
-    `--remote-debugging-port=${windowPort}`,
-  ])
+  const sp = spawn(executable, [`--inspect=0`, `--remote-debugging-port=0`])
 
-  let fetched = false
+  let ready = false
   const instanceId = v4()
 
   store.dispatch({
@@ -203,34 +186,61 @@ export async function startDebugging(
     payload: { appId: app.id, instanceId },
   })
 
-  sp.stdout.on('data', data => {
+  let nodePort: string
+  let windowPort: string
+
+  sp.stdout.on('data', chunk => {
     store.dispatch({
       type: UPDATE_LOG,
-      payload: { instanceId, log: data },
+      payload: { instanceId, log: chunk.toString() },
     })
   })
 
-  sp.stderr.on('data', async data => {
-    // waiting for stderr output to ensure debugger port is already listening
-    if (!fetched) {
-      fetched = true
+  sp.stderr.on('data', async chunk => {
+    const data = chunk.toString()
 
-      // Window port is not ready, use a timeout
+    // Try to find listening port from log
+    if (!nodePort) {
+      const match = /Debugger listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
+      console.log(match, data)
+      if (match) {
+        nodePort = match[1]
+      }
+    }
+    if (!windowPort) {
+      const match = /DevTools listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
+      console.log(match, data)
+      if (match) {
+        windowPort = match[1]
+      }
+    }
+
+    // Ensure debugger port is already listening
+    if (!ready && nodePort && windowPort) {
+      ready = true
+
       setTimeout(async () => {
-        const [json0, json1] = (await Promise.all(
+        const payloads = await Promise.all(
           [nodePort, windowPort].map(port =>
             fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
           ),
-        )) as [PageInfo[], PageInfo[]]
+        )
+        const pages = (payloads.flat() as PageInfo[]).reduce(
+          (a, b) => {
+            a[b.id] = b
+            return a
+          },
+          {} as Dict<PageInfo>,
+        )
 
         store.dispatch({
           type: UPDATE_INSTANCE,
-          payload: { instanceId, pages: [...json0, ...json1] },
+          payload: { instanceId, pages },
         })
-      }, 500)
+      }, 2000)
     }
 
-    // TODO: stderr
+    // TODO: stderr colors
     store.dispatch({
       type: UPDATE_LOG,
       payload: { instanceId, log: data },

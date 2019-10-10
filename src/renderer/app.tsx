@@ -111,8 +111,8 @@ export const App: React.FC = () => {
                   <div style={{ display: 'flex', marginTop: -20 }}>
                     <div style={{ flexBasis: 200, flexShrink: 0 }}>
                       <h3>Sessions (Click to open)</h3>
-                      {instance.pages.map(page => (
-                        <div key={page.id}>
+                      {Object.entries(instance.pages).map(([id, page]) => (
+                        <div key={id}>
                           <a
                             href="#"
                             onClick={e => {

@@ -28,17 +28,21 @@ const instanceInfo: Reducer<Dict<InstancePayload>> = (state = {}, action) => {
         ...state,
         [action.payload.instanceId]: {
           appId: action.payload.appId,
-          pages: [],
+          pages: {},
           log: '',
         },
       }
     case UPDATE_INSTANCE: {
       const { instanceId } = action.payload
+      console.log(action.payload)
       return {
         ...state,
         [instanceId]: {
           ...state[instanceId],
-          pages: action.payload.pages,
+          pages: {
+            ...state[instanceId].pages,
+            ...action.payload.pages,
+          },
         },
       }
     }

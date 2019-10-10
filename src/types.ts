@@ -17,7 +17,7 @@ export interface AppInfo {
 
 export interface InstancePayload {
   appId: string
-  pages: PageInfo[]
+  pages: Dict<PageInfo>
   log: string
 }
 
