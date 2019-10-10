@@ -100,10 +100,18 @@ export async function getAppInfo(
         })
         if (!exeFile) return
 
+        let icon = ''
+        if (fs.existsSync(path.resolve(appPath, 'app.ico'))) {
+          const iconBuffer = await fs.promises.readFile(
+            path.resolve(appPath, 'app.ico'),
+          )
+          icon = 'data:image/x-icon;base64,' + iconBuffer.toString('base64')
+        }
+
         return {
           id: v4(), // TODO: get app id from register
           name: path.basename(exeFile, '.exe'),
-          icon: '', // TODO: icon
+          icon,
           appPath,
           exePath: path.resolve(appPath, exeFile),
         }
