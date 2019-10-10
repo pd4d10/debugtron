@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { App } from './app'
-import { reducer } from '../reducer'
+import reducers from '../reducers'
 import { createStore, applyMiddleware, compose } from 'redux'
 import {
   forwardToMain,
@@ -19,7 +19,7 @@ const composeEnhancers =
 
 const initialState = getInitialStateRenderer()
 const store = createStore(
-  reducer,
+  reducers,
   initialState,
   composeEnhancers(applyMiddleware(forwardToMain, thunk)),
 )

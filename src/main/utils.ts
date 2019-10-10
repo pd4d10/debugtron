@@ -7,13 +7,13 @@ import { spawn } from 'child_process'
 import { AppInfo, Dict } from '../types'
 import { Store } from 'redux'
 import {
-  ADD_INSTANCE,
-  UPDATE_LOG,
-  REMOVE_INSTANCE,
-  State,
   updateNodePort,
   updateWindowPort,
-} from '../reducer'
+  addInstance,
+  updateLog,
+  removeInstance,
+} from '../reducers/instance'
+import { State } from '../reducers'
 
 export const readIcnsAsImageUri = async (file: string) => {
   let buf = await fs.promises.readFile(file)
@@ -167,36 +167,29 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
       : await getExecutable(app.appPath)
   const sp = spawn(executable, [`--inspect=0`, `--remote-debugging-port=0`])
 
-  const instanceId = v4()
-
-  store.dispatch({
-    type: ADD_INSTANCE,
-    payload: { appId: app.id, instanceId },
-  })
+  const id = v4()
+  store.dispatch(addInstance(id, app.id))
 
   const handleStdout = (isError = false) => (chunk: Buffer) => {
     const data = chunk.toString()
-    const instance = store.getState().instanceInfo[instanceId]
+    const instance = store.getState().instanceInfo[id]
 
     // Try to find listening port from log
     if (!instance.nodePort) {
       const match = /Debugger listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
       if (match) {
-        store.dispatch(updateNodePort(instanceId, match[1]))
+        store.dispatch(updateNodePort(id, match[1]))
       }
     }
     if (!instance.windowPort) {
       const match = /DevTools listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
       if (match) {
-        store.dispatch(updateWindowPort(instanceId, match[1]))
+        store.dispatch(updateWindowPort(id, match[1]))
       }
     }
 
     // TODO: stderr colors
-    store.dispatch({
-      type: UPDATE_LOG,
-      payload: { instanceId, log: data },
-    })
+    store.dispatch(updateLog(id, data))
   }
 
   sp.stdout.on('data', handleStdout())
@@ -204,11 +197,7 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
 
   sp.on('close', code => {
     // console.log(`child process exited with code ${code}`)
-
-    store.dispatch({
-      type: REMOVE_INSTANCE,
-      payload: { instanceId },
-    })
+    store.dispatch(removeInstance(id))
   })
 
   sp.on('error', () => {

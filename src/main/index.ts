@@ -2,13 +2,15 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import { reducer, GET_APPS, UPDATE_INSTANCE } from '../reducer'
+import { updatePages } from '../reducers/instance'
 import { getElectronApps, startDebugging, getAppInfo } from './utils'
 import { setUpdater } from './updater'
 import { AppInfo, PageInfo, Dict } from '../types'
 import fetch from 'node-fetch'
+import { getApps } from '../reducers/app'
+import reducers from '../reducers'
 
-const store = createStore(reducer, applyMiddleware(thunk, forwardToRenderer))
+const store = createStore(reducers, applyMiddleware(thunk, forwardToRenderer))
 replayActionMain(store)
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -28,7 +30,7 @@ const createWindow = () => {
   })
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -59,10 +61,7 @@ const fetchPages = async () => {
       {} as Dict<PageInfo>,
     )
 
-    store.dispatch({
-      type: UPDATE_INSTANCE,
-      payload: { instanceId: id, pages: pageDict },
-    })
+    store.dispatch(updatePages(id, pageDict))
   }
 }
 
@@ -81,7 +80,7 @@ app.on('ready', async () => {
   setInterval(fetchPages, 3000)
 
   const apps = await getElectronApps()
-  store.dispatch({ type: GET_APPS, payload: apps })
+  store.dispatch(getApps(apps))
 })
 
 app.on('window-all-closed', () => {

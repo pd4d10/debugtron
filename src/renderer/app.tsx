@@ -5,12 +5,12 @@ import { Tabs, Tab, Divider, Pre, Tag } from '@blueprintjs/core'
 import path from 'path'
 import './app.css'
 import { useSelector, useDispatch } from 'react-redux'
-import { State } from '../reducer'
+import { State } from '../reducers'
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
   const { appInfo, instanceInfo } = useSelector<State, State>(s => s)
-  const dispath = useDispatch()
+  // const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     onDrop(files) {
