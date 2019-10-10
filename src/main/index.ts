@@ -1,13 +1,13 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { updatePages } from '../reducers/instance'
-import { getElectronApps, startDebugging, getAppInfo } from './utils'
+import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
 import { setUpdater } from './updater'
 import { AppInfo, PageInfo, Dict } from '../types'
 import fetch from 'node-fetch'
-import { getApps } from '../reducers/app'
+import { getApps, addTempApp } from '../reducers/app'
 import reducers from '../reducers'
 
 const store = createStore(reducers, applyMiddleware(thunk, forwardToRenderer))
@@ -98,15 +98,19 @@ app.on('activate', () => {
 ipcMain.on(
   'startDebugging',
   async (e: Electron.Event, payload: { id?: string; path?: string }) => {
-    let appInfo: AppInfo | undefined
     if (payload.id) {
-      appInfo = store.getState().appInfo[payload.id]
-    } else if (payload.path) {
-      appInfo = await getAppInfo(payload.path)
-    }
+      const appInfo = store.getState().appInfo[payload.id]
 
-    if (appInfo) {
-      startDebugging(appInfo, store)
+      if (appInfo) {
+        startDebugging(appInfo, store)
+      }
+    } else if (payload.path) {
+      const appInfo = await getAppInfoByDnd(payload.path)
+
+      if (appInfo) {
+        store.dispatch(addTempApp(appInfo))
+        startDebugging(appInfo, store)
+      }
     }
   },
 )

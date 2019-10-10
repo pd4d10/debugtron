@@ -2,11 +2,21 @@ import { Reducer } from 'redux'
 import { AppInfo, Dict } from '../types'
 
 const GET_APPS = 'GET_APPS'
+const ADD_TEMP_APP = 'ADD_TEMP_APP'
 
 export const appInfo: Reducer<Dict<AppInfo>> = (state = {}, action) => {
+  const { payload } = action
   switch (action.type) {
     case GET_APPS:
-      return action.payload
+      return payload
+    case ADD_TEMP_APP:
+      return {
+        ...state,
+        [payload.id]: {
+          ...payload,
+          hidden: true,
+        },
+      }
     default:
       return state
   }
@@ -15,4 +25,9 @@ export const appInfo: Reducer<Dict<AppInfo>> = (state = {}, action) => {
 export const getApps = (apps: Dict<AppInfo>) => ({
   type: GET_APPS,
   payload: apps,
+})
+
+export const addTempApp = (app: AppInfo) => ({
+  type: ADD_TEMP_APP,
+  payload: app,
 })

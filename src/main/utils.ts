@@ -71,6 +71,27 @@ async function getPossibleAppPaths() {
   }
 }
 
+// win: exe path
+// macOS: application path
+export async function getAppInfoByDnd(p: string): Promise<AppInfo | undefined> {
+  switch (process.platform) {
+    case 'win32':
+      if (path.extname(p).toLowerCase() != '.exe') return
+
+      return {
+        id: v4(), // TODO: get app id from register
+        name: path.basename(p, '.exe'),
+        icon: '',
+        appPath: '',
+        exePath: p,
+      }
+    case 'darwin':
+      return getAppInfo(p)
+    default:
+      return
+  }
+}
+
 export async function getAppInfo(
   appPath: string,
 ): Promise<AppInfo | undefined> {
@@ -174,6 +195,7 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
   sp.on('close', code => {
     // console.log(`child process exited with code ${code}`)
     store.dispatch(removeInstance(id))
+    // TODO: Remove temp app
   })
 
   const handleStdout = (isError = false) => (chunk: Buffer) => {

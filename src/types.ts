@@ -15,6 +15,7 @@ export interface AppInfo {
   icon: string
   appPath: string
   exePath: string
+  hidden?: boolean
 }
 
 export interface InstancePayload {

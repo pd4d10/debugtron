@@ -14,13 +14,11 @@ export const App: React.FC = () => {
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     onDrop(files) {
+      if (files.length === 0) return
       // Find shortest path
       const [file] = files.sort((a, b) => a.path.length - b.path.length)
-      if (!file) return
 
-      ipcRenderer.send('startDebugging', {
-        path: path.dirname(path.dirname(file.path)),
-      })
+      ipcRenderer.send('startDebugging', { path: file.path })
     },
   })
 
@@ -34,6 +32,7 @@ export const App: React.FC = () => {
   }, [activeId, instanceInfo])
 
   const instanceEntries = Object.entries(instanceInfo)
+  console.log(appInfo, instanceInfo)
 
   return (
     <div
@@ -47,24 +46,28 @@ export const App: React.FC = () => {
       <h3>Installed Electron-based App (Click to debug)</h3>
       <div style={{ display: 'flex' }}>
         <div style={{ display: 'flex', flexGrow: 1, overflowX: 'auto' }}>
-          {Object.entries(appInfo).map(([id, app]) => (
-            <a
-              key={id}
-              href="#"
-              onClick={e => {
-                e.preventDefault()
-                ipcRenderer.send('startDebugging', { id: app.id })
-              }}
-              style={{ padding: 4, textAlign: 'center', width: 100 }}
-              className="hoverable"
-            >
-              <img
-                src={app.icon || require('./images/electron.png')}
-                style={{ width: 64, height: 64 }}
-              />
-              <div>{app.name}</div>
-            </a>
-          ))}
+          {Object.entries(appInfo).map(([id, app]) => {
+            if (app.hidden) return null
+
+            return (
+              <a
+                key={id}
+                href="#"
+                onClick={e => {
+                  e.preventDefault()
+                  ipcRenderer.send('startDebugging', { id: app.id })
+                }}
+                style={{ padding: 4, textAlign: 'center', width: 100 }}
+                className="hoverable"
+              >
+                <img
+                  src={app.icon || require('./images/electron.png')}
+                  style={{ width: 64, height: 64 }}
+                />
+                <div style={{ wordBreak: 'break-word' }}>{app.name}</div>
+              </a>
+            )
+          })}
         </div>
         <Divider />
         <div
