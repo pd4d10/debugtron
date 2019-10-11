@@ -3,6 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <title>Debugtron</title>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-145047249-4"
+    ></script>
+    <script>
+      if (require('electron').remote.app.isPackaged) {
+        window.dataLayer = window.dataLayer || []
+        function gtag() {
+          dataLayer.push(arguments)
+        }
+        gtag('js', new Date())
+        gtag('config', 'UA-145047249-4')
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
