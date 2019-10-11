@@ -2,7 +2,7 @@ import os from 'os'
 import fetch from 'node-fetch'
 import { dialog, shell } from 'electron'
 
-const pkg = require('../../package.json')
+export const pkg = require('../../package.json')
 
 export async function setUpdater() {
   switch (os.platform()) {
