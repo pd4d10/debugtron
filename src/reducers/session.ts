@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import { Dict, InstancePayload, PageInfo } from '../types'
+import { Dict, SessionInfo, PageInfo } from '../types'
 
 const ADD_INSTANCE = 'ADD_INSTANCE'
 const UPDATE_PAGES = 'UPDATE_PAGES'
@@ -8,10 +8,7 @@ const REMOVE_INSTANCE = 'REMOVE_INSTANCE'
 const UPDATE_NODE_PORT = 'UPDATE_NODE_PORT'
 const UPDATE_WINDOW_PORT = 'UPDATE_WINDOW_PORT'
 
-export const instanceInfo: Reducer<Dict<InstancePayload>> = (
-  state = {},
-  action,
-) => {
+export const sessionInfo: Reducer<Dict<SessionInfo>> = (state = {}, action) => {
   const { payload } = action
 
   switch (action.type) {

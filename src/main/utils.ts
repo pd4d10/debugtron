@@ -12,7 +12,7 @@ import {
   addInstance,
   updateLog,
   removeInstance,
-} from '../reducers/instance'
+} from '../reducers/session'
 import { State } from '../reducers'
 import { dialog } from 'electron'
 
@@ -200,7 +200,7 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
 
   const handleStdout = (isError = false) => (chunk: Buffer) => {
     const data = chunk.toString()
-    const instance = store.getState().instanceInfo[id]
+    const instance = store.getState().sessionInfo[id]
 
     // Try to find listening port from log
     if (!instance.nodePort) {

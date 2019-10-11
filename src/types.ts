@@ -18,7 +18,7 @@ export interface AppInfo {
   hidden?: boolean
 }
 
-export interface InstancePayload {
+export interface SessionInfo {
   appId: string
   pages: Dict<PageInfo>
   log: string

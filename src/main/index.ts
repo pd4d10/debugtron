@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import { updatePages } from '../reducers/instance'
+import { updatePages } from '../reducers/session'
 import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
 import { setUpdater, pkg } from './updater'
 import { PageInfo, Dict } from '../types'
@@ -40,11 +40,11 @@ const createWindow = () => {
 }
 
 const fetchPages = async () => {
-  const { instanceInfo } = store.getState()
-  for (let [id, instance] of Object.entries(instanceInfo)) {
+  const { sessionInfo } = store.getState()
+  for (let [id, info] of Object.entries(sessionInfo)) {
     const ports: string[] = []
-    if (instance.nodePort) ports.push(instance.nodePort)
-    if (instance.windowPort) ports.push(instance.windowPort)
+    if (info.nodePort) ports.push(info.nodePort)
+    if (info.windowPort) ports.push(info.windowPort)
 
     const payloads = await Promise.all(
       ports.map(port =>

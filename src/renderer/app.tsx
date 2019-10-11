@@ -8,7 +8,7 @@ import './app.css'
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
-  const { appInfo, instanceInfo } = useSelector<State, State>(s => s)
+  const { appInfo, sessionInfo } = useSelector<State, State>(s => s)
   // const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     // accept: process.platform === 'win32' ? 'exe' : undefined,
@@ -22,15 +22,15 @@ export const App: React.FC = () => {
   })
 
   useEffect(() => {
-    const instanceIds = Object.keys(instanceInfo)
+    const instanceIds = Object.keys(sessionInfo)
 
     // Ensure there always be one tab active
     if (!instanceIds.includes(activeId) && instanceIds.length) {
       setActiveId(instanceIds[0])
     }
-  }, [activeId, instanceInfo])
+  }, [activeId, sessionInfo])
 
-  const instanceEntries = Object.entries(instanceInfo)
+  const sessionEntries = Object.entries(sessionInfo)
   // console.log(appInfo, instanceInfo)
 
   return (
@@ -98,14 +98,14 @@ export const App: React.FC = () => {
       <Divider />
 
       <div style={{ overflowY: 'auto' }}>
-        {instanceEntries.length ? (
+        {sessionEntries.length ? (
           <Tabs
             selectedTabId={activeId}
             onChange={key => {
               setActiveId(key as string)
             }}
           >
-            {instanceEntries.map(([id, instance]) => (
+            {sessionEntries.map(([id, instance]) => (
               <Tab
                 id={id}
                 key={id}

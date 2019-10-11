@@ -1,14 +1,14 @@
 import { combineReducers } from 'redux'
-import { AppInfo, Dict, InstancePayload } from '../types'
+import { AppInfo, Dict, SessionInfo } from '../types'
 import { appInfo } from './app'
-import { instanceInfo } from './instance'
+import { sessionInfo } from './session'
 
 export interface State {
   appInfo: Dict<AppInfo>
-  instanceInfo: Dict<InstancePayload>
+  sessionInfo: Dict<SessionInfo>
 }
 
 export default combineReducers({
   appInfo,
-  instanceInfo,
+  sessionInfo,
 })
