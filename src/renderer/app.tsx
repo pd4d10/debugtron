@@ -2,17 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
 import { useDropzone } from 'react-dropzone'
 import { Tabs, Tab, Divider, Pre, Tag } from '@blueprintjs/core'
-import path from 'path'
-import './app.css'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { State } from '../reducers'
+import './app.css'
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
   const { appInfo, instanceInfo } = useSelector<State, State>(s => s)
   // const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    noClick: true,
+    // accept: process.platform === 'win32' ? 'exe' : undefined,
     onDrop(files) {
       if (files.length === 0) return
       // Find shortest path
@@ -32,7 +31,7 @@ export const App: React.FC = () => {
   }, [activeId, instanceInfo])
 
   const instanceEntries = Object.entries(instanceInfo)
-  console.log(appInfo, instanceInfo)
+  // console.log(appInfo, instanceInfo)
 
   return (
     <div
@@ -85,6 +84,7 @@ export const App: React.FC = () => {
               display: 'flex',
               marginTop: 10,
               marginBottom: 10,
+              cursor: 'pointer',
             },
           })}
         >
