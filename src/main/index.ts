@@ -5,7 +5,7 @@ import thunk from 'redux-thunk'
 import { updatePages } from '../reducers/instance'
 import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
 import { setUpdater } from './updater'
-import { AppInfo, PageInfo, Dict } from '../types'
+import { PageInfo, Dict } from '../types'
 import fetch from 'node-fetch'
 import { getApps, addTempApp } from '../reducers/app'
 import reducers from '../reducers'
@@ -66,6 +66,7 @@ const fetchPages = async () => {
 }
 
 app.on('ready', async () => {
+  // TODO: Uncomment after https://github.com/MarshallOfSound/electron-devtools-installer/pull/92 merged
   // if (process.env.NODE_ENV !== 'production') {
   //   const installer = require('electron-devtools-installer')
   //   await Promise.all(
@@ -98,18 +99,27 @@ app.on('activate', () => {
 ipcMain.on(
   'startDebugging',
   async (e: Electron.Event, payload: { id?: string; path?: string }) => {
+    const { appInfo } = store.getState()
     if (payload.id) {
-      const appInfo = store.getState().appInfo[payload.id]
+      const current = appInfo[payload.id]
 
-      if (appInfo) {
-        startDebugging(appInfo, store)
+      if (current) {
+        startDebugging(current, store)
       }
     } else if (payload.path) {
-      const appInfo = await getAppInfoByDnd(payload.path)
+      const current = await getAppInfoByDnd(payload.path)
 
-      if (appInfo) {
-        store.dispatch(addTempApp(appInfo))
-        startDebugging(appInfo, store)
+      if (current) {
+        const { exePath } = current
+        const duplicated = Object.values(appInfo).find(
+          a => a.exePath === exePath,
+        )
+        if (duplicated) {
+          startDebugging(duplicated, store)
+        } else {
+          store.dispatch(addTempApp(current))
+          startDebugging(current, store)
+        }
       }
     }
   },
