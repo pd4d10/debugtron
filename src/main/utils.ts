@@ -156,7 +156,7 @@ export async function getAppInfo(
       )
       const info = plist.parse(infoContent) as {
         CFBundleIdentifier: string
-        CFBundleDisplayName: string
+        CFBundleName: string
         CFBundleExecutable: string
         CFBundleIconFile: string
       }
@@ -167,7 +167,7 @@ export async function getAppInfo(
 
       return {
         id: info.CFBundleIdentifier,
-        name: info.CFBundleDisplayName,
+        name: info.CFBundleName,
         icon,
         appPath,
         exePath: path.resolve(
