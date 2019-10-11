@@ -65,62 +65,75 @@ const fetchPages = async () => {
   }
 }
 
-app.on('ready', async () => {
-  // TODO: Uncomment after https://github.com/MarshallOfSound/electron-devtools-installer/pull/92 merged
-  // if (process.env.NODE_ENV !== 'production') {
-  //   const installer = require('electron-devtools-installer')
-  //   await Promise.all(
-  //     ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
-  //       installer.default(installer[name]),
-  //     ),
-  //   )
-  // }
+const gotTheLock = app.requestSingleInstanceLock()
 
-  setUpdater()
-  createWindow()
-  setInterval(fetchPages, 3000)
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
 
-  const apps = await getElectronApps()
-  store.dispatch(getApps(apps))
-})
+  app.on('ready', async () => {
+    // TODO: Uncomment after https://github.com/MarshallOfSound/electron-devtools-installer/pull/92 merged
+    // if (process.env.NODE_ENV !== 'production') {
+    //   const installer = require('electron-devtools-installer')
+    //   await Promise.all(
+    //     ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
+    //       installer.default(installer[name]),
+    //     ),
+    //   )
+    // }
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-app.on('activate', () => {
-  if (mainWindow === null) {
+    setUpdater()
     createWindow()
-  }
-})
+    setInterval(fetchPages, 3000)
 
-ipcMain.on(
-  'startDebugging',
-  async (e: Electron.Event, payload: { id?: string; path?: string }) => {
-    const { appInfo } = store.getState()
-    if (payload.id) {
-      const current = appInfo[payload.id]
+    const apps = await getElectronApps()
+    store.dispatch(getApps(apps))
+  })
 
-      if (current) {
-        startDebugging(current, store)
-      }
-    } else if (payload.path) {
-      const current = await getAppInfoByDnd(payload.path)
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
 
-      if (current) {
-        const { exePath } = current
-        const duplicated = Object.values(appInfo).find(
-          a => a.exePath === exePath,
-        )
-        if (duplicated) {
-          startDebugging(duplicated, store)
-        } else {
-          store.dispatch(addTempApp(current))
+  app.on('activate', () => {
+    if (mainWindow === null) {
+      createWindow()
+    }
+  })
+
+  ipcMain.on(
+    'startDebugging',
+    async (e: Electron.Event, payload: { id?: string; path?: string }) => {
+      const { appInfo } = store.getState()
+      if (payload.id) {
+        const current = appInfo[payload.id]
+
+        if (current) {
           startDebugging(current, store)
         }
+      } else if (payload.path) {
+        const current = await getAppInfoByDnd(payload.path)
+
+        if (current) {
+          const { exePath } = current
+          const duplicated = Object.values(appInfo).find(
+            a => a.exePath === exePath,
+          )
+          if (duplicated) {
+            startDebugging(duplicated, store)
+          } else {
+            store.dispatch(addTempApp(current))
+            startDebugging(current, store)
+          }
+        }
       }
-    }
-  },
-)
+    },
+  )
+}
