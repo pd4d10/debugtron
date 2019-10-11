@@ -1,37 +1,12 @@
-# Debugtron [![npm](https://img.shields.io/npm/v/debugtron.svg)](https://www.npmjs.com/package/debugtron)
+# Debugtron
 
-Debugtron is a command line tool to debug Electron based app.
+Debugtron is an app to debug in-production Electron based app. It is also built with Electron.
 
-<img src="https://raw.githubusercontent.com/bytedance/debugtron/dee6ed71af2851a8cb696e2f4180925584954f35/assets/demo.gif" width="800" />
+![Screenshot](assets/0.png)
 
 ## Installation
 
-```sh
-npm install -g debugtron
-```
-
-You can also run `npx debugtron` to use it directly.
-
-## Usage
-
-```sh
-debugtron
-```
-
-This command will list all possible Electron based apps installed, then you can select which app to debug.
-
-If you want to debug specific app, run
-
-```sh
-debugtron [appPath]
-```
-
-For example:
-
-```sh
-debugtron /Application/Slack.app           # macOS
-debugtron ~/AppData/Local/slack/slack.exe  # windows
-```
+Installation binaries are available at [release page](https://github.com/bytedance/debugtron/releases).
 
 ## License
 
