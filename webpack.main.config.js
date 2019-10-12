@@ -1,3 +1,5 @@
+const { DefinePlugin } = require('webpack')
+
 module.exports = {
   /**
    * This is the main entry point for your application, it's the first file
@@ -12,8 +14,10 @@ module.exports = {
     extensions: ['.js', '.ts', '.tsx'],
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env.DEBUGTRON_GITHUB_TOKEN': process.env.DEBUGTRON_GITHUB_TOKEN,
+    new DefinePlugin({
+      DEBUGTRON_GITHUB_TOKEN: JSON.stringify(
+        process.env.DEBUGTRON_GITHUB_TOKEN,
+      ),
     }),
   ],
 }

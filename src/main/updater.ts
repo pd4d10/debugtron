@@ -9,7 +9,7 @@ export async function setUpdater() {
     // TODO: macOS: Make code sign work then use update-electron-app
     default:
       setUpdateNotification({
-        token: process.env.DEBUGTRON_GITHUB_TOKEN,
+        token: DEBUGTRON_GITHUB_TOKEN,
       })
   }
 }
