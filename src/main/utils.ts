@@ -9,9 +9,9 @@ import { Store } from 'redux'
 import {
   updateNodePort,
   updateWindowPort,
-  addInstance,
+  addSession,
   updateLog,
-  removeInstance,
+  removeSession,
 } from '../reducers/session'
 import { State } from '../reducers'
 import { dialog } from 'electron'
@@ -186,7 +186,7 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
   const sp = spawn(app.exePath, [`--inspect=0`, `--remote-debugging-port=0`])
 
   const id = v4()
-  store.dispatch(addInstance(id, app.id))
+  store.dispatch(addSession(id, app.id))
 
   sp.on('error', err => {
     dialog.showErrorBox(`Error: ${app.name}`, err.message)
@@ -194,22 +194,22 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
 
   sp.on('close', code => {
     // console.log(`child process exited with code ${code}`)
-    store.dispatch(removeInstance(id))
+    store.dispatch(removeSession(id))
     // TODO: Remove temp app
   })
 
   const handleStdout = (isError = false) => (chunk: Buffer) => {
     const data = chunk.toString()
-    const instance = store.getState().sessionInfo[id]
+    const session = store.getState().sessionInfo[id]
 
     // Try to find listening port from log
-    if (!instance.nodePort) {
+    if (!session.nodePort) {
       const match = /Debugger listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
       if (match) {
         store.dispatch(updateNodePort(id, match[1]))
       }
     }
-    if (!instance.windowPort) {
+    if (!session.windowPort) {
       const match = /DevTools listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
       if (match) {
         store.dispatch(updateWindowPort(id, match[1]))

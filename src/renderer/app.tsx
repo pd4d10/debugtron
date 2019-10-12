@@ -12,7 +12,8 @@ export const App: React.FC = () => {
   // const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: process.platform === 'win32' ? '.exe' : undefined,
-    noClick: process.platform !== 'win32', // Only allow win32 for selecting exe file
+    // noClick: process.platform !== 'win32', // Only allow win32 for selecting exe file
+    noClick: true, // TODO: Selector file or folder
     onDropRejected(files) {
       switch (process.platform) {
         case 'win32':
@@ -28,19 +29,23 @@ export const App: React.FC = () => {
 
       ipcRenderer.send('startDebuggingWithExePath', file.path)
     },
+    // async getFilesFromEvent(e) {
+    //   console.log(e.dataTransfer.items[0].webkitGetAsEntry())
+    //   return []
+    // },
   })
 
   useEffect(() => {
-    const instanceIds = Object.keys(sessionInfo)
+    const sessionIds = Object.keys(sessionInfo)
 
     // Ensure there always be one tab active
-    if (!instanceIds.includes(activeId) && instanceIds.length) {
-      setActiveId(instanceIds[0])
+    if (!sessionIds.includes(activeId) && sessionIds.length) {
+      setActiveId(sessionIds[0])
     }
   }, [activeId, sessionInfo])
 
   const sessionEntries = Object.entries(sessionInfo)
-  // console.log(appInfo, instanceInfo)
+  // console.log(appInfo, sessionInfo)
 
   return (
     <div
@@ -114,16 +119,16 @@ export const App: React.FC = () => {
               setActiveId(key as string)
             }}
           >
-            {sessionEntries.map(([id, instance]) => (
+            {sessionEntries.map(([id, session]) => (
               <Tab
                 id={id}
                 key={id}
-                title={appInfo[instance.appId].name}
+                title={appInfo[session.appId].name}
                 panel={
                   <div style={{ display: 'flex', marginTop: -20 }}>
                     <div style={{ flexBasis: 200, flexShrink: 0 }}>
                       <h3>Sessions (Click to open)</h3>
-                      {Object.entries(instance.pages).map(([id, page]) => (
+                      {Object.entries(session.pages).map(([id, page]) => (
                         <div key={id}>
                           <a
                             href="#"
@@ -168,7 +173,7 @@ export const App: React.FC = () => {
                         userSelect: 'text',
                       }}
                     >
-                      {instance.log}
+                      {session.log}
                     </Pre>
                   </div>
                 }

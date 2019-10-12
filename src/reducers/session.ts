@@ -1,10 +1,10 @@
 import { Reducer } from 'redux'
 import { Dict, SessionInfo, PageInfo } from '../types'
 
-const ADD_INSTANCE = 'ADD_INSTANCE'
+const ADD_SESSION = 'ADD_SESSION'
 const UPDATE_PAGES = 'UPDATE_PAGES'
 const UPDATE_LOG = 'UPDATE_LOG'
-const REMOVE_INSTANCE = 'REMOVE_INSTANCE'
+const REMOVE_SESSION = 'REMOVE_SESSION'
 const UPDATE_NODE_PORT = 'UPDATE_NODE_PORT'
 const UPDATE_WINDOW_PORT = 'UPDATE_WINDOW_PORT'
 
@@ -12,7 +12,7 @@ export const sessionInfo: Reducer<Dict<SessionInfo>> = (state = {}, action) => {
   const { payload } = action
 
   switch (action.type) {
-    case ADD_INSTANCE:
+    case ADD_SESSION:
       return {
         ...state,
         [payload.id]: {
@@ -21,7 +21,7 @@ export const sessionInfo: Reducer<Dict<SessionInfo>> = (state = {}, action) => {
           log: '',
         },
       }
-    case REMOVE_INSTANCE: {
+    case REMOVE_SESSION: {
       const copy = { ...state }
       delete copy[payload.id]
       return copy
@@ -63,13 +63,13 @@ export const sessionInfo: Reducer<Dict<SessionInfo>> = (state = {}, action) => {
   }
 }
 
-export const addInstance = (id: string, appId: string) => ({
-  type: ADD_INSTANCE,
+export const addSession = (id: string, appId: string) => ({
+  type: ADD_SESSION,
   payload: { id, appId },
 })
 
-export const removeInstance = (id: string) => ({
-  type: REMOVE_INSTANCE,
+export const removeSession = (id: string) => ({
+  type: REMOVE_SESSION,
   payload: { id },
 })
 
