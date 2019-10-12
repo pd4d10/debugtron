@@ -11,8 +11,17 @@ export const App: React.FC = () => {
   const { appInfo, sessionInfo } = useSelector<State, State>(s => s)
   // const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    // accept: process.platform === 'win32' ? 'exe' : undefined,
-    onDrop(files) {
+    accept: process.platform === 'win32' ? '.exe' : undefined,
+    noClick: process.platform !== 'win32', // Only allow win32 for selecting exe file
+    onDropRejected(files) {
+      switch (process.platform) {
+        case 'win32':
+          remote.dialog.showErrorBox('File type error', 'Should be an exe file')
+          break
+      }
+    },
+    onDropAccepted(files) {
+      // console.log(files)
       if (files.length === 0) return
       // Find shortest path
       const [file] = files.sort((a, b) => a.path.length - b.path.length)
