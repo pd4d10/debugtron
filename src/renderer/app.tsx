@@ -26,7 +26,7 @@ export const App: React.FC = () => {
       // Find shortest path
       const [file] = files.sort((a, b) => a.path.length - b.path.length)
 
-      ipcRenderer.send('startDebugging', { path: file.path })
+      ipcRenderer.send('startDebuggingWithExePath', file.path)
     },
   })
 
@@ -63,7 +63,7 @@ export const App: React.FC = () => {
                 href="#"
                 onClick={e => {
                   e.preventDefault()
-                  ipcRenderer.send('startDebugging', { id: app.id })
+                  ipcRenderer.send('startDebugging', app.id)
                 }}
                 style={{ padding: 4, textAlign: 'center', width: 100 }}
                 className="hoverable"

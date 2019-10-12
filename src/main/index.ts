@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
@@ -109,31 +109,30 @@ if (!gotTheLock) {
   })
 
   ipcMain.on(
-    'startDebugging',
-    async (e: Electron.Event, payload: { id?: string; path?: string }) => {
+    'startDebuggingWithExePath',
+    async (e: Electron.Event, exePath: string) => {
       const { appInfo } = store.getState()
-      if (payload.id) {
-        const current = appInfo[payload.id]
+      const duplicated = Object.values(appInfo).find(a => a.exePath === exePath)
+      if (duplicated) {
+        startDebugging(duplicated, store)
+        return
+      }
 
-        if (current) {
-          startDebugging(current, store)
-        }
-      } else if (payload.path) {
-        const current = await getAppInfoByDnd(payload.path)
-
-        if (current) {
-          const { exePath } = current
-          const duplicated = Object.values(appInfo).find(
-            a => a.exePath === exePath,
-          )
-          if (duplicated) {
-            startDebugging(duplicated, store)
-          } else {
-            store.dispatch(addTempApp(current))
-            startDebugging(current, store)
-          }
-        }
+      const current = await getAppInfoByDnd(exePath)
+      if (current) {
+        store.dispatch(addTempApp(current)) // TODO: Remove it after session closed
+        startDebugging(current, store)
+      } else {
+        dialog.showErrorBox(
+          'Invalid application path',
+          `${exePath} is not a valid application`,
+        )
       }
     },
   )
+
+  ipcMain.on('startDebugging', async (e: Electron.Event, id: string) => {
+    const { appInfo } = store.getState()
+    startDebugging(appInfo[id], store)
+  })
 }
