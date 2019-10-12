@@ -4,10 +4,8 @@ import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { updatePages } from '../reducers/session'
 import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
-import { setUpdater, pkg } from './updater'
+import { setUpdater } from './updater'
 import { PageInfo, Dict } from '../types'
-import { machineId } from 'node-machine-id'
-import ua from 'universal-analytics'
 import fetch from 'node-fetch'
 import { getApps, addTempApp } from '../reducers/app'
 import reducers from '../reducers'
@@ -89,14 +87,6 @@ if (!gotTheLock) {
     //     ),
     //   )
     // }
-
-    try {
-      const id = await machineId()
-      const client = ua('UA-145047249-4', id, { strictCidFormat: false })
-      client.pageview({ dp: '/' + pkg.version }).send()
-    } catch (err) {
-      console.error(err)
-    }
 
     setUpdater()
     createWindow()
