@@ -14,7 +14,8 @@
       },
       // runtimeArgs will be passed directly to your Electron application
       //   "runtimeArgs": ["foo", "bar"],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std"
     }
   ]
 }
