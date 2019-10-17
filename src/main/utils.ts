@@ -16,8 +16,9 @@ import {
 import { State } from '../reducers'
 import { dialog } from 'electron'
 import { promisify } from 'util'
+import { list } from 'regedit'
 
-const regeditList = promisify(require('regedit').list)
+const regeditList = promisify(list)
 
 export const readIcnsAsImageUri = async (file: string) => {
   let buf = await fs.promises.readFile(file)
@@ -59,7 +60,10 @@ async function readAppPaths(uninstallPath: string, arch: string) {
   const data = await regeditList(uninstallPath, arch)
   const obj = await regeditList(
     Object.values(data)
-      .map((x, i) => x.keys.map(k => path.join(uninstallPath, k)))
+      .map((x, i) => {
+        if (!x.keys) return []
+        return x.keys.map(k => path.join(uninstallPath, k))
+      })
       .flat(),
     arch,
   )
