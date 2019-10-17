@@ -3,6 +3,7 @@ import { AppInfo, Dict } from '../types'
 
 const GET_APPS = 'GET_APPS'
 const ADD_TEMP_APP = 'ADD_TEMP_APP'
+const APP_LOAD_START = 'APP_LOAD_START'
 
 export const appInfo: Reducer<Dict<AppInfo>> = (state = {}, action) => {
   const { payload } = action
@@ -21,6 +22,19 @@ export const appInfo: Reducer<Dict<AppInfo>> = (state = {}, action) => {
       return state
   }
 }
+
+export const appLoading: Reducer<boolean> = (state = false, action) => {
+  switch (action.type) {
+    case APP_LOAD_START:
+      return true
+    case GET_APPS:
+      return false
+    default:
+      return state
+  }
+}
+
+export const getAppStart = () => ({ type: APP_LOAD_START })
 
 export const getApps = (apps: Dict<AppInfo>) => ({
   type: GET_APPS,

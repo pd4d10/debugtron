@@ -7,7 +7,7 @@ import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
 import { setUpdater } from './updater'
 import { PageInfo, Dict } from '../types'
 import fetch from 'node-fetch'
-import { getApps, addTempApp } from '../reducers/app'
+import { getApps, addTempApp, getAppStart } from '../reducers/app'
 import reducers from '../reducers'
 
 const store = createStore(reducers, applyMiddleware(thunk, forwardToRenderer))
@@ -92,6 +92,7 @@ if (!gotTheLock) {
     createWindow()
     setInterval(fetchPages, 3000)
 
+    store.dispatch(getAppStart())
     const apps = await getElectronApps()
     store.dispatch(getApps(apps))
   })

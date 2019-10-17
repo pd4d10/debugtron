@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
 import { useDropzone } from 'react-dropzone'
-import { Tabs, Tab, Divider, Pre, Tag } from '@blueprintjs/core'
+import { Tabs, Tab, Divider, Pre, Tag, Spinner } from '@blueprintjs/core'
 import { useSelector } from 'react-redux'
 import { State } from '../reducers'
 import './app.css'
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
-  const { appInfo, sessionInfo } = useSelector<State, State>(s => s)
+  const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(s => s)
   // const dispath = useDispatch()
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: process.platform === 'win32' ? '.exe' : undefined,
@@ -58,30 +58,34 @@ export const App: React.FC = () => {
     >
       <h3>Installed Electron-based App (Click to debug)</h3>
       <div style={{ display: 'flex' }}>
-        <div style={{ display: 'flex', flexGrow: 1, overflowX: 'auto' }}>
-          {Object.entries(appInfo).map(([id, app]) => {
-            if (app.hidden) return null
+        {appLoading ? (
+          <Spinner />
+        ) : (
+          <div style={{ display: 'flex', flexGrow: 1, overflowX: 'auto' }}>
+            {Object.entries(appInfo).map(([id, app]) => {
+              if (app.hidden) return null
 
-            return (
-              <a
-                key={id}
-                href="#"
-                onClick={e => {
-                  e.preventDefault()
-                  ipcRenderer.send('startDebugging', app.id)
-                }}
-                style={{ padding: 4, textAlign: 'center', width: 100 }}
-                className="hoverable"
-              >
-                <img
-                  src={app.icon || require('./images/electron.png')}
-                  style={{ width: 64, height: 64 }}
-                />
-                <div style={{ wordBreak: 'break-word' }}>{app.name}</div>
-              </a>
-            )
-          })}
-        </div>
+              return (
+                <a
+                  key={id}
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault()
+                    ipcRenderer.send('startDebugging', app.id)
+                  }}
+                  style={{ padding: 4, textAlign: 'center', width: 100 }}
+                  className="hoverable"
+                >
+                  <img
+                    src={app.icon || require('./images/electron.png')}
+                    style={{ width: 64, height: 64 }}
+                  />
+                  <div style={{ wordBreak: 'break-word' }}>{app.name}</div>
+                </a>
+              )
+            })}
+          </div>
+        )}
         <Divider />
         <div
           {...getRootProps({
