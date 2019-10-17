@@ -15,6 +15,9 @@ import {
 } from '../reducers/session'
 import { State } from '../reducers'
 import { dialog } from 'electron'
+import { promisify } from 'util'
+
+const regeditList = promisify(require('regedit').list)
 
 export const readIcnsAsImageUri = async (file: string) => {
   let buf = await fs.promises.readFile(file)
@@ -52,17 +55,39 @@ async function readdirAbsolute(dir: string) {
   }
 }
 
+async function readAppPaths(uninstallPath: string, arch: string) {
+  const data = await regeditList(uninstallPath, arch)
+  const obj = await regeditList(
+    Object.values(data)
+      .map((x, i) => x.keys.map(k => path.join(uninstallPath, k)))
+      .flat(),
+    arch,
+  )
+  const apps = Object.values(obj)
+    .map(item => {
+      const app = item.values
+      if (!app || !app.InstallLocation || !app.InstallLocation.value) return
+
+      // TODO: name, icon
+      return app.InstallLocation.value
+    })
+    .filter(x => x)
+  return apps
+}
+
 async function getPossibleAppPaths() {
   switch (process.platform) {
     case 'win32': {
-      const apps = await Promise.all(
-        [
-          os.homedir() + '/AppData/Local',
-          'c:/Program Files',
-          'c:/Program Files (x86)',
-        ].map(dir => readdirAbsolute(dir)),
+      // FIXME: arguments too long
+      const params = [
+        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
+        ['HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+      ]
+      const items = await Promise.all(
+        params.map(param => readAppPaths(param[0], param[1])),
       )
-      return apps.flat()
+      return items.flat()
     }
     case 'darwin':
       return readdirAbsolute('/Applications')
