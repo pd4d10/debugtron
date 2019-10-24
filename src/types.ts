@@ -13,7 +13,7 @@ export interface AppInfo {
   id: string
   name: string
   icon: string
-  appPath: string
+  // appPath: string
   exePath: string
   hidden?: boolean
 }

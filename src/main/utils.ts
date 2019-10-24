@@ -56,7 +56,7 @@ async function readdirAbsolute(dir: string) {
   }
 }
 
-async function readAppPaths(uninstallPath: string, arch: string) {
+async function readWindowsApps(uninstallPath: string, arch: string) {
   const data = await regeditList(uninstallPath, arch)
   const obj = await regeditList(
     Object.values(data)
@@ -67,15 +67,70 @@ async function readAppPaths(uninstallPath: string, arch: string) {
       .flat(),
     arch,
   )
-  const apps = Object.values(obj)
-    .map(item => {
-      const app = item.values
-      if (!app || !app.InstallLocation || !app.InstallLocation.value) return
 
-      // TODO: name, icon
-      return app.InstallLocation.value
-    })
-    .filter(x => x)
+  let apps: AppInfo[] = []
+  for (let item of Object.values(obj)) {
+    const app = item.values
+    if (!app) continue
+
+    let iconPath = ''
+    let installPath = ''
+
+    if (app.DisplayIcon) {
+      const icon = app.DisplayIcon.value.split(',')[0]
+      if (icon.toLowerCase().endsWith('.exe')) {
+        // It is also executable path
+        if (fs.existsSync(path.join(icon, '../resources/electron.asar'))) {
+          apps.push({
+            id: icon,
+            name: app.DisplayName ? app.DisplayName.value : '',
+            icon: '',
+            exePath: icon,
+          })
+        } else {
+          continue
+        }
+      } else if (icon.toLowerCase().endsWith('.ico')) {
+        iconPath = icon
+        installPath = path.dirname(icon)
+      }
+    } else if (app.InstallLocation) {
+      installPath = app.InstallLocation.value
+    }
+
+    if (!installPath) continue
+
+    const files = await fs.promises.readdir(installPath)
+    if (fs.existsSync(path.join(installPath, 'resources/electron.asar'))) {
+      const [exeFile] = files.filter(file => {
+        return (
+          file.endsWith('.exe') &&
+          !['uninstall', 'update'].some(keyword =>
+            file.toLowerCase().includes(keyword),
+          )
+        )
+      })
+      if (exeFile) {
+        apps.push({
+          id: path.resolve(installPath, exeFile),
+          name: app.DisplayName ? app.DisplayName.value : '',
+          icon: '',
+          exePath: path.resolve(installPath, exeFile),
+        })
+      } else {
+        continue
+      }
+    }
+
+    const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
+
+    const isElectronBased =
+      semverDir &&
+      fs.existsSync(
+        path.join(installPath, semverDir, 'resources/electron.asar'),
+      )
+  }
+
   return apps
 }
 
@@ -89,7 +144,7 @@ async function getPossibleAppPaths() {
         ['HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
       ]
       const items = await Promise.all(
-        params.map(param => readAppPaths(param[0], param[1])),
+        params.map(param => readWindowsApps(param[0], param[1])),
       )
       return items.flat()
     }

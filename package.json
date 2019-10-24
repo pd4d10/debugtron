@@ -64,10 +64,10 @@
     }
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.15.1",
     "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
+    "@blueprintjs/core": "^3.15.1",
     "@electron-forge/cli": "6.0.0-beta.45",
     "@electron-forge/maker-deb": "6.0.0-beta.45",
     "@electron-forge/maker-rpm": "6.0.0-beta.45",
