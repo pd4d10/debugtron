@@ -1,5 +1,4 @@
 import fs from 'fs'
-import os from 'os'
 import path from 'path'
 import plist from 'plist'
 import { v4 } from 'uuid'
@@ -132,27 +131,6 @@ async function readWindowsApps(uninstallPath: string, arch: string) {
   }
 
   return apps
-}
-
-async function getPossibleAppPaths() {
-  switch (process.platform) {
-    case 'win32': {
-      // FIXME: arguments too long
-      const params = [
-        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
-        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
-        ['HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
-      ]
-      const items = await Promise.all(
-        params.map(param => readWindowsApps(param[0], param[1])),
-      )
-      return items.flat()
-    }
-    case 'darwin':
-      return readdirAbsolute('/Applications')
-    default:
-      return []
-  }
 }
 
 // win: exe path
@@ -314,19 +292,38 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
 
 // Detect Electron apps
 export async function getElectronApps() {
-  const appPaths = await getPossibleAppPaths()
-  const infos = [] as AppInfo[]
-  for (let p of appPaths) {
-    // TODO: parallel
-    // console.log(p)
-    const info = await getAppInfo(p)
-    if (info) {
-      // console.log(info.name)
-      infos.push(info)
+  let apps: AppInfo[] = []
+  switch (process.platform) {
+    case 'win32': {
+      // FIXME: arguments too long
+      const params = [
+        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
+        ['HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+      ]
+      const items = await Promise.all(
+        params.map(param => readWindowsApps(param[0], param[1])),
+      )
+      apps = items.flat()
+      break
+    }
+    case 'darwin': {
+      const appPaths = await readdirAbsolute('/Applications')
+      apps = [] as AppInfo[]
+      for (let p of appPaths) {
+        // TODO: parallel
+        // console.log(p)
+        const info = await getAppInfo(p)
+        if (info) {
+          // console.log(info.name)
+          apps.push(info)
+        }
+      }
+      break
     }
   }
 
-  return infos.reduce(
+  return apps.reduce(
     (a, b) => {
       a[b.id] = b
       return a
