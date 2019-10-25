@@ -15,7 +15,8 @@
       // runtimeArgs will be passed directly to your Electron application
       //   "runtimeArgs": ["foo", "bar"],
       "cwd": "${workspaceFolder}",
-      "outputCapture": "std"
+      "outputCapture": "std",
+      "timeout": 30000
     }
   ]
 }
