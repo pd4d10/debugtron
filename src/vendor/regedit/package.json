@@ -1,0 +1,39 @@
+{
+  "name": "regedit",
+  "version": "3.0.3",
+  "description": "Read, Write, List and do all sorts of funky stuff to the windows registry using node.js and windows script host",
+  "keywords": [
+    "windows",
+    "registry"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --fix",
+    "lint:src": "eslint . --fix --ignore-pattern test/",
+    "lint:test": "eslint test --fix",
+    "test": "mocha -R spec",
+    "prepush": "npm run lint"
+  },
+  "dependencies": {
+    "debug": "^4.1.0",
+    "if-async": "^3.7.4",
+    "stream-slicer": "0.0.6",
+    "through2": "^0.6.3"
+  },
+  "author": "Yaniv Kessler",
+  "bugs": {
+    "url": "https://github.com/ironSource/node-regedit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironSource/node-regedit"
+  },
+  "homepage": "https://github.com/ironSource/node-regedit",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "eslint": "^4.18.2",
+    "husky": "^0.13.4",
+    "should": "^4.4.2"
+  }
+}
