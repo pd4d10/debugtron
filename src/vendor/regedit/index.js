@@ -214,7 +214,7 @@ function execute(args, callback) {
 			return callback(err)
 		}
 
-		childProcess.execFile(cscript.path(), args, function(err, stdout, stderr) {
+		childProcess.execFile(cscript.path(), args,{ maxBuffer: 10*1024*1024 }, function(err, stdout, stderr) {
 
 			if (err) {
 				if (stdout) {

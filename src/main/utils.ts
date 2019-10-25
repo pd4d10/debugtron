@@ -15,7 +15,7 @@ import {
 import { State } from '../reducers'
 import { dialog } from 'electron'
 import { promisify } from 'util'
-import { list } from 'regedit'
+import { list } from '../vendor/regedit'
 
 const regeditList = promisify(list)
 
@@ -99,35 +99,39 @@ async function readWindowsApps(uninstallPath: string, arch: string) {
 
     if (!installPath) continue
 
-    const files = await fs.promises.readdir(installPath)
-    if (fs.existsSync(path.join(installPath, 'resources/electron.asar'))) {
-      const [exeFile] = files.filter(file => {
-        return (
-          file.endsWith('.exe') &&
-          !['uninstall', 'update'].some(keyword =>
-            file.toLowerCase().includes(keyword),
+    try {
+      const files = await fs.promises.readdir(installPath)
+      if (fs.existsSync(path.join(installPath, 'resources/electron.asar'))) {
+        const [exeFile] = files.filter(file => {
+          return (
+            file.endsWith('.exe') &&
+            !['uninstall', 'update'].some(keyword =>
+              file.toLowerCase().includes(keyword),
+            )
           )
-        )
-      })
-      if (exeFile) {
-        apps.push({
-          id: path.resolve(installPath, exeFile),
-          name: app.DisplayName ? app.DisplayName.value : '',
-          icon: '',
-          exePath: path.resolve(installPath, exeFile),
         })
-      } else {
-        continue
+        if (exeFile) {
+          apps.push({
+            id: path.resolve(installPath, exeFile),
+            name: app.DisplayName ? app.DisplayName.value : '',
+            icon: '',
+            exePath: path.resolve(installPath, exeFile),
+          })
+        } else {
+          continue
+        }
       }
+    } catch (err) {
+      console.error(err)
     }
 
-    const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
+    // const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
 
-    const isElectronBased =
-      semverDir &&
-      fs.existsSync(
-        path.join(installPath, semverDir, 'resources/electron.asar'),
-      )
+    // const isElectronBased =
+    //   semverDir &&
+    //   fs.existsSync(
+    //     path.join(installPath, semverDir, 'resources/electron.asar'),
+    //   )
   }
 
   return apps
@@ -295,11 +299,10 @@ export async function getElectronApps() {
   let apps: AppInfo[] = []
   switch (process.platform) {
     case 'win32': {
-      // FIXME: arguments too long
       const params = [
-        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
-        // ['HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
-        ['HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+        ['HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+        ['HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
+        ['HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
       ]
       const items = await Promise.all(
         params.map(param => readWindowsApps(param[0], param[1])),
