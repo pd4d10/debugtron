@@ -76,31 +76,43 @@ async function getAppInfoFromRegeditItemValues(
   if (displayIcon) {
     const icon = displayIcon.data.split(',')[0]
     if (icon.toLowerCase().endsWith('.exe')) {
-      if (fs.existsSync(path.join(icon, '../resources/electron.asar'))) {
-        exePath = icon
-      } else {
-        return
-      }
+      if (!fs.existsSync(path.join(icon, '../resources/electron.asar'))) return
+      exePath = icon
     } else if (icon.toLowerCase().endsWith('.ico')) {
       iconPath = icon
     }
-  } else {
-    const installLocation = values.find(
-      (v): v is RegistryStringEntry =>
-        v &&
-        v.type === RegistryValueType.REG_SZ &&
-        v.name === 'InstallLocation',
-    )
-    if (installLocation) {
-      const dir = installLocation.data
-      let files: string[] = []
-      try {
-        files = await fs.promises.readdir(dir)
-      } catch (err) {
-        console.error(err, typeof dir)
-      }
+  }
 
-      if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
+  const installLocation = values.find(
+    (v): v is RegistryStringEntry =>
+      v && v.type === RegistryValueType.REG_SZ && v.name === 'InstallLocation',
+  )
+  if (installLocation) {
+    const dir = installLocation.data
+    let files: string[] = []
+    try {
+      files = await fs.promises.readdir(dir)
+    } catch (err) {
+      console.error(err, typeof dir)
+    }
+
+    if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
+      const exeFiles = files.filter(file => {
+        const lc = file.toLowerCase()
+        return (
+          lc.endsWith('.exe') &&
+          !['uninstall', 'update'].some(keyword => lc.includes(keyword))
+        )
+      })
+      if (exeFiles.length) {
+        exePath = path.join(dir, exeFiles[0]) // FIXME:
+      }
+    } else {
+      const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
+      if (
+        semverDir &&
+        fs.existsSync(path.join(dir, semverDir, 'resources/electron.asar'))
+      ) {
         const exeFiles = files.filter(file => {
           const lc = file.toLowerCase()
           return (
@@ -109,45 +121,28 @@ async function getAppInfoFromRegeditItemValues(
           )
         })
         if (exeFiles.length) {
-          exePath = exeFiles[0] // FIXME:
-        }
-      } else {
-        const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
-        if (
-          semverDir &&
-          fs.existsSync(path.join(dir, semverDir, 'resources/electron.asar'))
-        ) {
-          const exeFiles = files.filter(file => {
-            const lc = file.toLowerCase()
-            return (
-              lc.endsWith('.exe') &&
-              !['uninstall', 'update'].some(keyword => lc.includes(keyword))
-            )
-          })
-          if (exeFiles.length) {
-            exePath = exeFiles[0] // FIXME:
-          }
+          exePath = path.join(dir, semverDir, exeFiles[0]) // FIXME:
         }
       }
     }
   }
 
-  if (exePath) {
-    const displayName = values.find(
-      (v): v is RegistryStringEntry =>
-        v && v.type === RegistryValueType.REG_SZ && v.name === 'DisplayName',
-    )
-    let icon = ''
-    if (iconPath) {
-      const iconBuffer = await fs.promises.readFile(iconPath)
-      icon = 'data:image/x-icon;base64,' + iconBuffer.toString('base64')
-    }
-    return {
-      id: exePath,
-      name: displayName ? displayName.data : path.basename(exePath, '.exe'),
-      icon: icon,
-      exePath: exePath,
-    }
+  if (!exePath) return
+
+  const displayName = values.find(
+    (v): v is RegistryStringEntry =>
+      v && v.type === RegistryValueType.REG_SZ && v.name === 'DisplayName',
+  )
+  let icon = ''
+  if (iconPath) {
+    const iconBuffer = await fs.promises.readFile(iconPath)
+    icon = 'data:image/x-icon;base64,' + iconBuffer.toString('base64')
+  }
+  return {
+    id: exePath,
+    name: displayName ? displayName.data : path.basename(exePath, '.exe'),
+    icon: icon,
+    exePath: exePath,
   }
 }
 
@@ -264,11 +259,14 @@ export async function getElectronApps(): Promise<(AppInfo | undefined)[]> {
           'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
         ),
         ...enumRegeditItems(
+          HKEY.HKEY_LOCAL_MACHINE,
+          'Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+        ),
+        ...enumRegeditItems(
           HKEY.HKEY_CURRENT_USER,
           'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
         ),
       ]
-      // FIXME: 32-bit
       return Promise.all(
         items.map(itemValues => getAppInfoFromRegeditItemValues(itemValues)),
       )
