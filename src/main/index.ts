@@ -5,7 +5,7 @@ import thunk from 'redux-thunk'
 import { updatePages } from '../reducers/session'
 import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
 import { setUpdater } from './updater'
-import { PageInfo, Dict } from '../types'
+import { PageInfo, Dict, AppInfo } from '../types'
 import fetch from 'node-fetch'
 import { getApps, addTempApp, getAppStart } from '../reducers/app'
 import reducers from '../reducers'
@@ -94,7 +94,16 @@ if (!gotTheLock) {
 
     store.dispatch(getAppStart())
     const apps = await getElectronApps()
-    store.dispatch(getApps(apps))
+    const appInfo = apps.reduce(
+      (a, b) => {
+        if (b) {
+          a[b.id] = b
+        }
+        return a
+      },
+      {} as Dict<AppInfo>,
+    )
+    store.dispatch(getApps(appInfo))
   })
 
   app.on('window-all-closed', () => {

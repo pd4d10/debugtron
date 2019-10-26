@@ -55,7 +55,7 @@ async function readdirAbsolute(dir: string) {
   }
 }
 
-async function readAppInfoFromRegeditItem(
+async function getAppInfoFromRegeditItem(
   item: Result,
 ): Promise<AppInfo | undefined> {
   const app = item.values
@@ -109,25 +109,32 @@ async function readAppInfoFromRegeditItem(
       } else {
         return
       }
+    } else {
+      const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
+
+      // if (
+      //   semverDir &&
+      //   fs.existsSync(
+      //     path.join(installPath, semverDir, 'resources/electron.asar'),
+      //   )
+      // ) {
+      //   return {
+
+      //   }
+      // } else {
+      //   return
+      // }
     }
   } catch (err) {
     console.error(err)
     return
   }
-
-  // const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
-
-  // const isElectronBased =
-  //   semverDir &&
-  //   fs.existsSync(
-  //     path.join(installPath, semverDir, 'resources/electron.asar'),
-  //   )
 }
 
-async function readWindowsApps(
+async function getWindowsAppsFromRegedit(
   uninstallPath: string,
   arch: string,
-): Promise<AppInfo[]> {
+): Promise<(AppInfo | undefined)[]> {
   const data = await regeditList(uninstallPath, arch)
   console.time([...arguments].toString())
   const obj = await regeditList(
@@ -141,10 +148,9 @@ async function readWindowsApps(
   )
   console.timeEnd([...arguments].toString())
 
-  const apps = await Promise.all(
-    Object.values(obj).map(item => readAppInfoFromRegeditItem(item)),
+  return Promise.all(
+    Object.values(obj).map(item => getAppInfoFromRegeditItem(item)),
   )
-  return apps.filter((app): app is AppInfo => typeof app !== 'undefined')
 }
 
 // win: exe path
@@ -302,42 +308,25 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
 }
 
 // Detect Electron apps
-export async function getElectronApps() {
-  let apps: AppInfo[] = []
+export async function getElectronApps(): Promise<(AppInfo | undefined)[]> {
   switch (process.platform) {
     case 'win32': {
-      const params = [
+      const params: [string, string][] = [
         ['HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
         ['HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
         ['HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '64'],
+        ['HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall', '32'],
       ]
       const items = await Promise.all(
-        params.map(param => readWindowsApps(param[0], param[1])),
+        params.map(param => getWindowsAppsFromRegedit(...param)),
       )
-      apps = items.flat()
-      break
+      return items.flat()
     }
     case 'darwin': {
       const appPaths = await readdirAbsolute('/Applications')
-      apps = [] as AppInfo[]
-      for (let p of appPaths) {
-        // TODO: parallel
-        // console.log(p)
-        const info = await getAppInfo(p)
-        if (info) {
-          // console.log(info.name)
-          apps.push(info)
-        }
-      }
-      break
+      return Promise.all(appPaths.map(p => getAppInfo(p)))
     }
+    default:
+      return []
   }
-
-  return apps.reduce(
-    (a, b) => {
-      a[b.id] = b
-      return a
-    },
-    {} as Dict<AppInfo>,
-  )
 }
