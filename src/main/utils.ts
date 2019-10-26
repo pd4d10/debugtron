@@ -15,7 +15,7 @@ import {
 import { State } from '../reducers'
 import { dialog } from 'electron'
 import { promisify } from 'util'
-import { list } from '../vendor/regedit'
+import { list, Result } from '../vendor/regedit'
 
 const regeditList = promisify(list)
 
@@ -55,8 +55,81 @@ async function readdirAbsolute(dir: string) {
   }
 }
 
-async function readWindowsApps(uninstallPath: string, arch: string) {
+async function readAppInfoFromRegeditItem(
+  item: Result,
+): Promise<AppInfo | undefined> {
+  const app = item.values
+  if (!app) return
+
+  let iconPath = ''
+  let installPath = ''
+
+  if (app.DisplayIcon) {
+    const icon = app.DisplayIcon.value.split(',')[0]
+    if (icon.toLowerCase().endsWith('.exe')) {
+      // It is also executable path
+      if (fs.existsSync(path.join(icon, '../resources/electron.asar'))) {
+        return {
+          id: icon,
+          name: app.DisplayName ? app.DisplayName.value : '',
+          icon: '',
+          exePath: icon,
+        }
+      } else {
+        return
+      }
+    } else if (icon.toLowerCase().endsWith('.ico')) {
+      iconPath = icon
+      installPath = path.dirname(icon)
+    }
+  } else if (app.InstallLocation) {
+    installPath = app.InstallLocation.value
+  }
+
+  if (!installPath) return
+
+  try {
+    const files = await fs.promises.readdir(installPath)
+    if (fs.existsSync(path.join(installPath, 'resources/electron.asar'))) {
+      const [exeFile] = files.filter(file => {
+        return (
+          file.endsWith('.exe') &&
+          !['uninstall', 'update'].some(keyword =>
+            file.toLowerCase().includes(keyword),
+          )
+        )
+      })
+      if (exeFile) {
+        return {
+          id: path.resolve(installPath, exeFile),
+          name: app.DisplayName ? app.DisplayName.value : '',
+          icon: '',
+          exePath: path.resolve(installPath, exeFile),
+        }
+      } else {
+        return
+      }
+    }
+  } catch (err) {
+    console.error(err)
+    return
+  }
+
+  // const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
+
+  // const isElectronBased =
+  //   semverDir &&
+  //   fs.existsSync(
+  //     path.join(installPath, semverDir, 'resources/electron.asar'),
+  //   )
+}
+
+async function readWindowsApps(
+  uninstallPath: string,
+  arch: string,
+): Promise<AppInfo[]> {
   const data = await regeditList(uninstallPath, arch)
+  console.time([...arguments].toString())
   const obj = await regeditList(
     Object.values(data)
       .map((x, i) => {
@@ -66,75 +139,12 @@ async function readWindowsApps(uninstallPath: string, arch: string) {
       .flat(),
     arch,
   )
+  console.timeEnd([...arguments].toString())
 
-  let apps: AppInfo[] = []
-  for (let item of Object.values(obj)) {
-    const app = item.values
-    if (!app) continue
-
-    let iconPath = ''
-    let installPath = ''
-
-    if (app.DisplayIcon) {
-      const icon = app.DisplayIcon.value.split(',')[0]
-      if (icon.toLowerCase().endsWith('.exe')) {
-        // It is also executable path
-        if (fs.existsSync(path.join(icon, '../resources/electron.asar'))) {
-          apps.push({
-            id: icon,
-            name: app.DisplayName ? app.DisplayName.value : '',
-            icon: '',
-            exePath: icon,
-          })
-        } else {
-          continue
-        }
-      } else if (icon.toLowerCase().endsWith('.ico')) {
-        iconPath = icon
-        installPath = path.dirname(icon)
-      }
-    } else if (app.InstallLocation) {
-      installPath = app.InstallLocation.value
-    }
-
-    if (!installPath) continue
-
-    try {
-      const files = await fs.promises.readdir(installPath)
-      if (fs.existsSync(path.join(installPath, 'resources/electron.asar'))) {
-        const [exeFile] = files.filter(file => {
-          return (
-            file.endsWith('.exe') &&
-            !['uninstall', 'update'].some(keyword =>
-              file.toLowerCase().includes(keyword),
-            )
-          )
-        })
-        if (exeFile) {
-          apps.push({
-            id: path.resolve(installPath, exeFile),
-            name: app.DisplayName ? app.DisplayName.value : '',
-            icon: '',
-            exePath: path.resolve(installPath, exeFile),
-          })
-        } else {
-          continue
-        }
-      }
-    } catch (err) {
-      console.error(err)
-    }
-
-    // const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
-
-    // const isElectronBased =
-    //   semverDir &&
-    //   fs.existsSync(
-    //     path.join(installPath, semverDir, 'resources/electron.asar'),
-    //   )
-  }
-
-  return apps
+  const apps = await Promise.all(
+    Object.values(obj).map(item => readAppInfoFromRegeditItem(item)),
+  )
+  return apps.filter((app): app is AppInfo => typeof app !== 'undefined')
 }
 
 // win: exe path
@@ -148,7 +158,6 @@ export async function getAppInfoByDnd(p: string): Promise<AppInfo | undefined> {
         id: v4(), // TODO: get app id from register
         name: path.basename(p, '.exe'),
         icon: '',
-        appPath: '',
         exePath: p,
       }
     case 'darwin':
@@ -199,7 +208,6 @@ export async function getAppInfo(
           id: v4(), // TODO: get app id from register
           name: path.basename(exeFile, '.exe'),
           icon,
-          appPath,
           exePath: path.resolve(appPath, exeFile),
         }
       } catch (err) {
@@ -235,7 +243,6 @@ export async function getAppInfo(
         id: info.CFBundleIdentifier,
         name: info.CFBundleName,
         icon,
-        appPath,
         exePath: path.resolve(
           appPath,
           'Contents/MacOS',
