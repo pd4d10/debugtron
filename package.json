@@ -64,7 +64,8 @@
     }
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "registry-js": "^1.9.0"
   },
   "devDependencies": {
     "@blueprintjs/core": "^3.15.1",
@@ -98,12 +99,14 @@
     "react-redux": "^7.1.1",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
-    "regedit": "^3.0.3",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.2",
     "typescript": "^3.5.1",
     "update-electron-app": "^1.5.0",
     "url-loader": "^2.0.0",
     "uuid": "^3.3.2"
+  },
+  "resolutions": {
+    "node-gyp": "5.0.4"
   }
 }
