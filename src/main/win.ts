@@ -104,8 +104,9 @@ export class WinAdapter extends Adapter {
     )
     if (installLocation) {
       const dir = installLocation.data
+      if (!dir) return
       const files = await readdirSafe(dir)
-      if (files.length === 0) return
+      if (!files.length) return
 
       if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
         const exeFiles = files.filter(file => {
