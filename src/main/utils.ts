@@ -1,5 +1,5 @@
-import path from 'path'
 import { v4 } from 'uuid'
+import fs from 'fs'
 import { spawn } from 'child_process'
 import { AppInfo } from '../types'
 import { Store } from 'redux'
@@ -12,26 +12,12 @@ import {
 } from '../reducers/session'
 import { State } from '../reducers'
 import { dialog } from 'electron'
-import { getAppsOfWin } from './win'
-import { getAppsOfMacos, getMacOsAppInfo } from './macos'
 
-// win: exe path
-// macOS: application path
-export async function getAppInfoByDnd(p: string): Promise<AppInfo | undefined> {
-  switch (process.platform) {
-    case 'win32':
-      if (path.extname(p).toLowerCase() != '.exe') return
-
-      return {
-        id: p,
-        name: path.basename(p, '.exe'),
-        icon: '',
-        exePath: p,
-      }
-    case 'darwin':
-      return getMacOsAppInfo(p)
-    default:
-      return
+export async function readdirSafe(dir: string) {
+  try {
+    return fs.promises.readdir(dir)
+  } catch (err) {
+    return []
   }
 }
 
@@ -78,17 +64,5 @@ export async function startDebugging(app: AppInfo, store: Store<State>) {
   }
   if (sp.stderr) {
     sp.stderr.on('data', handleStdout(true))
-  }
-}
-
-// Detect Electron apps
-export async function getElectronApps(): Promise<(AppInfo | undefined)[]> {
-  switch (process.platform) {
-    case 'win32':
-      return getAppsOfWin()
-    case 'darwin':
-      return getAppsOfMacos()
-    default:
-      return []
   }
 }

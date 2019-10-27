@@ -3,12 +3,15 @@ import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { updatePages } from '../reducers/session'
-import { getElectronApps, startDebugging, getAppInfoByDnd } from './utils'
+import { startDebugging } from './utils'
 import { setUpdater } from './updater'
 import { PageInfo, Dict, AppInfo } from '../types'
 import fetch from 'node-fetch'
 import { getApps, addTempApp, getAppStart } from '../reducers/app'
 import reducers from '../reducers'
+import { Adapter } from './adapter'
+import { WinAdapter } from './win'
+import { MacosAdapter } from './macos'
 
 const store = createStore(reducers, applyMiddleware(thunk, forwardToRenderer))
 replayActionMain(store)
@@ -77,6 +80,18 @@ if (!gotTheLock) {
     }
   })
 
+  let adapter: Adapter
+  switch (process.platform) {
+    case 'win32':
+      adapter = new WinAdapter()
+      break
+    case 'darwin':
+      adapter = new MacosAdapter()
+      break
+    default:
+      throw new Error('platform not supported')
+  }
+
   app.on('ready', async () => {
     // TODO: Uncomment after https://github.com/MarshallOfSound/electron-devtools-installer/pull/92 merged
     // if (!app.isPackaged) {
@@ -93,7 +108,7 @@ if (!gotTheLock) {
     setInterval(fetchPages, 3000)
 
     store.dispatch(getAppStart())
-    const apps = await getElectronApps()
+    const apps = await adapter.readApps()
     const appInfo = apps.reduce(
       (a, b) => {
         if (b) {
@@ -120,22 +135,22 @@ if (!gotTheLock) {
 
   ipcMain.on(
     'startDebuggingWithExePath',
-    async (e: Electron.Event, exePath: string) => {
+    async (e: Electron.Event, p: string) => {
       const { appInfo } = store.getState()
-      const duplicated = Object.values(appInfo).find(a => a.exePath === exePath)
+      const duplicated = Object.values(appInfo).find(a => a.exePath === p)
       if (duplicated) {
         startDebugging(duplicated, store)
         return
       }
 
-      const current = await getAppInfoByDnd(exePath)
+      const current = await adapter.readAppByPath(p)
       if (current) {
         store.dispatch(addTempApp(current)) // TODO: Remove it after session closed
         startDebugging(current, store)
       } else {
         dialog.showErrorBox(
           'Invalid application path',
-          `${exePath} is not a valid application`,
+          `${p} is not a valid application`,
         )
       }
     },
