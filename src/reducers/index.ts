@@ -9,7 +9,6 @@ export interface State {
   sessionInfo: Dict<SessionInfo>
 }
 
-appLoading
 export default combineReducers({
   appLoading,
   appInfo,

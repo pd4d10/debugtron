@@ -2,18 +2,19 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import { updatePages } from '../reducers/session'
-import { startDebugging } from './utils'
 import { setUpdater } from './updater'
-import { PageInfo, Dict, AppInfo } from '../types'
-import fetch from 'node-fetch'
+import { Dict, AppInfo } from '../types'
 import { getApps, addTempApp, getAppStart } from '../reducers/app'
-import reducers from '../reducers'
+import reducers, { State } from '../reducers'
 import { Adapter } from './adapter'
 import { WinAdapter } from './win'
 import { MacosAdapter } from './macos'
+import { startDebugging, fetchPages } from './actions'
 
-const store = createStore(reducers, applyMiddleware(thunk, forwardToRenderer))
+const store = createStore<State, any, {}, {}>(
+  reducers,
+  applyMiddleware(thunk, forwardToRenderer),
+)
 replayActionMain(store)
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -38,34 +39,6 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-}
-
-const fetchPages = async () => {
-  const { sessionInfo } = store.getState()
-  for (let [id, info] of Object.entries(sessionInfo)) {
-    const ports: string[] = []
-    if (info.nodePort) ports.push(info.nodePort)
-    if (info.windowPort) ports.push(info.windowPort)
-
-    const payloads = await Promise.all(
-      ports.map(port =>
-        fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
-      ),
-    )
-
-    const pages = payloads.flat() as PageInfo[]
-    if (pages.length === 0) return
-
-    const pageDict = pages.reduce(
-      (a, b) => {
-        a[b.id] = b
-        return a
-      },
-      {} as Dict<PageInfo>,
-    )
-
-    store.dispatch(updatePages(id, pageDict))
-  }
 }
 
 const gotTheLock = app.requestSingleInstanceLock()
@@ -105,7 +78,9 @@ if (!gotTheLock) {
 
     setUpdater()
     createWindow()
-    setInterval(fetchPages, 3000)
+    setInterval(() => {
+      store.dispatch(fetchPages())
+    }, 3000)
 
     store.dispatch(getAppStart())
     const apps = await adapter.readApps()
@@ -139,14 +114,14 @@ if (!gotTheLock) {
       const { appInfo } = store.getState()
       const duplicated = Object.values(appInfo).find(a => a.exePath === p)
       if (duplicated) {
-        startDebugging(duplicated, store)
+        store.dispatch(startDebugging(duplicated))
         return
       }
 
       const current = await adapter.readAppByPath(p)
       if (current) {
         store.dispatch(addTempApp(current)) // TODO: Remove it after session closed
-        startDebugging(current, store)
+        store.dispatch(startDebugging(current))
       } else {
         dialog.showErrorBox(
           'Invalid application path',
@@ -158,6 +133,6 @@ if (!gotTheLock) {
 
   ipcMain.on('startDebugging', async (e: Electron.Event, id: string) => {
     const { appInfo } = store.getState()
-    startDebugging(appInfo[id], store)
+    store.dispatch(startDebugging(appInfo[id]))
   })
 }
