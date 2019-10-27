@@ -10,6 +10,7 @@ import {
   RegistryStringEntry,
 } from 'registry-js'
 import { Adapter } from './adapter'
+import { readdirSafe } from './utils'
 
 export class WinAdapter extends Adapter {
   async readApps() {
@@ -103,12 +104,8 @@ export class WinAdapter extends Adapter {
     )
     if (installLocation) {
       const dir = installLocation.data
-      let files: string[] = []
-      try {
-        files = await fs.promises.readdir(dir)
-      } catch (err) {
-        console.error(err, typeof dir)
-      }
+      const files = await readdirSafe(dir)
+      if (files.length === 0) return
 
       if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
         const exeFiles = files.filter(file => {

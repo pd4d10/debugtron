@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import plist from 'plist'
 import { Adapter } from './adapter'
-import { readdirSafe } from './utils'
+import { readdirSafe, readFileSafe } from './utils'
 
 export class MacosAdapter extends Adapter {
   async readApps() {
@@ -17,10 +17,9 @@ export class MacosAdapter extends Adapter {
     )
     if (!isElectronBased) return
 
-    const infoContent = await fs.promises.readFile(
-      path.join(p, 'Contents/Info.plist'),
-      { encoding: 'utf8' },
-    )
+    const infoContent = await readFileSafe(path.join(p, 'Contents/Info.plist'))
+    if (!infoContent) return
+
     const info = plist.parse(infoContent) as {
       CFBundleIdentifier: string
       CFBundleName: string
