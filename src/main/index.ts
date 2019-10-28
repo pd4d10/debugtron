@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  Menu,
+  MenuItem,
+  shell,
+} from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
@@ -75,6 +83,31 @@ if (!gotTheLock) {
     //     ),
     //   )
     // }
+
+    const defaultMenu = Menu.getApplicationMenu()
+    if (defaultMenu) {
+      defaultMenu.append(
+        new MenuItem({
+          label: 'About',
+          submenu: [
+            {
+              label: 'Source Code',
+              click() {
+                shell.openExternal('https://github.com/bytedance/debugtron')
+              },
+            },
+            {
+              label: 'Submit an Issue',
+              click() {
+                shell.openExternal(
+                  'https://github.com/bytedance/debugtron/issues/new',
+                )
+              },
+            },
+          ],
+        }),
+      )
+    }
 
     setUpdater()
     createWindow()
