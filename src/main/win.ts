@@ -72,8 +72,17 @@ export class WinAdapter extends Adapter {
     }
   }
 
+  private isElectronApp(installDir: string) {
+    return (
+      fs.existsSync(path.join(installDir, 'resources')) &&
+      ['electron.asar', 'app.asar', 'app.asar.unpacked'].some(file =>
+        fs.existsSync(path.join(installDir, 'resources', file)),
+      )
+    )
+  }
+
   private async findExeFile(dir: string) {
-    if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
+    if (this.isElectronApp(dir)) {
       const files = await readdirSafe(dir)
       const exeFiles = files.filter(file => {
         const lc = file.toLowerCase()
@@ -102,8 +111,7 @@ export class WinAdapter extends Adapter {
     if (displayIcon) {
       const icon = displayIcon.data.split(',')[0]
       if (icon.toLowerCase().endsWith('.exe')) {
-        if (!fs.existsSync(path.join(icon, '../resources/electron.asar')))
-          return
+        if (!this.isElectronApp(path.dirname(icon))) return
         return this.getAppInfoByExePath(icon, iconPath, values)
       } else if (icon.toLowerCase().endsWith('.ico')) {
         iconPath = icon
