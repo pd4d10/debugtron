@@ -72,6 +72,20 @@ export class WinAdapter extends Adapter {
     }
   }
 
+  private async findExeFile(dir: string) {
+    if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
+      const files = await readdirSafe(dir)
+      const exeFiles = files.filter(file => {
+        const lc = file.toLowerCase()
+        return (
+          lc.endsWith('.exe') &&
+          !['uninstall', 'update'].some(keyword => lc.includes(keyword))
+        )
+      })
+      if (exeFiles.length) return path.join(dir, exeFiles[0])
+    }
+  }
+
   private async getAppInfoFromRegeditItemValues(
     values: readonly RegistryValue[],
   ): Promise<AppInfo | undefined> {
@@ -105,45 +119,19 @@ export class WinAdapter extends Adapter {
     if (installLocation) {
       const dir = installLocation.data
       if (!dir) return
-      const files = await readdirSafe(dir)
-      if (!files.length) return
 
-      if (fs.existsSync(path.join(dir, 'resources/electron.asar'))) {
-        const exeFiles = files.filter(file => {
-          const lc = file.toLowerCase()
-          return (
-            lc.endsWith('.exe') &&
-            !['uninstall', 'update'].some(keyword => lc.includes(keyword))
-          )
-        })
-        if (exeFiles.length) {
-          return this.getAppInfoByExePath(
-            path.join(dir, exeFiles[0]),
-            iconPath,
-            values,
-          ) // FIXME:
-        }
+      const exeFile = await this.findExeFile(dir)
+      if (exeFile) {
+        return this.getAppInfoByExePath(exeFile, iconPath, values)
       } else {
+        const files = await readdirSafe(dir)
         const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
-        if (
-          semverDir &&
-          fs.existsSync(path.join(dir, semverDir, 'resources/electron.asar'))
-        ) {
-          const exeFiles = files.filter(file => {
-            const lc = file.toLowerCase()
-            return (
-              lc.endsWith('.exe') &&
-              !['uninstall', 'update'].some(keyword => lc.includes(keyword))
-            )
-          })
-          if (exeFiles.length) {
-            return this.getAppInfoByExePath(
-              path.join(dir, exeFiles[0]),
-              iconPath,
-              values,
-            )
-          }
-        }
+        if (!semverDir) return
+
+        const exeFile = await this.findExeFile(path.join(dir, semverDir))
+        if (!exeFile) return
+
+        return this.getAppInfoByExePath(exeFile, iconPath, values)
       }
     }
   }
