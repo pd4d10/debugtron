@@ -110,29 +110,35 @@ export class WinAdapter extends Adapter {
       }
     }
 
+    let installDir = ''
+
     const installLocation = values.find(
       (v): v is RegistryStringEntry =>
         v &&
         v.type === RegistryValueType.REG_SZ &&
         v.name === 'InstallLocation',
     )
-    if (installLocation) {
-      const dir = installLocation.data
-      if (!dir) return
 
-      const exeFile = await this.findExeFile(dir)
-      if (exeFile) {
-        return this.getAppInfoByExePath(exeFile, iconPath, values)
-      } else {
-        const files = await readdirSafe(dir)
-        const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
-        if (!semverDir) return
+    if (installLocation && installLocation.data) {
+      installDir = installLocation.data
+    } else if (iconPath) {
+      installDir = path.dirname(iconPath)
+    }
 
-        const exeFile = await this.findExeFile(path.join(dir, semverDir))
-        if (!exeFile) return
+    if (!installDir) return
 
-        return this.getAppInfoByExePath(exeFile, iconPath, values)
-      }
+    const exeFile = await this.findExeFile(installDir)
+    if (exeFile) {
+      return this.getAppInfoByExePath(exeFile, iconPath, values)
+    } else {
+      const files = await readdirSafe(installDir)
+      const semverDir = files.find(file => /\d+\.\d+\.\d+/.test(file))
+      if (!semverDir) return
+
+      const exeFile = await this.findExeFile(path.join(installDir, semverDir))
+      if (!exeFile) return
+
+      return this.getAppInfoByExePath(exeFile, iconPath, values)
     }
   }
 }
