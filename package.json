@@ -41,6 +41,9 @@
         {
           "name": "@electron-forge/maker-rpm",
           "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-dmg"
         }
       ],
       "plugins": [
@@ -71,6 +74,7 @@
     "@blueprintjs/core": "^3.15.1",
     "@electron-forge/cli": "6.0.0-beta.45",
     "@electron-forge/maker-deb": "6.0.0-beta.45",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.45",
     "@electron-forge/maker-rpm": "6.0.0-beta.45",
     "@electron-forge/maker-squirrel": "6.0.0-beta.45",
     "@electron-forge/maker-zip": "6.0.0-beta.45",
