@@ -9,30 +9,18 @@ import './app.css'
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
   const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(s => s)
-  // const dispath = useDispatch()
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     accept: process.platform === 'win32' ? '.exe' : undefined,
-    // noClick: process.platform !== 'win32', // Only allow win32 for selecting exe file
-    noClick: true, // TODO: Selector file or folder
-    onDropRejected(files) {
-      switch (process.platform) {
-        case 'win32':
-          remote.dialog.showErrorBox('File type error', 'Should be an exe file')
-          break
-      }
-    },
+    noClick: process.platform === 'darwin',
     onDropAccepted(files) {
-      // console.log(files)
       if (files.length === 0) return
-      // Find shortest path
-      const [file] = files.sort((a, b) => a.path.length - b.path.length)
-
-      ipcRenderer.send('startDebuggingWithExePath', file.path)
+      ipcRenderer.send('startDebuggingWithExePath', files[0].path)
     },
-    // async getFilesFromEvent(e) {
-    //   console.log(e.dataTransfer.items[0].webkitGetAsEntry())
-    //   return []
-    // },
+    async getFilesFromEvent(e) {
+      const fileList = (e as any).dataTransfer.files as FileList
+      if (!fileList) return []
+      return [...fileList]
+    },
   })
 
   useEffect(() => {

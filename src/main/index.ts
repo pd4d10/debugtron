@@ -158,7 +158,7 @@ if (!gotTheLock) {
       } else {
         dialog.showErrorBox(
           'Invalid application path',
-          `${p} is not a valid application`,
+          `${p} is not an Electron-based application`,
         )
       }
     },
