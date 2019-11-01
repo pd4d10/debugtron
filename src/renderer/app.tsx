@@ -10,14 +10,14 @@ export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
   const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(s => s)
   const { getRootProps, getInputProps } = useDropzone({
-    accept: process.platform === 'win32' ? '.exe' : undefined,
     noClick: process.platform === 'darwin',
     onDropAccepted(files) {
       if (files.length === 0) return
       ipcRenderer.send('startDebuggingWithExePath', files[0].path)
     },
-    async getFilesFromEvent(e) {
-      const fileList = (e as any).dataTransfer.files as FileList
+    async getFilesFromEvent(e: any) {
+      if (!e.dataTransfer) return []
+      const fileList = e.dataTransfer.files as FileList
       if (!fileList) return []
       return [...fileList]
     },
