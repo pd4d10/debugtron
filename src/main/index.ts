@@ -6,6 +6,7 @@ import {
   Menu,
   MenuItem,
   shell,
+  nativeImage,
 } from 'electron'
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
@@ -37,6 +38,10 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
+    icon:
+      process.platform === 'linux'
+        ? nativeImage.createFromDataURL(require('../../assets/icon.png'))
+        : undefined,
     webPreferences: {
       nodeIntegration: true,
     },
