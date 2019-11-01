@@ -12,7 +12,7 @@ import {
 import { Adapter } from './adapter'
 import { readdirSafe } from './utils'
 
-require('registry-js/build/Release/registry.node')
+const noop = () => require('registry-js/build/Release/registry.node')
 
 export class WinAdapter extends Adapter {
   async readApps() {
