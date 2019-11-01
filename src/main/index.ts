@@ -18,6 +18,7 @@ import { Adapter } from './adapter'
 import { WinAdapter } from './win'
 import { MacosAdapter } from './macos'
 import { startDebugging, fetchPages } from './actions'
+import { LinuxAdapter } from './linux'
 
 const store = createStore<State, any, {}, {}>(
   reducers,
@@ -68,6 +69,9 @@ if (!gotTheLock) {
       break
     case 'darwin':
       adapter = new MacosAdapter()
+      break
+    case 'linux':
+      adapter = new LinuxAdapter()
       break
     default:
       throw new Error('platform not supported')
