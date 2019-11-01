@@ -20,4 +20,15 @@ module.exports = {
       ),
     }),
   ],
+  externals: [
+    function(context, request, callback) {
+      if (request === '../../build/Release/registry.node') {
+        return callback(
+          null,
+          'commonjs ./native_modules/build/Release/registry.node',
+        )
+      }
+      callback()
+    },
+  ],
 }
