@@ -1,7 +1,7 @@
 {
   "name": "debugtron",
   "productName": "Debugtron",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Debug in-production Electron based App",
   "main": ".webpack/main",
   "repository": "bytedance/debugtron",
@@ -24,13 +24,10 @@
       },
       "makers": [
         {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "debugtron"
-          }
+          "name": "@electron-forge/maker-zip"
         },
         {
-          "name": "@electron-forge/maker-zip"
+          "name": "@electron-forge/maker-squirrel"
         },
         {
           "name": "@electron-forge/maker-dmg"
