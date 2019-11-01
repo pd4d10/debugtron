@@ -175,6 +175,8 @@ export const App: React.FC = () => {
                         flexGrow: 1,
                         overflow: 'auto',
                         userSelect: 'text',
+                        fontFamily:
+                          'SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace',
                       }}
                     >
                       {session.log}
