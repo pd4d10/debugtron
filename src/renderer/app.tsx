@@ -16,10 +16,19 @@ export const App: React.FC = () => {
       ipcRenderer.send('startDebuggingWithExePath', files[0].path)
     },
     async getFilesFromEvent(e: any) {
-      if (!e.dataTransfer) return []
-      const fileList = e.dataTransfer.files as FileList
-      if (!fileList) return []
-      return [...fileList]
+      // Drop
+      if (e.dataTransfer && e.e.dataTransfer.files) {
+        const fileList = e.dataTransfer.files as FileList
+        return [...fileList]
+      }
+
+      // Click
+      if (e.target && e.target.files) {
+        const fileList = e.target.files as FileList
+        return [...fileList]
+      }
+
+      return []
     },
   })
 
