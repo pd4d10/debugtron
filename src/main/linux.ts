@@ -49,9 +49,21 @@ export class LinuxAdapter extends Adapter {
 
     if (!fs.existsSync(path.join(exePath, '../resources/electron.asar'))) return
 
+    let icon = ''
+    if (entry.Icon) {
+      try {
+        const iconBuffer = await fs.promises.readFile(
+          `/usr/share/icons/hicolor/1024x1024/apps/${entry.Icon}.png`,
+        )
+        icon = 'data:image/png;base64,' + iconBuffer.toString('base64')
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
     return {
       id: exePath,
-      icon: '', // TODO: Read icon
+      icon: icon, // TODO: Read icon
       name: entry.Name || path.basename(exePath),
       exePath: exePath,
     }
