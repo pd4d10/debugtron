@@ -126,15 +126,12 @@ if (!gotTheLock) {
 
     store.dispatch(getAppStart())
     const apps = await adapter.readApps()
-    const appInfo = apps.reduce(
-      (a, b) => {
-        if (b) {
-          a[b.id] = b
-        }
-        return a
-      },
-      {} as Dict<AppInfo>,
-    )
+    const appInfo = apps.reduce((a, b) => {
+      if (b) {
+        a[b.id] = b
+      }
+      return a
+    }, {} as Dict<AppInfo>)
     store.dispatch(getApps(appInfo))
   })
 

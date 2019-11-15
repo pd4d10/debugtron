@@ -33,13 +33,10 @@ export const fetchPages = (): ThunkAction<any, State, any, any> => async (
     const pages = payloads.flat() as PageInfo[]
     if (pages.length === 0) return
 
-    const pageDict = pages.reduce(
-      (a, b) => {
-        a[b.id] = b
-        return a
-      },
-      {} as Dict<PageInfo>,
-    )
+    const pageDict = pages.reduce((a, b) => {
+      a[b.id] = b
+      return a
+    }, {} as Dict<PageInfo>)
 
     dispatch(updatePages(id, pageDict))
   }
