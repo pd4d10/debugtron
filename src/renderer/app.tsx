@@ -17,7 +17,7 @@ export const App: React.FC = () => {
     },
     async getFilesFromEvent(e: any) {
       // Drop
-      if (e.dataTransfer && e.e.dataTransfer.files) {
+      if (e.dataTransfer && e.dataTransfer.files) {
         const fileList = e.dataTransfer.files as FileList
         return [...fileList]
       }
