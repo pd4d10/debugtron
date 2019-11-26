@@ -17,3 +17,12 @@ export async function readFileSafe(p: string) {
     return ''
   }
 }
+
+export async function readFileAsBufferSafe(p: string) {
+  try {
+    return await fs.promises.readFile(p)
+  } catch (err) {
+    console.error(err)
+    return
+  }
+}

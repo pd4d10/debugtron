@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import plist from 'plist'
 import { Adapter } from './adapter'
-import { readdirSafe, readFileSafe } from './utils'
+import { readdirSafe, readFileSafe, readFileAsBufferSafe } from './utils'
 
 export class MacosAdapter extends Adapter {
   async readApps() {
@@ -40,7 +40,9 @@ export class MacosAdapter extends Adapter {
   }
 
   private async readIcnsAsImageUri(file: string) {
-    let buf = await fs.promises.readFile(file)
+    let buf = await readFileAsBufferSafe(file)
+    if (!buf) return ''
+
     const totalSize = buf.readInt32BE(4) - 8
     buf = buf.slice(8)
 
