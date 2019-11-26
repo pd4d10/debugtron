@@ -11,6 +11,7 @@ export const appInfo: Reducer<Dict<AppInfo>> = (state = {}, action) => {
     case GET_APPS:
       return payload
     case ADD_TEMP_APP:
+      if (state[payload.id]) return state
       return {
         ...state,
         [payload.id]: {
