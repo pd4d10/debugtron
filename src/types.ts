@@ -24,3 +24,10 @@ export interface SessionInfo {
   nodePort: string
   windowPort: string
 }
+
+export interface MacosAppInfo {
+  CFBundleIdentifier: string
+  CFBundleName: string
+  CFBundleExecutable: string
+  CFBundleIconFile: string
+}

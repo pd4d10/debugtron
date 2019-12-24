@@ -1,4 +1,6 @@
 import fs from 'fs'
+import { readFile as readPlist } from 'simple-plist'
+import { MacosAppInfo } from '../types'
 
 export async function readdirSafe(p: string) {
   try {
@@ -25,4 +27,16 @@ export async function readFileAsBufferSafe(p: string) {
     console.error(err)
     return
   }
+}
+
+export async function readPlistFile(path: string): Promise<MacosAppInfo> {
+  return new Promise((resolve, reject) => {
+    readPlist(path, (error: any, data: MacosAppInfo) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(data)
+      }
+    })
+  })
 }
