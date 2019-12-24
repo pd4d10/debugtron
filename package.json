@@ -1,7 +1,7 @@
 {
   "name": "debugtron",
   "productName": "Debugtron",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Debug in-production Electron based App",
   "main": ".webpack/main",
   "repository": "bytedance/debugtron",
