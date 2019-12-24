@@ -1,8 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import plist from 'plist'
 import { Adapter } from './adapter'
-import { readdirSafe, readFileSafe, readFileAsBufferSafe } from './utils'
+import { readdirSafe, readFileAsBufferSafe, readPlistFile } from './utils'
 
 export class MacosAdapter extends Adapter {
   async readApps() {
@@ -17,15 +16,7 @@ export class MacosAdapter extends Adapter {
     )
     if (!isElectronBased) return
 
-    const infoContent = await readFileSafe(path.join(p, 'Contents/Info.plist'))
-    if (!infoContent) return
-
-    const info = plist.parse(infoContent) as {
-      CFBundleIdentifier: string
-      CFBundleName: string
-      CFBundleExecutable: string
-      CFBundleIconFile: string
-    }
+    const info = await readPlistFile(path.join(p, 'Contents/Info.plist'))
 
     const icon = await this.readIcnsAsImageUri(
       path.join(p, 'Contents/Resources', info.CFBundleIconFile),
