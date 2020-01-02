@@ -177,10 +177,15 @@ export const App: React.FC = () => {
                                   onClick={() => {
                                     const win = new remote.BrowserWindow()
                                     win.loadURL(
-                                      page.devtoolsFrontendUrl.replace(
-                                        /^\/devtools/,
-                                        'chrome-devtools://devtools/bundled',
-                                      ),
+                                      page.devtoolsFrontendUrl
+                                        .replace(
+                                          /^\/devtools/,
+                                          'devtools://devtools/bundled',
+                                        )
+                                        .replace(
+                                          /^chrome-devtools:\/\//,
+                                          'devtools://',
+                                        ),
                                     )
                                   }}
                                 >
