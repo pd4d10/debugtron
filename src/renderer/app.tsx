@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ipcRenderer, remote } from 'electron'
+import { ipcRenderer } from 'electron'
 import { useDropzone } from 'react-dropzone'
 import {
   Tabs,
@@ -175,8 +175,7 @@ export const App: React.FC = () => {
                                   small
                                   rightIcon="share"
                                   onClick={() => {
-                                    const win = new remote.BrowserWindow()
-                                    win.loadURL(
+                                    window.open(
                                       page.devtoolsFrontendUrl
                                         .replace(
                                           /^\/devtools/,
