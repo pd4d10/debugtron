@@ -12,13 +12,12 @@ import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { setUpdater } from './updater'
-import { Dict, AppInfo } from '../types'
-import { getApps, addTempApp, getAppStart } from '../reducers/app'
+import { addTempApp } from '../reducers/app'
 import reducers, { State } from '../reducers'
 import { Adapter } from './adapter'
 import { WinAdapter } from './win'
 import { MacosAdapter } from './macos'
-import { startDebugging, fetchPages } from './actions'
+import { startDebugging, fetchPages, detectApps } from './actions'
 import { LinuxAdapter } from './linux'
 
 const store = createStore<State, any, {}, {}>(
@@ -120,19 +119,10 @@ if (!gotTheLock) {
 
     setUpdater()
     createWindow()
+    store.dispatch(detectApps(adapter))
     setInterval(() => {
       store.dispatch(fetchPages())
     }, 3000)
-
-    store.dispatch(getAppStart())
-    const apps = await adapter.readApps()
-    const appInfo = apps.reduce((a, b) => {
-      if (b) {
-        a[b.id] = b
-      }
-      return a
-    }, {} as Dict<AppInfo>)
-    store.dispatch(getApps(appInfo))
   })
 
   app.on('window-all-closed', () => {
@@ -173,5 +163,9 @@ if (!gotTheLock) {
   ipcMain.on('startDebugging', async (e: Electron.Event, id: string) => {
     const { appInfo } = store.getState()
     store.dispatch(startDebugging(appInfo[id]))
+  })
+
+  ipcMain.on('detectApps', async () => {
+    store.dispatch(detectApps(adapter))
   })
 }

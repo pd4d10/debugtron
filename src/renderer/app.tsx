@@ -62,7 +62,18 @@ export const App: React.FC = () => {
         flexDirection: 'column',
       }}
     >
-      <h3>Installed Electron-based App (Click to debug)</h3>
+      <h3>
+        Installed Electron-based App (Click to debug){'  '}
+        <Button
+          small
+          icon="refresh"
+          onClick={() => {
+            ipcRenderer.send('detectApps')
+          }}
+        >
+          Refresh
+        </Button>
+      </h3>
       <div style={{ display: 'flex' }}>
         {appLoading ? (
           <Spinner />

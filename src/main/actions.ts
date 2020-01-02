@@ -13,6 +13,8 @@ import {
 import { State } from '../reducers'
 import { dialog } from 'electron'
 import { ThunkAction } from 'redux-thunk'
+import { Adapter } from './adapter'
+import { getApps, getAppStart } from '../reducers/app'
 
 export const fetchPages = (): ThunkAction<any, State, any, any> => async (
   dispatch,
@@ -90,4 +92,18 @@ export const startDebugging = (
   if (sp.stderr) {
     sp.stderr.on('data', handleStdout(true))
   }
+}
+
+export const detectApps = (
+  adapter: Adapter,
+): ThunkAction<any, State, any, any> => async dispatch => {
+  dispatch(getAppStart())
+  const apps = await adapter.readApps()
+  const appInfo = apps.reduce((a, b) => {
+    if (b) {
+      a[b.id] = b
+    }
+    return a
+  }, {} as Dict<AppInfo>)
+  dispatch(getApps(appInfo))
 }
