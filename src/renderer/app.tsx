@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { ipcRenderer, remote } from 'electron'
 import { useDropzone } from 'react-dropzone'
-import { Tabs, Tab, Divider, Pre, Tag, Spinner } from '@blueprintjs/core'
+import {
+  Tabs,
+  Tab,
+  Divider,
+  Pre,
+  Tag,
+  Spinner,
+  HTMLTable,
+  Button,
+} from '@blueprintjs/core'
 import { useSelector } from 'react-redux'
 import { State } from '../reducers'
 import './app.css'
@@ -127,44 +136,61 @@ export const App: React.FC = () => {
                 title={appInfo[session.appId].name}
                 panel={
                   <div style={{ display: 'flex', marginTop: -20 }}>
-                    <div style={{ flexBasis: 200, flexShrink: 0 }}>
+                    <div>
                       <h3>Sessions (Click to open)</h3>
-                      {Object.entries(session.pages).map(([id, page]) => (
-                        <div key={id}>
-                          <a
-                            href="#"
-                            className="hoverable"
-                            style={{
-                              display: 'block',
-                              padding: 8,
-                              wordBreak: 'break-all',
-                            }}
-                            onClick={e => {
-                              e.preventDefault()
-                              const win = new remote.BrowserWindow()
-                              win.loadURL(
-                                page.devtoolsFrontendUrl.replace(
-                                  /^\/devtools/,
-                                  'chrome-devtools://devtools/bundled',
-                                ),
-                              )
-                            }}
-                          >
-                            <Tag
-                              intent={
-                                page.type === 'node'
-                                  ? 'success'
-                                  : page.type === 'page'
-                                  ? 'primary'
-                                  : 'none'
-                              }
-                            >
-                              {page.type}
-                            </Tag>{' '}
-                            {page.title}
-                          </a>
-                        </div>
-                      ))}
+                      <HTMLTable condensed interactive>
+                        <thead>
+                          <tr>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(session.pages).map(([id, page]) => (
+                            <tr key={id}>
+                              <td>
+                                <Tag
+                                  intent={
+                                    page.type === 'node'
+                                      ? 'success'
+                                      : page.type === 'page'
+                                      ? 'primary'
+                                      : 'none'
+                                  }
+                                >
+                                  {page.type}
+                                </Tag>
+                              </td>
+                              <td
+                                style={{
+                                  maxWidth: 200,
+                                  wordWrap: 'break-word',
+                                }}
+                              >
+                                {page.title}
+                              </td>
+                              <td>
+                                <Button
+                                  small
+                                  rightIcon="share"
+                                  onClick={() => {
+                                    const win = new remote.BrowserWindow()
+                                    win.loadURL(
+                                      page.devtoolsFrontendUrl.replace(
+                                        /^\/devtools/,
+                                        'chrome-devtools://devtools/bundled',
+                                      ),
+                                    )
+                                  }}
+                                >
+                                  Inspect
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </HTMLTable>
                     </div>
                     <Divider />
                     <Pre
