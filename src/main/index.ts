@@ -11,7 +11,6 @@ import {
 import { forwardToRenderer, replayActionMain } from 'electron-redux'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import { setUpdater } from './updater'
 import { addTempApp } from '../reducers/app'
 import reducers, { State } from '../reducers'
 import { Adapter } from './adapter'
@@ -19,6 +18,7 @@ import { WinAdapter } from './win'
 import { MacosAdapter } from './macos'
 import { startDebugging, fetchPages, detectApps } from './actions'
 import { LinuxAdapter } from './linux'
+import { setUpdater, setReporter } from './utils'
 
 const store = createStore<State, any, {}, {}>(
   reducers,
@@ -117,6 +117,7 @@ if (!gotTheLock) {
       )
     }
 
+    setReporter()
     setUpdater()
     createWindow()
     store.dispatch(detectApps(adapter))
