@@ -85,10 +85,11 @@ export const detectApps = (
   dispatch(getAppStart())
   const apps = await adapter.readApps()
   const appInfo = {} as Dict<AppInfo>
-  for (const app of apps) {
-    if (app) {
+  apps
+    .filter((app): app is AppInfo => typeof app !== 'undefined')
+    .sort((a, b) => (a.id < b.id ? -1 : 1))
+    .forEach(app => {
       appInfo[app.id] = app
-    }
-  }
+    })
   dispatch(getApps(appInfo))
 }
