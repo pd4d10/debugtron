@@ -30,12 +30,12 @@ export const fetchPages = (): ThunkAction<any, State, any, any> => async (
     const pages = payloads.flat() as PageInfo[]
     if (pages.length === 0) return
 
-    const pageDict = pages
+    const pageDict = {} as Dict<PageInfo>
+    pages
       .sort((a, b) => (a.id < b.id ? -1 : 1))
-      .reduce((a, b) => {
-        a[b.id] = b
-        return a
-      }, {} as Dict<PageInfo>)
+      .forEach(page => {
+        pageDict[page.id] = page
+      })
 
     dispatch(updatePages(id, pageDict))
   }
@@ -84,11 +84,11 @@ export const detectApps = (
 ): ThunkAction<any, State, any, any> => async dispatch => {
   dispatch(getAppStart())
   const apps = await adapter.readApps()
-  const appInfo = apps.reduce((a, b) => {
-    if (b) {
-      a[b.id] = b
+  const appInfo = {} as Dict<AppInfo>
+  for (const app of apps) {
+    if (app) {
+      appInfo[app.id] = app
     }
-    return a
-  }, {} as Dict<AppInfo>)
+  }
   dispatch(getApps(appInfo))
 }

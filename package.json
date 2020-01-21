@@ -108,7 +108,7 @@
     "simple-plist": "^1.1.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.2",
-    "typescript": "^3.5.1",
+    "typescript": "^3.7.5",
     "universal-analytics": "^0.4.20",
     "update-electron-app": "^1.5.0",
     "url-loader": "^2.0.0",
