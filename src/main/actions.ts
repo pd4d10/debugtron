@@ -3,15 +3,10 @@ import { spawn } from 'child_process'
 import { updatePages } from '../reducers/session'
 import { PageInfo, Dict, AppInfo } from '../types'
 import fetch from 'node-fetch'
-import {
-  updateNodePort,
-  updateWindowPort,
-  addSession,
-  updateLog,
-  removeSession,
-} from '../reducers/session'
+import { addSession, updateLog, removeSession } from '../reducers/session'
 import { State } from '../reducers'
 import { dialog } from 'electron'
+import getPort from 'get-port'
 import { ThunkAction } from 'redux-thunk'
 import { Adapter } from './adapter'
 import { getApps, getAppStart } from '../reducers/app'
@@ -48,11 +43,17 @@ export const fetchPages = (): ThunkAction<any, State, any, any> => async (
 
 export const startDebugging = (
   app: AppInfo,
-): ThunkAction<any, State, any, any> => (dispatch, getState) => {
-  const sp = spawn(app.exePath, [`--inspect=0`, `--remote-debugging-port=0`])
+): ThunkAction<any, State, any, any> => async (dispatch, getState) => {
+  const nodePort = await getPort()
+  const windowPort = await getPort()
+
+  const sp = spawn(app.exePath, [
+    `--inspect=${nodePort}`,
+    `--remote-debugging-port=${windowPort}`,
+  ])
 
   const id = v4()
-  dispatch(addSession(id, app.id))
+  dispatch(addSession(id, app.id, nodePort, windowPort))
 
   sp.on('error', err => {
     dialog.showErrorBox(`Error: ${app.name}`, err.message)
@@ -66,22 +67,6 @@ export const startDebugging = (
 
   const handleStdout = (isError = false) => (chunk: Buffer) => {
     const data = chunk.toString()
-    const session = getState().sessionInfo[id]
-
-    // Try to find listening port from log
-    if (!session.nodePort) {
-      const match = /Debugger listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
-      if (match) {
-        dispatch(updateNodePort(id, match[1]))
-      }
-    }
-    if (!session.windowPort) {
-      const match = /DevTools listening on ws:\/\/127.0.0.1:(\d+)\//.exec(data)
-      if (match) {
-        dispatch(updateWindowPort(id, match[1]))
-      }
-    }
-
     // TODO: stderr colors
     dispatch(updateLog(id, data))
   }
