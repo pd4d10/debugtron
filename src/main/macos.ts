@@ -7,19 +7,21 @@ export class MacosAdapter extends Adapter {
   async readApps() {
     const dir = '/Applications'
     const appPaths = await readdirSafe(dir)
-    return Promise.all(appPaths.map(p => this.readAppByPath(path.join(dir, p))))
+    return Promise.all(
+      appPaths.map((p) => this.readAppByPath(path.join(dir, p)))
+    )
   }
 
   async readAppByPath(p: string) {
     const isElectronBased = fs.existsSync(
-      path.join(p, 'Contents/Frameworks/Electron Framework.framework'),
+      path.join(p, 'Contents/Frameworks/Electron Framework.framework')
     )
     if (!isElectronBased) return
 
     const info = await readPlistFile(path.join(p, 'Contents/Info.plist'))
 
     const icon = await this.readIcnsAsImageUri(
-      path.join(p, 'Contents/Resources', info.CFBundleIconFile),
+      path.join(p, 'Contents/Resources', info.CFBundleIconFile)
     )
 
     return {

@@ -51,7 +51,7 @@ export const addSession = (
   id: string,
   appId: string,
   nodePort: number,
-  windowPort: number,
+  windowPort: number
 ) => ({
   type: ADD_SESSION,
   payload: { id, appId, nodePort, windowPort },

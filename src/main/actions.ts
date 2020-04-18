@@ -13,7 +13,7 @@ import { getApps, getAppStart } from '../reducers/app'
 
 export const fetchPages = (): ThunkAction<any, State, any, any> => async (
   dispatch,
-  getState,
+  getState
 ) => {
   const { sessionInfo } = getState()
   for (let [id, info] of Object.entries(sessionInfo)) {
@@ -22,9 +22,9 @@ export const fetchPages = (): ThunkAction<any, State, any, any> => async (
     if (info.windowPort) ports.push(info.windowPort)
 
     const payloads = await Promise.all(
-      ports.map(port =>
-        fetch(`http://127.0.0.1:${port}/json`).then(res => res.json()),
-      ),
+      ports.map((port) =>
+        fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())
+      )
     )
 
     const pages = payloads.flat() as PageInfo[]
@@ -33,7 +33,7 @@ export const fetchPages = (): ThunkAction<any, State, any, any> => async (
     const pageDict = {} as Dict<PageInfo>
     pages
       .sort((a, b) => (a.id < b.id ? -1 : 1))
-      .forEach(page => {
+      .forEach((page) => {
         pageDict[page.id] = page
       })
 
@@ -42,7 +42,7 @@ export const fetchPages = (): ThunkAction<any, State, any, any> => async (
 }
 
 export const startDebugging = (
-  app: AppInfo,
+  app: AppInfo
 ): ThunkAction<any, State, any, any> => async (dispatch, getState) => {
   const nodePort = await getPort()
   const windowPort = await getPort()
@@ -55,11 +55,11 @@ export const startDebugging = (
   const id = v4()
   dispatch(addSession(id, app.id, nodePort, windowPort))
 
-  sp.on('error', err => {
+  sp.on('error', (err) => {
     dialog.showErrorBox(`Error: ${app.name}`, err.message)
   })
 
-  sp.on('close', code => {
+  sp.on('close', (code) => {
     // console.log(`child process exited with code ${code}`)
     dispatch(removeSession(id))
     // TODO: Remove temp app
@@ -80,15 +80,15 @@ export const startDebugging = (
 }
 
 export const detectApps = (
-  adapter: Adapter,
-): ThunkAction<any, State, any, any> => async dispatch => {
+  adapter: Adapter
+): ThunkAction<any, State, any, any> => async (dispatch) => {
   dispatch(getAppStart())
   const apps = await adapter.readApps()
   const appInfo = {} as Dict<AppInfo>
   apps
     .filter((app): app is AppInfo => typeof app !== 'undefined')
     .sort((a, b) => (a.id < b.id ? -1 : 1))
-    .forEach(app => {
+    .forEach((app) => {
       appInfo[app.id] = app
     })
   dispatch(getApps(appInfo))

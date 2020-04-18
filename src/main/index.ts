@@ -22,7 +22,7 @@ import { setUpdater, setReporter } from './utils'
 
 const store = createStore<State, any, {}, {}>(
   reducers,
-  applyMiddleware(thunk, forwardToRenderer),
+  applyMiddleware(thunk, forwardToRenderer)
 )
 replayActionMain(store)
 
@@ -108,12 +108,12 @@ if (!gotTheLock) {
               label: 'Submit an Issue',
               click() {
                 shell.openExternal(
-                  'https://github.com/bytedance/debugtron/issues/new',
+                  'https://github.com/bytedance/debugtron/issues/new'
                 )
               },
             },
           ],
-        }),
+        })
       )
     }
 
@@ -142,7 +142,7 @@ if (!gotTheLock) {
     'startDebuggingWithExePath',
     async (e: Electron.Event, p: string) => {
       const { appInfo } = store.getState()
-      const duplicated = Object.values(appInfo).find(a => a.exePath === p)
+      const duplicated = Object.values(appInfo).find((a) => a.exePath === p)
       if (duplicated) {
         store.dispatch(startDebugging(duplicated))
         return
@@ -155,10 +155,10 @@ if (!gotTheLock) {
       } else {
         dialog.showErrorBox(
           'Invalid application path',
-          `${p} is not an Electron-based application`,
+          `${p} is not an Electron-based application`
         )
       }
-    },
+    }
   )
 
   ipcMain.on('startDebugging', async (e: Electron.Event, id: string) => {

@@ -11,10 +11,10 @@ export class LinuxAdapter extends Adapter {
   async readApps() {
     const files = await readdirSafe(desktopFilesDir)
     const apps = await Promise.all(
-      files.map(file => {
+      files.map((file) => {
         if (!file.endsWith('.desktop')) return
         return this.readAppInfo(path.join(desktopFilesDir, file))
-      }),
+      })
     )
     return apps
   }
@@ -53,7 +53,7 @@ export class LinuxAdapter extends Adapter {
     if (entry.Icon) {
       try {
         const iconBuffer = await fs.promises.readFile(
-          `/usr/share/icons/hicolor/1024x1024/apps/${entry.Icon}.png`,
+          `/usr/share/icons/hicolor/1024x1024/apps/${entry.Icon}.png`
         )
         icon = 'data:image/png;base64,' + iconBuffer.toString('base64')
       } catch (err) {
