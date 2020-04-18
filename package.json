@@ -89,6 +89,7 @@
     "@types/universal-analytics": "^0.4.3",
     "@types/uuid": "^3.4.4",
     "css-loader": "^2.1.1",
+    "devtron": "^1.4.0",
     "electron": "8.2.3",
     "electron-devtools-installer": "^3.0.0",
     "electron-redux": "^1.4.0",

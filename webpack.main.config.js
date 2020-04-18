@@ -16,16 +16,17 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       DEBUGTRON_GITHUB_TOKEN: JSON.stringify(
-        process.env.DEBUGTRON_GITHUB_TOKEN,
+        process.env.DEBUGTRON_GITHUB_TOKEN
       ),
     }),
   ],
   externals: [
-    function(context, request, callback) {
+    'devtron',
+    function (context, request, callback) {
       if (request === '../../build/Release/registry.node') {
         return callback(
           null,
-          'commonjs ./native_modules/build/Release/registry.node',
+          'commonjs ./native_modules/build/Release/registry.node'
         )
       }
       callback()

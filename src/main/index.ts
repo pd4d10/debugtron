@@ -47,7 +47,9 @@ const createWindow = () => {
   })
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
-  // mainWindow.webContents.openDevTools()
+  if (!app.isPackaged) {
+    mainWindow.webContents.openDevTools()
+  }
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -82,13 +84,17 @@ if (!gotTheLock) {
   }
 
   app.on('ready', async () => {
-    if (!app.isPackaged) {
+    if (app.isPackaged) {
+      setReporter()
+    } else {
       const installer = require('electron-devtools-installer')
       await Promise.all(
         ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map((name) =>
           installer.default(installer[name])
         )
       )
+      require('devtron').install()
+      setReporter()
     }
 
     const defaultMenu = Menu.getApplicationMenu()
@@ -116,7 +122,6 @@ if (!gotTheLock) {
       )
     }
 
-    setReporter()
     setUpdater()
     createWindow()
     store.dispatch(detectApps(adapter))
