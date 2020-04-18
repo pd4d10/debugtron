@@ -82,15 +82,14 @@ if (!gotTheLock) {
   }
 
   app.on('ready', async () => {
-    // TODO: Uncomment after https://github.com/MarshallOfSound/electron-devtools-installer/pull/92 merged
-    // if (!app.isPackaged) {
-    //   const installer = require('electron-devtools-installer')
-    //   await Promise.all(
-    //     ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map(name =>
-    //       installer.default(installer[name]),
-    //     ),
-    //   )
-    // }
+    if (!app.isPackaged) {
+      const installer = require('electron-devtools-installer')
+      await Promise.all(
+        ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map((name) =>
+          installer.default(installer[name])
+        )
+      )
+    }
 
     const defaultMenu = Menu.getApplicationMenu()
     if (defaultMenu) {

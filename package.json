@@ -90,7 +90,7 @@
     "@types/uuid": "^3.4.4",
     "css-loader": "^2.1.1",
     "electron": "8.2.3",
-    "electron-devtools-installer": "^2.2.4",
+    "electron-devtools-installer": "^3.0.0",
     "electron-redux": "^1.4.0",
     "electron-update-notification": "^0.1.0",
     "get-port": "^5.1.1",
