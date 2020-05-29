@@ -52,7 +52,7 @@ export const startDebugging = (
     app.exePath,
     [`--inspect=${nodePort}`, `--remote-debugging-port=${windowPort}`],
     {
-      cwd: path.dirname(app.exePath), // For win
+      cwd: process.platform === 'win32' ? path.dirname(app.exePath) : '/',
     }
   )
 
