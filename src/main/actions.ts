@@ -1,4 +1,5 @@
 import { v4 } from 'uuid'
+import path from 'path'
 import { spawn } from 'child_process'
 import { updatePages } from '../reducers/session'
 import { PageInfo, Dict, AppInfo } from '../types'
@@ -47,10 +48,13 @@ export const startDebugging = (
   const nodePort = await getPort()
   const windowPort = await getPort()
 
-  const sp = spawn(app.exePath, [
-    `--inspect=${nodePort}`,
-    `--remote-debugging-port=${windowPort}`,
-  ])
+  const sp = spawn(
+    app.exePath,
+    [`--inspect=${nodePort}`, `--remote-debugging-port=${windowPort}`],
+    {
+      cwd: path.dirname(app.exePath), // For win
+    }
+  )
 
   const id = v4()
   dispatch(addSession(id, app.id, nodePort, windowPort))
