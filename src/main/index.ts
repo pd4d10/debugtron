@@ -43,6 +43,7 @@ const createWindow = () => {
         : undefined,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
   })
 
