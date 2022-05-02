@@ -33,6 +33,7 @@ specifiers:
   node-fetch: ^2.6.0
   node-loader: ^2.0.0
   node-machine-id: ^1.1.12
+  normalize.css: ^8.0.1
   path-browserify: ^1.0.1
   react: ^16.8.6
   react-dom: ^16.8.6
@@ -86,6 +87,7 @@ devDependencies:
   node-fetch: 2.6.7
   node-loader: 2.0.0
   node-machine-id: 1.1.12
+  normalize.css: 8.0.1
   path-browserify: 1.0.1
   react: 16.14.0
   react-dom: 16.14.0_react@16.14.0
