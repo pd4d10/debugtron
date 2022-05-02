@@ -17,7 +17,9 @@ import './app.css'
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
-  const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(s => s)
+  const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(
+    (s) => s
+  )
   const { getRootProps, getInputProps } = useDropzone({
     noClick: process.platform === 'darwin',
     onDropAccepted(files) {
@@ -86,7 +88,7 @@ export const App: React.FC = () => {
                 <a
                   key={id}
                   href="#"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.preventDefault()
                     ipcRenderer.send('startDebugging', app.id)
                   }}
@@ -136,7 +138,7 @@ export const App: React.FC = () => {
         {sessionEntries.length ? (
           <Tabs
             selectedTabId={activeId}
-            onChange={key => {
+            onChange={(key) => {
               setActiveId(key as string)
             }}
           >
@@ -190,12 +192,12 @@ export const App: React.FC = () => {
                                       page.devtoolsFrontendUrl
                                         .replace(
                                           /^\/devtools/,
-                                          'devtools://devtools/bundled',
+                                          'devtools://devtools/bundled'
                                         )
                                         .replace(
                                           /^chrome-devtools:\/\//,
-                                          'devtools://',
-                                        ),
+                                          'devtools://'
+                                        )
                                     )
                                   }}
                                 >

@@ -10,8 +10,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\"",
-    "test": "npx prettier --list-different src/**/*.ts"
+    "lint": "npx prettier --check src/**/*.{ts,tsx,js,jsx}",
+    "lint-fix": "npx prettier --write src/**/*.{ts,tsx,js,jsx}"
   },
   "keywords": [],
   "author": "Rongjian Zhang <pd4d10@gmail.com>",

@@ -12,16 +12,16 @@ import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 
 const composeEnhancers =
-    (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
-  // For debug
+// For debug
 ;(window as any).electron = require('electron')
 
 const initialState = getInitialStateRenderer()
 const store = createStore(
   reducers,
   initialState,
-  composeEnhancers(applyMiddleware(forwardToMain, thunk)),
+  composeEnhancers(applyMiddleware(forwardToMain, thunk))
 )
 replayActionRenderer(store)
 
@@ -29,5 +29,5 @@ ReactDOM.render(
   <Provider store={store}>
     <App />
   </Provider>,
-  document.getElementById('root'),
+  document.getElementById('root')
 )
