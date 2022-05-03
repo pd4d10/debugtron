@@ -115,5 +115,6 @@
     "universal-analytics": "^0.5.3",
     "url-loader": "^4.1.1",
     "uuid": "^8.3.2"
-  }
+  },
+  "packageManager": "pnpm@7.0.0"
 }
