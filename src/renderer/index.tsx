@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { App } from './app'
 import reducers from '../reducers'
 import { createStore, applyMiddleware, compose } from 'redux'
@@ -25,9 +25,8 @@ const store = createStore(
 )
 replayActionRenderer(store)
 
-ReactDOM.render(
+createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
     <App />
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
 )
