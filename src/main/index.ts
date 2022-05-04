@@ -8,7 +8,7 @@ import {
   shell,
   nativeImage,
 } from 'electron'
-import { forwardToRenderer, replayActionMain } from 'electron-redux'
+import { composeWithStateSync } from 'electron-redux/main'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { addTempApp } from '../reducers/app'
@@ -22,9 +22,8 @@ import { setUpdater, setReporter } from './utils'
 
 const store = createStore<State, any, {}, {}>(
   reducers,
-  applyMiddleware(thunk, forwardToRenderer)
+  composeWithStateSync(applyMiddleware(thunk))
 )
-replayActionMain(store)
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -32,6 +31,8 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow: BrowserWindow | null = null
+
+console.log(MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY)
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -44,6 +45,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   })
 

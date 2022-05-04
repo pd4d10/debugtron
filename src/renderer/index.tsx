@@ -2,28 +2,18 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './app'
 import reducers from '../reducers'
-import { createStore, applyMiddleware, compose } from 'redux'
-import {
-  forwardToMain,
-  replayActionRenderer,
-  getInitialStateRenderer,
-} from 'electron-redux'
+import { createStore, applyMiddleware } from 'redux'
+import { composeWithStateSync } from 'electron-redux/renderer'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
-
-const composeEnhancers =
-  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 // For debug
 ;(window as any).electron = require('electron')
 
-const initialState = getInitialStateRenderer()
 const store = createStore(
   reducers,
-  initialState,
-  composeEnhancers(applyMiddleware(forwardToMain, thunk))
+  composeWithStateSync(applyMiddleware(thunk))
 )
-replayActionRenderer(store)
 
 createRoot(document.getElementById('root')!).render(
   <Provider store={store}>

@@ -23,7 +23,7 @@ specifiers:
   devtron: ^1.4.0
   electron: ^11.5.0
   electron-devtools-installer: ^3.0.0
-  electron-redux: ^1.4.0
+  electron-redux: 2.0.0-alpha.9
   electron-squirrel-startup: ^1.0.0
   electron-update-notification: ^0.1.0
   get-port: '5'
@@ -76,7 +76,7 @@ devDependencies:
   devtron: 1.4.0
   electron: 11.5.0
   electron-devtools-installer: 3.2.0
-  electron-redux: 1.5.4
+  electron-redux: 2.0.0-alpha.9_37gv5m23okllrig6bvtxp3fpuq
   electron-update-notification: 0.1.0_electron@11.5.0
   get-port: 5.1.1
   ini: 3.0.0
@@ -2474,13 +2474,17 @@ packages:
       - supports-color
     dev: true
 
-  /electron-redux/1.5.4:
-    resolution: {integrity: sha512-7fM7OLVR34prk/ZlIv3yRbB4XCZPPQJ9ZfYLPmWPvKIONe2qm1e0on+cMLGgwzREapQrzCmc1VAxs8WNbWgncg==}
+  /electron-redux/2.0.0-alpha.9_37gv5m23okllrig6bvtxp3fpuq:
+    resolution: {integrity: sha512-LEnZC8PgUFb+O7BKQKhI9GqIFRzIV1WT0wCGLHcCnU6tKI5sou8BOTVJFfoJUAKEHlzS+D+NE3X7P2DZjyh1dw==}
+    engines: {node: '>= 12'}
+    peerDependencies:
+      electron: '>=8.0.0'
+      redux: '>=4.0.0'
     dependencies:
-      debug: 4.3.4
+      electron: 11.5.0
+      lodash.isplainobject: 4.0.6
+      lodash.isstring: 4.0.1
       redux: 4.2.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /electron-squirrel-startup/1.0.0:
@@ -4048,6 +4052,14 @@ packages:
 
   /lodash.get/4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    dev: true
+
+  /lodash.isplainobject/4.0.6:
+    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
+    dev: true
+
+  /lodash.isstring/4.0.1:
+    resolution: {integrity: sha512-0wJxfxH1wgO3GrbuP+dTTk7op+6L41QCXbGINEmD+ny/G/eCqGzxyCsh7159S+mgDDcoarnBw6PC1PS5+wUGgw==}
     dev: true
 
   /lodash.sortby/4.7.0:

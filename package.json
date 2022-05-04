@@ -45,7 +45,10 @@
                 {
                   "html": "./src/index.html",
                   "js": "./src/renderer.js",
-                  "name": "main_window"
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/preload.js"
+                  }
                 }
               ]
             }
@@ -92,7 +95,7 @@
     "devtron": "^1.4.0",
     "electron": "^11.5.0",
     "electron-devtools-installer": "^3.0.0",
-    "electron-redux": "^1.4.0",
+    "electron-redux": "2.0.0-alpha.9",
     "electron-update-notification": "^0.1.0",
     "get-port": "5",
     "ini": "^3.0.0",
