@@ -21,7 +21,7 @@ specifiers:
   '@vercel/webpack-asset-relocator-loader': ^1.7.2
   css-loader: ^6.7.1
   devtron: ^1.4.0
-  electron: ^11.5.0
+  electron: ^18.2.0
   electron-devtools-installer: ^3.0.0
   electron-redux: 2.0.0-alpha.9
   electron-squirrel-startup: ^1.0.0
@@ -36,7 +36,7 @@ specifiers:
   path-browserify: ^1.0.1
   react: ^18.1.0
   react-dom: ^18.1.0
-  react-dropzone: ^14.1.2
+  react-dropzone: ^14.2.0
   react-redux: ^8.0.1
   redux: ^4.0.4
   redux-thunk: ^2.3.0
@@ -74,10 +74,10 @@ devDependencies:
   '@vercel/webpack-asset-relocator-loader': 1.7.2
   css-loader: 6.7.1
   devtron: 1.4.0
-  electron: 11.5.0
+  electron: 18.2.0
   electron-devtools-installer: 3.2.0
-  electron-redux: 2.0.0-alpha.9_37gv5m23okllrig6bvtxp3fpuq
-  electron-update-notification: 0.1.0_electron@11.5.0
+  electron-redux: 2.0.0-alpha.9_phbjxk2kws5myphaxo7g7xt73y
+  electron-update-notification: 0.1.0_electron@18.2.0
   get-port: 5.1.1
   ini: 3.0.0
   lodash-es: 4.17.21
@@ -88,7 +88,7 @@ devDependencies:
   path-browserify: 1.0.1
   react: 18.1.0
   react-dom: 18.1.0_react@18.1.0
-  react-dropzone: 14.1.2_react@18.1.0
+  react-dropzone: 14.2.0_react@18.1.0
   react-redux: 8.0.1_yuza2qmfs45yy2ane2xcuswehi
   redux: 4.2.0
   redux-thunk: 2.4.1_redux@4.2.0
@@ -921,8 +921,8 @@ packages:
       form-data: 3.0.1
     dev: true
 
-  /@types/node/12.20.50:
-    resolution: {integrity: sha512-+9axpWx2b2JCVovr7Ilgt96uc6C1zBKOQMpGtRbWT9IoR/8ue32GGMfGA4woP8QyP2gBs6GQWEVM3tCybGCxDA==}
+  /@types/node/16.11.33:
+    resolution: {integrity: sha512-0PJ0vg+JyU0MIan58IOIFRtSvsb7Ri+7Wltx2qAg94eMOrpg4+uuP3aUHCpxXc1i0jCXiC+zIamSZh3l9AbcQA==}
     dev: true
 
   /@types/node/17.0.31:
@@ -1660,7 +1660,7 @@ packages:
     resolution: {integrity: sha512-gxGWBrTT1JuMx6R+o5PTXMmUnhnVzLQ9SNutD4YqKtI6ap897t3tKECYla6gCWEkplXnlNybEkZg9GEGxKFCgw==}
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.3.1
+      tslib: 2.4.0
     dev: true
 
   /camelcase/5.3.1:
@@ -2474,14 +2474,14 @@ packages:
       - supports-color
     dev: true
 
-  /electron-redux/2.0.0-alpha.9_37gv5m23okllrig6bvtxp3fpuq:
+  /electron-redux/2.0.0-alpha.9_phbjxk2kws5myphaxo7g7xt73y:
     resolution: {integrity: sha512-LEnZC8PgUFb+O7BKQKhI9GqIFRzIV1WT0wCGLHcCnU6tKI5sou8BOTVJFfoJUAKEHlzS+D+NE3X7P2DZjyh1dw==}
     engines: {node: '>= 12'}
     peerDependencies:
       electron: '>=8.0.0'
       redux: '>=4.0.0'
     dependencies:
-      electron: 11.5.0
+      electron: 18.2.0
       lodash.isplainobject: 4.0.6
       lodash.isstring: 4.0.1
       redux: 4.2.0
@@ -2497,13 +2497,13 @@ packages:
     resolution: {integrity: sha512-GgtN6bsDtHdtXJtlMYZWGB/uOyjZWjmRDumXTas7dGBaB9zUyCjzHet1DY2KhyHN8R0GLbzZWqm4efeddqqyRQ==}
     dev: true
 
-  /electron-update-notification/0.1.0_electron@11.5.0:
+  /electron-update-notification/0.1.0_electron@18.2.0:
     resolution: {integrity: sha512-e27zMqAcKgONAm8S4iAOBO5nRrZlPhOCg9KuJqNSzeOjVZQi8nHiKcD96hvDraKSmnWWfYNibOUpoNNyZV/jlQ==}
     peerDependencies:
       electron: '*'
     dependencies:
       '@types/node-fetch': 2.6.1
-      electron: 11.5.0
+      electron: 18.2.0
       github-url-to-object: 4.0.6
       node-fetch: 2.6.7
     transitivePeerDependencies:
@@ -2525,14 +2525,14 @@ packages:
     dev: true
     optional: true
 
-  /electron/11.5.0:
-    resolution: {integrity: sha512-WjNDd6lGpxyiNjE3LhnFCAk/D9GIj1rU3GSDealVShhkkkPR3Vh4q8ErXGDl1OAO/faomVa10KoFPUN/pLbNxg==}
+  /electron/18.2.0:
+    resolution: {integrity: sha512-AN+CKalzA57beuvuI90PVgW/yj6zjw7rpb1h8FvIwBJ3toDC3x0Plfzbzh4Ondecbjci7pSg/NA5ngOk804WIQ==}
     engines: {node: '>= 8.6'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@electron/get': 1.14.1
-      '@types/node': 12.20.50
+      '@types/node': 16.11.33
       extract-zip: 1.7.0
     transitivePeerDependencies:
       - supports-color
@@ -2842,9 +2842,9 @@ packages:
       escape-string-regexp: 1.0.5
     dev: true
 
-  /file-selector/0.5.0:
-    resolution: {integrity: sha512-s8KNnmIDTBoD0p9uJ9uD0XY38SCeBOtj0UMXyQSLg1Ypfrfj8+dAvwsLjYQkQ2GjhVtp2HrnF5cJzMhBjfD8HA==}
-    engines: {node: '>= 10'}
+  /file-selector/0.6.0:
+    resolution: {integrity: sha512-QlZ5yJC0VxHxQQsQhXvBaC7VRJ2uaxTf+Tfpu4Z/OcVQJVpZO+DGU0rkoVW5ce2SccxugvpBJoMvUs59iILYdw==}
+    engines: {node: '>= 12'}
     dependencies:
       tslib: 2.4.0
     dev: true
@@ -4801,7 +4801,7 @@ packages:
     resolution: {integrity: sha512-RXlj7zCYokReqWpOPH9oYivUzLYZ5vAPIfEmCTNViosC78F8F0H9y7T7gG2M39ymgutxF5gcFEsyZQSph9Bp3A==}
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.3.1
+      tslib: 2.4.0
     dev: true
 
   /parse-author/2.0.0:
@@ -5208,14 +5208,14 @@ packages:
       scheduler: 0.22.0
     dev: true
 
-  /react-dropzone/14.1.2_react@18.1.0:
-    resolution: {integrity: sha512-NoqvPmu2IDeJXHTRyyY0CnxGBG43gggynUY37bU3QHeAhhXSWSyYr9Aq1mIO152rQvpTd7afyRFvqeTWQYRxDA==}
+  /react-dropzone/14.2.0_react@18.1.0:
+    resolution: {integrity: sha512-D7AXPtRba8rd7DBOejh3W2v1Uax6i7XKPYPuMr13XFPfnDcPHHvlEfp3raVpdj3XMHlRfYuf2H5+m8p7mlgKdQ==}
     engines: {node: '>= 10.13'}
     peerDependencies:
       react: '>= 16.8 || 18.0.0'
     dependencies:
       attr-accept: 2.2.2
-      file-selector: 0.5.0
+      file-selector: 0.6.0
       prop-types: 15.8.1
       react: 18.1.0
     dev: true

@@ -188,7 +188,8 @@ export const App: React.FC = () => {
                                   small
                                   rightIcon="share"
                                   onClick={() => {
-                                    window.open(
+                                    ipcRenderer.send(
+                                      'openWindow',
                                       page.devtoolsFrontendUrl
                                         .replace(
                                           /^\/devtools/,

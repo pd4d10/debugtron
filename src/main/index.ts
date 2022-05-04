@@ -44,7 +44,7 @@ const createWindow = () => {
         : undefined,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
+      contextIsolation: false, // for `require`
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   })
@@ -175,5 +175,11 @@ if (!gotTheLock) {
 
   ipcMain.on('detectApps', async () => {
     store.dispatch(detectApps(adapter))
+  })
+
+  ipcMain.on('openWindow', (e: Electron.Event, url: string) => {
+    const win = new BrowserWindow()
+    // console.log(url)
+    win.loadURL(url)
   })
 }
