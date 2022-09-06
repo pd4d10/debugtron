@@ -20,7 +20,7 @@ specifiers:
   '@vercel/webpack-asset-relocator-loader': ^1.7.2
   css-loader: ^6.7.1
   devtron: ^1.4.0
-  electron: ^18.2.0
+  electron: ^20.1.1
   electron-devtools-installer: ^3.0.0
   electron-redux: 2.0.0-alpha.9
   electron-squirrel-startup: ^1.0.0
@@ -72,10 +72,10 @@ devDependencies:
   '@vercel/webpack-asset-relocator-loader': 1.7.3
   css-loader: 6.7.1
   devtron: 1.4.0
-  electron: 18.3.11
+  electron: 20.1.1
   electron-devtools-installer: 3.2.0
-  electron-redux: 2.0.0-alpha.9_qoonvdomtdwlgbqpuetsadhovu
-  electron-update-notification: 0.1.0_electron@18.3.11
+  electron-redux: 2.0.0-alpha.9_76kbrh334ej72ywhxp6wgqqcoa
+  electron-update-notification: 0.1.0_electron@20.1.1
   get-port: 6.1.2
   ini: 3.0.1
   lodash-es: 4.17.21
@@ -1076,7 +1076,7 @@ packages:
     resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
     requiresBuild: true
     dependencies:
-      '@types/node': 18.7.15
+      '@types/node': 16.11.57
     dev: true
     optional: true
 
@@ -1949,16 +1949,6 @@ packages:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
-  /concat-stream/1.6.2:
-    resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
-    engines: {'0': node >= 0.8}
-    dependencies:
-      buffer-from: 1.1.2
-      inherits: 2.0.4
-      readable-stream: 2.3.7
-      typedarray: 0.0.6
-    dev: true
-
   /config-chain/1.1.13:
     resolution: {integrity: sha512-qj+f8APARXHrM0hraqXYb2/bOVSV4PvJQlNZ/DVj0QrmNM2q2euizkeuVckQ57J+W0mRH6Hvi+k50M4Jul2VRQ==}
     dependencies:
@@ -2507,14 +2497,14 @@ packages:
       - supports-color
     dev: true
 
-  /electron-redux/2.0.0-alpha.9_qoonvdomtdwlgbqpuetsadhovu:
+  /electron-redux/2.0.0-alpha.9_76kbrh334ej72ywhxp6wgqqcoa:
     resolution: {integrity: sha512-LEnZC8PgUFb+O7BKQKhI9GqIFRzIV1WT0wCGLHcCnU6tKI5sou8BOTVJFfoJUAKEHlzS+D+NE3X7P2DZjyh1dw==}
     engines: {node: '>= 12'}
     peerDependencies:
       electron: '>=8.0.0'
       redux: '>=4.0.0'
     dependencies:
-      electron: 18.3.11
+      electron: 20.1.1
       lodash.isplainobject: 4.0.6
       lodash.isstring: 4.0.1
       redux: 4.2.0
@@ -2532,13 +2522,13 @@ packages:
     resolution: {integrity: sha512-nPdgMWtjjWGCtreW/2adkrB2jyHjClo9PtVhR6rW+oxa4E4Wom642Tn+5LslHP3XPL5MCpkn5/UEY60EXylNeQ==}
     dev: true
 
-  /electron-update-notification/0.1.0_electron@18.3.11:
+  /electron-update-notification/0.1.0_electron@20.1.1:
     resolution: {integrity: sha512-e27zMqAcKgONAm8S4iAOBO5nRrZlPhOCg9KuJqNSzeOjVZQi8nHiKcD96hvDraKSmnWWfYNibOUpoNNyZV/jlQ==}
     peerDependencies:
       electron: '*'
     dependencies:
       '@types/node-fetch': 2.6.2
-      electron: 18.3.11
+      electron: 20.1.1
       github-url-to-object: 4.0.6
       node-fetch: 2.6.7
     transitivePeerDependencies:
@@ -2560,15 +2550,15 @@ packages:
     dev: true
     optional: true
 
-  /electron/18.3.11:
-    resolution: {integrity: sha512-lKPfyp2/AhGy1mNRqm12ABwih3paoOEFGPtT1u4IlwlyV1UbD5RK2Z88CH5PFTTtJFGvmlGTlAY/meV5MQBSNw==}
-    engines: {node: '>= 8.6'}
+  /electron/20.1.1:
+    resolution: {integrity: sha512-cFTfP4R2O5onaXiu+S20xK7eLpyX/H7PYk7lj9mlHS0ui1+w1jDDWD3RhvjmPgeksPfMAZiRLK8lAQvzSBAKdg==}
+    engines: {node: '>= 10.17.0'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@electron/get': 1.14.1
       '@types/node': 16.11.57
-      extract-zip: 1.7.0
+      extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2799,18 +2789,6 @@ packages:
       chardet: 0.7.0
       iconv-lite: 0.4.24
       tmp: 0.0.33
-    dev: true
-
-  /extract-zip/1.7.0:
-    resolution: {integrity: sha512-xoh5G1W/PB0/27lXgMQyIhP5DSY/LhoCsOyZgb+6iMmRtCwVBo55uKaMoEYrDCKQhWvqEip5ZPKAc6eFNyf/MA==}
-    hasBin: true
-    dependencies:
-      concat-stream: 1.6.2
-      debug: 2.6.9
-      mkdirp: 0.5.6
-      yauzl: 2.10.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /extract-zip/2.0.1:
@@ -6176,10 +6154,6 @@ packages:
 
   /typed-styles/0.0.7:
     resolution: {integrity: sha512-pzP0PWoZUhsECYjABgCGQlRGL1n7tOHsgwYv3oIiEpJwGhFTuty/YNeduxQYzXXa3Ge5BdT6sHYIQYpl4uJ+5Q==}
-    dev: true
-
-  /typedarray/0.0.6:
-    resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
     dev: true
 
   /typescript/4.8.2:

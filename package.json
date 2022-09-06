@@ -92,7 +92,7 @@
     "@vercel/webpack-asset-relocator-loader": "^1.7.2",
     "css-loader": "^6.7.1",
     "devtron": "^1.4.0",
-    "electron": "^18.2.0",
+    "electron": "^20.1.1",
     "electron-devtools-installer": "^3.0.0",
     "electron-redux": "2.0.0-alpha.9",
     "electron-update-notification": "^0.1.0",
