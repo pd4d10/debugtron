@@ -20,13 +20,15 @@ export const fetchPages =
       if (info.nodePort) ports.push(info.nodePort)
       if (info.windowPort) ports.push(info.windowPort)
 
-      const payloads = await Promise.all(
+      const payloads = await Promise.allSettled<PageInfo>(
         ports.map((port) =>
           fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())
         )
       )
 
-      const pages = payloads.flat() as PageInfo[]
+      const pages = payloads.flatMap((p) =>
+        p.status === 'fulfilled' ? p.value : []
+      )
       if (pages.length === 0) return
 
       const pageDict = {} as Dict<PageInfo>
