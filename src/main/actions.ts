@@ -23,7 +23,7 @@ export const fetchPages =
       const payloads = await Promise.allSettled<PageInfo>(
         ports.map((port) =>
           fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())
-        )
+        ) as any
       )
 
       const pages = payloads.flatMap((p) =>
