@@ -1,22 +1,30 @@
+import os from 'os'
 import path from 'path'
 import ini from 'ini'
 import fs from 'fs'
 import { Adapter } from './adapter'
 import { readdirSafe, readFileSafe } from './utils'
 import { AppInfo } from '../types'
+import { findIconPath } from './linux/find-icon'
 
-const desktopFilesDir = '/usr/share/applications'
+const userAppsDir = path.join(os.homedir(), '.local/share/applications')
+const sysAppsDir = '/usr/share/applications'
 
 export class LinuxAdapter extends Adapter {
-  async readApps() {
-    const files = await readdirSafe(desktopFilesDir)
+  async readAppDir(dir: string) {
+    const files = await readdirSafe(dir)
     const apps = await Promise.all(
       files.map((file) => {
         if (!file.endsWith('.desktop')) return
-        return this.readAppInfo(path.join(desktopFilesDir, file))
+        return this.readAppInfo(path.join(dir, file))
       })
     )
     return apps
+  }
+  async readApps() {
+    const userApps = await this.readAppDir(userAppsDir)
+    const sysApps = await this.readAppDir(sysAppsDir)
+    return [...userApps, ...sysApps]
   }
   async readAppByPath(p: string) {
     return {
@@ -47,17 +55,34 @@ export class LinuxAdapter extends Adapter {
 
     if (!exePath.startsWith('/')) return
 
-    if (!fs.existsSync(path.join(exePath, '../resources/electron.asar'))) return
+    const exeDir = path.dirname(exePath)
+    // if (!fs.existsSync(path.join(exePath, '../resources/electron.asar'))) return
+    if (
+      !fs.existsSync(path.join(exeDir, 'LICENSE.electron.txt'))
+      && !fs.existsSync(path.join(exeDir, 'chrome-sanbox'))
+      && !fs.existsSync(path.join(exeDir, 'resources/electron.asar'))
+    ) return
 
     let icon = ''
+    let iconPath = '' // todo: set default icon
     if (entry.Icon) {
-      try {
-        const iconBuffer = await fs.promises.readFile(
-          `/usr/share/icons/hicolor/1024x1024/apps/${entry.Icon}.png`
-        )
-        icon = 'data:image/png;base64,' + iconBuffer.toString('base64')
-      } catch (err) {
-        console.error(err)
+      if (path.isAbsolute(entry.Icon)) {
+        iconPath = entry.Icon
+      } else {
+        iconPath = findIconPath(entry.Icon) || iconPath
+      }
+
+      if (fs.existsSync(iconPath)) {
+        const base64 = await fs.promises.readFile(iconPath, 'base64')
+
+        const ext = path.extname(iconPath)
+        if (ext === '.svg') {
+          icon = 'data:image/svg+xml;base64,' + base64
+        }
+        if (ext === '.png') {
+          icon = 'data:image/png;base64,' + base64
+        }
+        // todo: if (ext === 'xpm') {}
       }
     }
 
