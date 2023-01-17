@@ -34,13 +34,14 @@ let mainWindow: BrowserWindow | null = null
 
 console.log(MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY)
 
+const icon = require('../../assets/icon.png')
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     icon:
       process.platform === 'linux'
-        ? nativeImage.createFromDataURL(require('../../assets/icon.png'))
+        ? nativeImage.createFromDataURL(icon.default || icon)
         : undefined,
     webPreferences: {
       nodeIntegration: true,
