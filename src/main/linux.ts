@@ -6,6 +6,7 @@ import { Adapter } from './adapter'
 import { readdirSafe, readFileSafe } from './utils'
 import { AppInfo } from '../types'
 import { findIconPath } from './linux/find-icon'
+import { findExecPath } from './linux/find-exec'
 
 const userAppsDir = path.join(os.homedir(), '.local/share/applications')
 const sysAppsDir = '/usr/share/applications'
@@ -53,14 +54,22 @@ export class LinuxAdapter extends Adapter {
       exePath = entry.Exec.split(/\s+/)[0]
     }
 
+    if (!exePath.startsWith('/')) {
+      exePath = findExecPath(exePath) || exePath
+    }
+
     if (!exePath.startsWith('/')) return
 
-    const exeDir = path.dirname(exePath)
     // if (!fs.existsSync(path.join(exePath, '../resources/electron.asar'))) return
+    const exeDir = path.dirname(exePath)
     if (
-      !fs.existsSync(path.join(exeDir, 'LICENSE.electron.txt'))
-      && !fs.existsSync(path.join(exeDir, 'chrome-sanbox'))
-      && !fs.existsSync(path.join(exeDir, 'resources/electron.asar'))
+      !(
+        fs.existsSync(path.join(exeDir, './resources/electron.asar'))
+        ||
+        fs.existsSync(path.join(exeDir, './LICENSE.electron.txt'))
+        ||
+        fs.existsSync(path.join(exeDir, './chrome-sandbox'))
+      )
     ) return
 
     let icon = ''
