@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path'
+import { readPlistFile } from './macos/read-plist'
 import { Adapter } from './adapter'
-import { readdirSafe, readFileAsBufferSafe, readPlistFile } from './utils'
+import { readdirSafe, readFileAsBufferSafe } from './utils'
 
 export class MacosAdapter extends Adapter {
   async readApps() {
