@@ -14,10 +14,7 @@ import thunk from 'redux-thunk'
 import { addTempApp } from '../reducers/app'
 import reducers, { State } from '../reducers'
 import { Adapter } from './adapter'
-import { WinAdapter } from './win'
-import { MacosAdapter } from './macos'
 import { startDebugging, fetchPages, detectApps } from './actions'
-import { LinuxAdapter } from './linux'
 import { setUpdater, setReporter } from './utils'
 
 const store = createStore<State, any, {}, {}>(
@@ -75,13 +72,13 @@ if (!gotTheLock) {
   let adapter: Adapter
   switch (process.platform) {
     case 'win32':
-      adapter = new WinAdapter()
+      adapter = new (require('./win').WinAdapter)()
       break
     case 'darwin':
-      adapter = new MacosAdapter()
+      adapter = new (require('./macos').MacosAdapter)()
       break
     case 'linux':
-      adapter = new LinuxAdapter()
+      adapter = new (require('./linux').LinuxAdapter)()
       break
     default:
       throw new Error('platform not supported')

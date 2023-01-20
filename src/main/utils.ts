@@ -1,8 +1,6 @@
 import fs from 'fs'
 import os from 'os'
 import { setUpdateNotification } from 'electron-update-notification'
-import plist from 'simple-plist'
-import { MacosAppInfo } from '../types'
 import { machineId } from 'node-machine-id'
 import ua from 'universal-analytics'
 
@@ -31,20 +29,6 @@ export async function readFileAsBufferSafe(p: string) {
     console.error(err)
     return
   }
-}
-
-export async function readPlistFile(path: string): Promise<MacosAppInfo> {
-  return new Promise((resolve, reject) => {
-    plist.readFile<MacosAppInfo>(path, (error, data) => {
-      // console.log(error, data)
-
-      if (error || !data) {
-        reject(error)
-      } else {
-        resolve(data)
-      }
-    })
-  })
 }
 
 export async function setReporter() {
