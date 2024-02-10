@@ -64,9 +64,9 @@ if (!gotTheLock) {
   app.quit();
 } else {
   // send action to renderer
-  const appDispatch: AppDispatch = (action) => {
-    mainWindow?.webContents.send("app-dispatch", action);
-  };
+  // const appDispatch: AppDispatch = (action) => {
+  //   mainWindow?.webContents.send("app-dispatch", action);
+  // };
   const sessionDispatch: SessionDispatch = (action) => {
     mainWindow?.webContents.send("session-dispatch", action);
   };

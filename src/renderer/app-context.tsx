@@ -68,16 +68,14 @@ const reducer: Reducer<State, Action> = (state, action) => {
   }
 };
 
-export const AppContext = createContext({
-  state: initialState,
-  dispatch: (() => {}) as Dispatch<Action>,
-});
+export const AppContext = createContext([
+  initialState,
+  (() => {}) as Dispatch<Action>,
+] as const);
 
 export const AppProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={useReducer(reducer, initialState)}>
       {children}
     </AppContext.Provider>
   );

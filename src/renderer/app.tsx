@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Tabs,
@@ -19,21 +19,42 @@ const { ipcRenderer } = require("electron");
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState("");
-  const app = useContext(AppContext);
-  const session = useContext(SessionContext);
+  const [appState, appDispatch] = useContext(AppContext);
+  const [sessionState, sessionDispatch] = useContext(SessionContext);
 
-  const readApps = async () => {
-    app.dispatch({ type: "apps_start" });
+  const readApps = useCallback(async () => {
+    appDispatch({ type: "apps_start" });
     const apps: AppInfo[] = await ipcRenderer.invoke("read-apps");
-    app.dispatch({ type: "apps_succeed", apps });
-  };
+    appDispatch({ type: "apps_succeed", apps });
+  }, [appDispatch]);
+
+  const fetchPages = useCallback(async () => {
+    for (let [id, info] of Object.entries(sessionState)) {
+      const ports: number[] = [];
+      if (info.nodePort) ports.push(info.nodePort);
+      if (info.windowPort) ports.push(info.windowPort);
+
+      const payloads = await Promise.allSettled<PageInfo>(
+        ports.map((port) =>
+          fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
+        ),
+      );
+
+      const pages = payloads.flatMap((p) =>
+        p.status === "fulfilled" ? p.value : [],
+      );
+      if (pages.length === 0) return;
+
+      sessionDispatch({ type: "pages", sessionId: id, pages: pages });
+    }
+  }, [sessionDispatch, sessionState]);
 
   const { getRootProps, getInputProps } = useDropzone({
     noClick: process.platform === "darwin",
     onDropAccepted: async (files) => {
       if (files.length === 0) return;
       const p = files[0].path;
-      const duplicated = Object.values(app.state.info).find(
+      const duplicated = Object.values(appState.info).find(
         (a) => a.exePath === p,
       );
       if (duplicated) {
@@ -44,7 +65,7 @@ export const App: React.FC = () => {
           p,
         );
         if (current) {
-          app.dispatch({ type: "temp_app", info: current }); // TODO: Remove it after session closed
+          appDispatch({ type: "temp_app", info: current }); // TODO: Remove it after session closed
           ipcRenderer.send("debug", duplicated);
         } else {
           alert(
@@ -72,54 +93,38 @@ export const App: React.FC = () => {
   });
 
   useEffect(() => {
-    const sessionIds = Object.keys(session.state);
+    const sessionIds = Object.keys(sessionState);
 
     // Ensure there always be one tab active
     if (!sessionIds.includes(activeId) && sessionIds.length) {
       setActiveId(sessionIds[0]);
     }
-  }, [activeId, session.state]);
+  }, [activeId, sessionState]);
 
   useEffect(() => {
     // listen to main process
-    ipcRenderer.on("app-dispatch", (e, action) => {
-      app.dispatch(action);
-    });
+    // ipcRenderer.on("app-dispatch", (e, action) => {
+    //   appDispatch(action);
+    // });
     ipcRenderer.on("session-dispatch", (e, action) => {
-      session.dispatch(action);
+      sessionDispatch(action);
     });
+  }, [sessionDispatch]);
 
-    // read apps
+  // only first time
+  useEffect(() => {
     readApps();
+  }, [readApps]);
 
-    // set timer
-    const fetchPages = async () => {
-      for (let [id, info] of Object.entries(session.state)) {
-        const ports: number[] = [];
-        if (info.nodePort) ports.push(info.nodePort);
-        if (info.windowPort) ports.push(info.windowPort);
-
-        const payloads = await Promise.allSettled<PageInfo>(
-          ports.map((port) =>
-            fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
-          ),
-        );
-
-        const pages = payloads.flatMap((p) =>
-          p.status === "fulfilled" ? p.value : [],
-        );
-        if (pages.length === 0) return;
-
-        session.dispatch({ type: "pages", sessionId: id, pages: pages });
-      }
-    };
+  // set timer
+  useEffect(() => {
     const timer = setInterval(fetchPages, 3000);
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [fetchPages]);
 
-  const sessionEntries = Object.entries(session.state);
+  const sessionEntries = Object.entries(sessionState);
   // console.log(app, session)
 
   return (
@@ -144,11 +149,11 @@ export const App: React.FC = () => {
         </Button>
       </h3>
       <div style={{ display: "flex" }}>
-        {app.state.loading ? (
+        {appState.loading ? (
           <Spinner />
         ) : (
           <div style={{ display: "flex", flexGrow: 1, overflowX: "auto" }}>
-            {Object.entries(app.state.info).map(([id, app]) => {
+            {Object.entries(appState.info).map(([id, app]) => {
               if (app.hidden) return null;
 
               return (
@@ -213,7 +218,7 @@ export const App: React.FC = () => {
               <Tab
                 id={id}
                 key={id}
-                title={app.state.info[session.appId].name}
+                title={appState.info[session.appId].name}
                 panel={
                   <div style={{ display: "flex", marginTop: -20 }}>
                     <div>

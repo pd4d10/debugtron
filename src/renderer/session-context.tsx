@@ -89,16 +89,14 @@ const reducer: Reducer<State, Action> = (state, action) => {
   }
 };
 
-export const SessionContext = createContext({
-  state: initialState,
-  dispatch: (() => {}) as Dispatch<Action>,
-});
+export const SessionContext = createContext([
+  initialState,
+  (() => {}) as Dispatch<Action>,
+] as const);
 
 export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
   return (
-    <SessionContext.Provider value={{ state, dispatch }}>
+    <SessionContext.Provider value={useReducer(reducer, initialState)}>
       {children}
     </SessionContext.Provider>
   );
