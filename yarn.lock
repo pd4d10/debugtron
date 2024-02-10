@@ -1025,10 +1025,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ini@npm:^1.3.30":
-  version: 1.3.34
-  resolution: "@types/ini@npm:1.3.34"
-  checksum: 10c0/93ad848d25da8add8dc569577912f26c59f0b7464682a8cc37b999d250d4ed2bda7776a77265cd41b150a81937e98aaa405e0938f5692cc8dfbdc716efcadfb2
+"@types/ini@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "@types/ini@npm:4.1.0"
+  checksum: 10c0/26e283d9f79f2428605e349f920e03a0ba0ddc5a0d5cc3503be8e92d283726244371e0b188f05aa924e108639a9caa24f00e7d527e1a50e1795cb313d3f0fddc
   languageName: node
   linkType: hard
 
@@ -1041,7 +1041,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash-es@npm:^4.17.3":
+"@types/lodash-es@npm:^4.17.12":
   version: 4.17.12
   resolution: "@types/lodash-es@npm:4.17.12"
   dependencies:
@@ -1099,7 +1099,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.3":
+"@types/react-dom@npm:^18.2.19":
   version: 18.2.19
   resolution: "@types/react-dom@npm:18.2.19"
   dependencies:
@@ -1108,7 +1108,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:^18.0.8":
+"@types/react@npm:*, @types/react@npm:^18.2.55":
   version: 18.2.55
   resolution: "@types/react@npm:18.2.55"
   dependencies:
@@ -1135,17 +1135,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/universal-analytics@npm:^0.4.3":
+"@types/universal-analytics@npm:^0.4.8":
   version: 0.4.8
   resolution: "@types/universal-analytics@npm:0.4.8"
   checksum: 10c0/4d46f9fc8ecf2e4a02d067b6fab0095acd60735e88457473166197db441f01ea4963078b4e04337632355596cfc989d883d7a5962e30e3d0d801fbba326bba20
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^8.3.4":
-  version: 8.3.4
-  resolution: "@types/uuid@npm:8.3.4"
-  checksum: 10c0/b9ac98f82fcf35962317ef7dc44d9ac9e0f6fdb68121d384c88fe12ea318487d5585d3480fa003cf28be86a3bbe213ca688ba786601dce4a97724765eb5b1cf2
+"@types/uuid@npm:^9.0.8":
+  version: 9.0.8
+  resolution: "@types/uuid@npm:9.0.8"
+  checksum: 10c0/b411b93054cb1d4361919579ef3508a1f12bf15b5fdd97337d3d351bece6c921b52b6daeef89b62340fd73fd60da407878432a1af777f40648cbe53a01723489
   languageName: node
   linkType: hard
 
@@ -1483,12 +1483,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bplist-creator@npm:0.1.1":
-  version: 0.1.1
-  resolution: "bplist-creator@npm:0.1.1"
+"bplist-creator@npm:0.1.0":
+  version: 0.1.0
+  resolution: "bplist-creator@npm:0.1.0"
   dependencies:
     stream-buffers: "npm:2.2.x"
-  checksum: 10c0/427ec37263ce0e8c68a83f595fc9889a9cbf2e6fda2de18e1f8ef7f0c6ce68c0cdbb7c9c1f3bb3f2d217407af8cffbdf254bf0f71c99f2186175d07752f08a47
+  checksum: 10c0/86f5fe95f34abd369b381abf0f726e220ecebd60a3d932568ae94895ccf1989a87553e4aee9ab3cfb4f35e6f72319f52aa73028165eec82819ed39f15189d493
   languageName: node
   linkType: hard
 
@@ -1501,12 +1501,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bplist-parser@npm:0.3.2":
-  version: 0.3.2
-  resolution: "bplist-parser@npm:0.3.2"
+"bplist-parser@npm:0.3.1":
+  version: 0.3.1
+  resolution: "bplist-parser@npm:0.3.1"
   dependencies:
     big-integer: "npm:1.6.x"
-  checksum: 10c0/4dc307c11d2511a01255e87e370d4ab6f1962b35fdc27605fd4ce9a557a259c2dc9f87822617ddb1f7aa062a71e30ef20d6103329ac7ce235628f637fb0ed763
+  checksum: 10c0/00940a60214e8f58246264d389db8817b7f7f968cd544ec4a5843e33f810c7a07294a92060fc507104a1a2921212c053fe8e941fb2129b9b4da5fbb12a08e95c
   languageName: node
   linkType: hard
 
@@ -2042,31 +2042,31 @@ __metadata:
     "@electron-forge/plugin-auto-unpack-natives": "npm:^7.2.0"
     "@electron-forge/plugin-vite": "npm:^7.2.0"
     "@electron-forge/publisher-github": "npm:^7.2.0"
-    "@types/ini": "npm:^1.3.30"
-    "@types/lodash-es": "npm:^4.17.3"
-    "@types/react": "npm:^18.0.8"
-    "@types/react-dom": "npm:^18.0.3"
-    "@types/universal-analytics": "npm:^0.4.3"
-    "@types/uuid": "npm:^8.3.4"
+    "@types/ini": "npm:^4.1.0"
+    "@types/lodash-es": "npm:^4.17.12"
+    "@types/react": "npm:^18.2.55"
+    "@types/react-dom": "npm:^18.2.19"
+    "@types/universal-analytics": "npm:^0.4.8"
+    "@types/uuid": "npm:^9.0.8"
     electron: "npm:^28.2.2"
     electron-devtools-installer: "npm:^3.2.0"
     electron-squirrel-startup: "npm:^1.0.0"
     electron-update-notification: "npm:^0.1.0"
-    get-port: "npm:^6.1.2"
-    ini: "npm:^3.0.0"
-    lodash-es: "npm:^4.17.11"
+    get-port: "npm:^7.0.0"
+    ini: "npm:^4.1.1"
+    lodash-es: "npm:^4.17.21"
     node-machine-id: "npm:^1.1.12"
     normalize.css: "npm:^8.0.1"
     path-browserify: "npm:^1.0.1"
     prettier: "npm:^3.2.5"
-    react: "npm:^18.1.0"
-    react-dom: "npm:^18.1.0"
-    react-dropzone: "npm:^14.2.0"
-    registry-js: "npm:^1.9.0"
-    simple-plist: "npm:^1.1.0"
-    typescript: "npm:^4.6.4"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    react-dropzone: "npm:^14.2.3"
+    registry-js: "npm:^1.15.1"
+    simple-plist: "npm:1.3.1"
+    typescript: "npm:^5.3.3"
     universal-analytics: "npm:^0.5.3"
-    uuid: "npm:^9.0.0"
+    uuid: "npm:^9.0.1"
   languageName: unknown
   linkType: soft
 
@@ -3097,10 +3097,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-port@npm:^6.1.2":
-  version: 6.1.2
-  resolution: "get-port@npm:6.1.2"
-  checksum: 10c0/cac5f0c600691aed72fdcfacd394b8046080b5208898c3a6b9d10f999466297f162d7907bc6ecbc62d109a904dab7af7cdc0d7933ce2bcecfc5c1fedf7fcfab1
+"get-port@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "get-port@npm:7.0.0"
+  checksum: 10c0/8d6ba2a45ed0171dcacf67c69faf315f4fddf09cdb6596648951746430103415b7a79feb35e78fba71e8bcbe0c3dbf64fea384963302c689dcae2359bea3b369
   languageName: node
   linkType: hard
 
@@ -3516,10 +3516,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ini@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "ini@npm:3.0.1"
-  checksum: 10c0/4473d8d42d4b0c4fcf8707e5d37a7eacd5a1d2ed2b99f1b6805c76efddf674c3deba6fb26811eeeb883a71d6c6917c3250d336e545b4e2c8d96081bf05e58df6
+"ini@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "ini@npm:4.1.1"
+  checksum: 10c0/7fddc8dfd3e63567d4fdd5d999d1bf8a8487f1479d0b34a1d01f28d391a9228d261e19abc38e1a6a1ceb3400c727204fce05725d5eb598dfcf2077a1e3afe211
   languageName: node
   linkType: hard
 
@@ -3885,7 +3885,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash-es@npm:^4.17.11":
+"lodash-es@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash-es@npm:4.17.21"
   checksum: 10c0/fb407355f7e6cd523a9383e76e6b455321f0f153a6c9625e21a8827d10c54c2a2341bd2ae8d034358b60e07325e1330c14c224ff582d04612a46a4f0479ff2f2
@@ -5191,7 +5191,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18.1.0":
+"react-dom@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
   dependencies:
@@ -5203,7 +5203,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dropzone@npm:^14.2.0":
+"react-dropzone@npm:^14.2.3":
   version: 14.2.3
   resolution: "react-dropzone@npm:14.2.3"
   dependencies:
@@ -5274,7 +5274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.1.0":
+"react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:
@@ -5357,7 +5357,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"registry-js@npm:^1.9.0":
+"registry-js@npm:^1.15.1":
   version: 1.15.1
   resolution: "registry-js@npm:1.15.1"
   dependencies:
@@ -5772,14 +5772,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-plist@npm:^1.1.0":
-  version: 1.4.0
-  resolution: "simple-plist@npm:1.4.0"
+"simple-plist@npm:1.3.1":
+  version: 1.3.1
+  resolution: "simple-plist@npm:1.3.1"
   dependencies:
-    bplist-creator: "npm:0.1.1"
-    bplist-parser: "npm:0.3.2"
+    bplist-creator: "npm:0.1.0"
+    bplist-parser: "npm:0.3.1"
     plist: "npm:^3.0.5"
-  checksum: 10c0/226c283492d8518d715e4133d94bdbd15c0619561bcde583b4807b36cde106c0078c615b9b4e25c0e8758a4ae4e79ed5dd76e57cd528d8b7001ecab5ad35e343
+  checksum: 10c0/3d5adeb705815338b1f4615c52584d540b12575337a0e0688f0a2b19a6a4162769cd8a3a36e9eb2b0fc9e27d63dcba8b9088a13e93eabcb7cdec5fe90ec5b0a5
   languageName: node
   linkType: hard
 
@@ -6260,23 +6260,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.6.4":
-  version: 4.9.5
-  resolution: "typescript@npm:4.9.5"
+"typescript@npm:^5.3.3":
+  version: 5.3.3
+  resolution: "typescript@npm:5.3.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/5f6cad2e728a8a063521328e612d7876e12f0d8a8390d3b3aaa452a6a65e24e9ac8ea22beb72a924fd96ea0a49ea63bb4e251fb922b12eedfb7f7a26475e5c56
+  checksum: 10c0/e33cef99d82573624fc0f854a2980322714986bc35b9cb4d1ce736ed182aeab78e2cb32b385efa493b2a976ef52c53e20d6c6918312353a91850e2b76f1ea44f
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^4.6.4#optional!builtin<compat/typescript>":
-  version: 4.9.5
-  resolution: "typescript@patch:typescript@npm%3A4.9.5#optional!builtin<compat/typescript>::version=4.9.5&hash=289587"
+"typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>":
+  version: 5.3.3
+  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/e3333f887c6829dfe0ab6c1dbe0dd1e3e2aeb56c66460cb85c5440c566f900c833d370ca34eb47558c0c69e78ced4bfe09b8f4f98b6de7afed9b84b8d1dd06a1
+  checksum: 10c0/1d0a5f4ce496c42caa9a30e659c467c5686eae15d54b027ee7866744952547f1be1262f2d40de911618c242b510029d51d43ff605dba8fb740ec85ca2d3f9500
   languageName: node
   linkType: hard
 
@@ -6439,7 +6439,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^9.0.0":
+"uuid@npm:^9.0.1":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
   bin:
