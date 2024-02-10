@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import pkg from "./package.json";
 
 export default defineConfig({
   define: {
@@ -7,7 +8,7 @@ export default defineConfig({
   build: {
     minify: false,
     rollupOptions: {
-      external: ["registry-js"],
+      external: Object.keys(pkg.dependencies),
     },
   },
 });
