@@ -153,7 +153,7 @@ export const App: React.FC = () => {
                   <div style={{ display: "flex", marginTop: -20 }}>
                     <div>
                       <h3>Sessions (Click to open)</h3>
-                      <HTMLTable condensed interactive>
+                      <HTMLTable compact interactive>
                         <thead>
                           <tr>
                             <th>Type</th>
