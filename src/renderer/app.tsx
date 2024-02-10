@@ -76,20 +76,19 @@ export const App: React.FC = () => {
         }
       }
     },
-    async getFilesFromEvent(e: any) {
-      // Drop
-      if (e.dataTransfer && e.dataTransfer.files) {
-        const fileList = e.dataTransfer.files as FileList;
-        return [...fileList];
-      }
+    async getFilesFromEvent(e) {
+      const files =
+        // @ts-expect-error no dataTransfer
+        e.dataTransfer?.files ?? // drop
+        // @ts-expect-error target type
+        e.target?.files; // click
 
-      // Click
-      if (e.target && e.target.files) {
-        const fileList = e.target.files as FileList;
+      if (files) {
+        const fileList = files as FileList;
         return [...fileList];
+      } else {
+        return [];
       }
-
-      return [];
     },
   });
 

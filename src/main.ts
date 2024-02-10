@@ -15,7 +15,7 @@ import { WinAdapter } from "./main/win";
 import { MacosAdapter } from "./main/macos";
 import { LinuxAdapter } from "./main/linux";
 import { setUpdater, setReporter } from "./main/utils";
-import { AppDispatch, AppInfo } from "./renderer/app-context";
+import { AppInfo } from "./renderer/app-context";
 import { SessionDispatch } from "./renderer/session-context";
 import getPort from "get-port";
 import { v4 } from "uuid";
@@ -71,7 +71,7 @@ if (!gotTheLock) {
     mainWindow?.webContents.send("session-dispatch", action);
   };
 
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
+  app.on("second-instance", () => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
@@ -171,7 +171,7 @@ if (!gotTheLock) {
     sp.on("error", (err) => {
       dialog.showErrorBox(`Error: ${app.name}`, err.message);
     });
-    sp.on("close", (code) => {
+    sp.on("close", () => {
       // console.log(`child process exited with code ${code}`)
       sessionDispatch({ type: "remove", sessionId });
       // TODO: Remove temp app
@@ -181,6 +181,7 @@ if (!gotTheLock) {
       (isError = false) =>
       (chunk: Buffer) => {
         // TODO: stderr colors
+        console.log(isError);
         sessionDispatch({ type: "log", sessionId, text: chunk.toString() });
       };
 

@@ -19,6 +19,9 @@ module.exports = defineFlatConfig({
     "react-hooks": reactHooks,
   },
   rules: {
+    ...ts.configs.recommended.rules,
+    "@typescript-eslint/no-var-requires": "off", // electron require
+
     ...react.configs.recommended.rules,
     ...react.configs["jsx-runtime"].rules,
     ...reactHooks.configs.recommended.rules,

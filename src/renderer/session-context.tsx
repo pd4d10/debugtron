@@ -6,7 +6,6 @@ import {
   createContext,
   useReducer,
 } from "react";
-import { v4 } from "uuid";
 
 type SessionId = string;
 type PageId = string;

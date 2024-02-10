@@ -5,8 +5,8 @@ import { App } from "./app";
 import { AppProvider } from "./app-context";
 import { SessionProvider } from "./session-context";
 
-// For debug
-(window as any).electron = require("electron");
+// @ts-expect-error for debug
+window.electron = require("electron");
 
 createRoot(document.getElementById("root")!).render(
   <AppProvider>
