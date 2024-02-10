@@ -97,13 +97,12 @@ if (!gotTheLock) {
       setReporter();
     } else {
       // TODO: electron 9
-      // const installer = require('electron-devtools-installer')
-      // await Promise.all(
-      //   ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'].map((name) =>
-      //     installer.default(installer[name])
-      //   )
-      // )
-      // require('devtron').install()
+      const installer = require("electron-devtools-installer");
+      await Promise.all(
+        ["REACT_DEVELOPER_TOOLS", "REDUX_DEVTOOLS"].map((name) =>
+          installer.default(installer[name]),
+        ),
+      );
     }
 
     const defaultMenu = Menu.getApplicationMenu();

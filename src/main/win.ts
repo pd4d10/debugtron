@@ -2,9 +2,7 @@ import fs from "fs";
 import path from "path";
 import { AppInfo } from "../types";
 import type {
-  // enumerateKeys,
   HKEY,
-  // enumerateValues,
   RegistryValue,
   RegistryValueType,
   RegistryStringEntry,
@@ -12,20 +10,27 @@ import type {
 import { Adapter } from "./adapter";
 import { readdirSafe } from "./utils";
 
-// const noop = () => require('registry-js/build/Release/registry.node')
-
 export class WinAdapter extends Adapter {
   async readApps() {
+    const { HKEY, enumerateKeys, enumerateValues } = await import(
+      "registry-js"
+    ); // only on windows
+    const enumRegeditItems = (key: HKEY, subkey: string) => {
+      return enumerateKeys(key, subkey).map((k) =>
+        enumerateValues(key, subkey + "\\" + k),
+      );
+    };
+
     const items = [
-      ...this.enumRegeditItems(
+      ...enumRegeditItems(
         HKEY.HKEY_LOCAL_MACHINE,
         "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
       ),
-      ...this.enumRegeditItems(
+      ...enumRegeditItems(
         HKEY.HKEY_LOCAL_MACHINE,
         "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
       ),
-      ...this.enumRegeditItems(
+      ...enumRegeditItems(
         HKEY.HKEY_CURRENT_USER,
         "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
       ),
@@ -46,13 +51,6 @@ export class WinAdapter extends Adapter {
       icon: "",
       exePath: p,
     };
-  }
-
-  private enumRegeditItems(key: HKEY, subkey: string) {
-    return []; // TODO:
-    // return enumerateKeys(key, subkey).map((k) =>
-    //   enumerateValues(key, subkey + '\\' + k)
-    // )
   }
 
   private async getAppInfoByExePath(

@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     minify: false,
     rollupOptions: {
-      external: ["devtron", "registry-js", "simple-plist"],
+      external: ["registry-js"],
     },
   },
 });
