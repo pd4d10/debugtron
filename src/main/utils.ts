@@ -1,35 +1,35 @@
-import fs from 'fs'
-import os from 'os'
+import fs from "fs";
+import os from "os";
 // import { setUpdateNotification } from 'electron-update-notification' // TODO:
-import plist from 'simple-plist'
-import { MacosAppInfo } from '../types'
-import { machineId } from 'node-machine-id'
-import ua from 'universal-analytics'
+import plist from "simple-plist";
+import { MacosAppInfo } from "../types";
+import { machineId } from "node-machine-id";
+import ua from "universal-analytics";
 
 export async function readdirSafe(p: string) {
   try {
-    return await fs.promises.readdir(p)
+    return await fs.promises.readdir(p);
   } catch (err) {
-    console.error(err)
-    return []
+    console.error(err);
+    return [];
   }
 }
 
 export async function readFileSafe(p: string) {
   try {
-    return await fs.promises.readFile(p, { encoding: 'utf8' })
+    return await fs.promises.readFile(p, { encoding: "utf8" });
   } catch (err) {
-    console.error(err)
-    return ''
+    console.error(err);
+    return "";
   }
 }
 
 export async function readFileAsBufferSafe(p: string) {
   try {
-    return await fs.promises.readFile(p)
+    return await fs.promises.readFile(p);
   } catch (err) {
-    console.error(err)
-    return
+    console.error(err);
+    return;
   }
 }
 
@@ -39,19 +39,19 @@ export async function readPlistFile(path: string): Promise<MacosAppInfo> {
       // console.log(error, data)
 
       if (error || !data) {
-        reject(error)
+        reject(error);
       } else {
-        resolve(data)
+        resolve(data);
       }
-    })
-  })
+    });
+  });
 }
 
 export async function setReporter() {
   try {
-    const id = await machineId()
-    const client = ua('UA-145047249-4', id, { strictCidFormat: false })
-    client.pageview('/' + require('../../package.json').version).send()
+    const id = await machineId();
+    const client = ua("UA-145047249-4", id, { strictCidFormat: false });
+    client.pageview("/" + require("../../package.json").version).send();
   } catch (err) {}
 }
 
@@ -64,6 +64,6 @@ export async function setUpdater() {
     default:
       setUpdateNotification({
         token: DEBUGTRON_GITHUB_TOKEN,
-      })
+      });
   }
 }

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
+import React, { useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import {
   Tabs,
   Tab,
@@ -9,101 +9,101 @@ import {
   Spinner,
   HTMLTable,
   Button,
-} from '@blueprintjs/core'
-import { useSelector } from 'react-redux'
-import { State } from '../reducers'
-import defaultImage from './images/electron.png'
-import './app.css'
+} from "@blueprintjs/core";
+import { useSelector } from "react-redux";
+import { State } from "../reducers";
+import defaultImage from "./images/electron.png";
+import "./app.css";
 
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require("electron");
 
 export const App: React.FC = () => {
-  const [activeId, setActiveId] = useState('')
+  const [activeId, setActiveId] = useState("");
   const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(
-    (s) => s
-  )
+    (s) => s,
+  );
   const { getRootProps, getInputProps } = useDropzone({
-    noClick: process.platform === 'darwin',
+    noClick: process.platform === "darwin",
     onDropAccepted(files) {
-      if (files.length === 0) return
-      ipcRenderer.send('startDebuggingWithExePath', files[0].path)
+      if (files.length === 0) return;
+      ipcRenderer.send("startDebuggingWithExePath", files[0].path);
     },
     async getFilesFromEvent(e: any) {
       // Drop
       if (e.dataTransfer && e.dataTransfer.files) {
-        const fileList = e.dataTransfer.files as FileList
-        return [...fileList]
+        const fileList = e.dataTransfer.files as FileList;
+        return [...fileList];
       }
 
       // Click
       if (e.target && e.target.files) {
-        const fileList = e.target.files as FileList
-        return [...fileList]
+        const fileList = e.target.files as FileList;
+        return [...fileList];
       }
 
-      return []
+      return [];
     },
-  })
+  });
 
   useEffect(() => {
-    const sessionIds = Object.keys(sessionInfo)
+    const sessionIds = Object.keys(sessionInfo);
 
     // Ensure there always be one tab active
     if (!sessionIds.includes(activeId) && sessionIds.length) {
-      setActiveId(sessionIds[0])
+      setActiveId(sessionIds[0]);
     }
-  }, [activeId, sessionInfo])
+  }, [activeId, sessionInfo]);
 
-  const sessionEntries = Object.entries(sessionInfo)
+  const sessionEntries = Object.entries(sessionInfo);
   // console.log(appInfo, sessionInfo)
 
   return (
     <div
       style={{
-        height: '100vh',
-        padding: '1px 8px',
-        display: 'flex',
-        flexDirection: 'column',
+        height: "100vh",
+        padding: "1px 8px",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <h3>
-        Installed Electron-based App (Click to debug){'  '}
+        Installed Electron-based App (Click to debug){"  "}
         <Button
           small
           icon="refresh"
           onClick={() => {
-            ipcRenderer.send('detectApps')
+            ipcRenderer.send("detectApps");
           }}
         >
           Refresh
         </Button>
       </h3>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: "flex" }}>
         {appLoading ? (
           <Spinner />
         ) : (
-          <div style={{ display: 'flex', flexGrow: 1, overflowX: 'auto' }}>
+          <div style={{ display: "flex", flexGrow: 1, overflowX: "auto" }}>
             {Object.entries(appInfo).map(([id, app]) => {
-              if (app.hidden) return null
+              if (app.hidden) return null;
 
               return (
                 <a
                   key={id}
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault()
-                    ipcRenderer.send('startDebugging', app.id)
+                    e.preventDefault();
+                    ipcRenderer.send("startDebugging", app.id);
                   }}
-                  style={{ padding: 4, textAlign: 'center', width: 100 }}
+                  style={{ padding: 4, textAlign: "center", width: 100 }}
                   className="hoverable"
                 >
                   <img
                     src={app.icon || defaultImage}
                     style={{ width: 64, height: 64 }}
                   />
-                  <div style={{ wordBreak: 'break-word' }}>{app.name}</div>
+                  <div style={{ wordBreak: "break-word" }}>{app.name}</div>
                 </a>
-              )
+              );
             })}
           </div>
         )}
@@ -114,21 +114,21 @@ export const App: React.FC = () => {
               padding: 20,
               borderWidth: 2,
               borderRadius: 2,
-              borderColor: '#eeeeee',
-              borderStyle: 'dashed',
-              backgroundColor: '#fafafa',
-              color: '#aaa',
-              outline: 'none',
-              transition: 'border 0.24s ease-in-out',
-              display: 'flex',
+              borderColor: "#eeeeee",
+              borderStyle: "dashed",
+              backgroundColor: "#fafafa",
+              color: "#aaa",
+              outline: "none",
+              transition: "border 0.24s ease-in-out",
+              display: "flex",
               marginTop: 10,
               marginBottom: 10,
-              cursor: 'pointer',
+              cursor: "pointer",
             },
           })}
         >
           <input {...getInputProps()} />
-          <p style={{ alignSelf: 'center' }}>
+          <p style={{ alignSelf: "center" }}>
             App not found? Drag your app here
           </p>
         </div>
@@ -136,12 +136,12 @@ export const App: React.FC = () => {
 
       <Divider />
 
-      <div style={{ overflowY: 'auto' }}>
+      <div style={{ overflowY: "auto" }}>
         {sessionEntries.length ? (
           <Tabs
             selectedTabId={activeId}
             onChange={(key) => {
-              setActiveId(key as string)
+              setActiveId(key as string);
             }}
           >
             {sessionEntries.map(([id, session]) => (
@@ -150,7 +150,7 @@ export const App: React.FC = () => {
                 key={id}
                 title={appInfo[session.appId].name}
                 panel={
-                  <div style={{ display: 'flex', marginTop: -20 }}>
+                  <div style={{ display: "flex", marginTop: -20 }}>
                     <div>
                       <h3>Sessions (Click to open)</h3>
                       <HTMLTable condensed interactive>
@@ -167,11 +167,11 @@ export const App: React.FC = () => {
                               <td>
                                 <Tag
                                   intent={
-                                    page.type === 'node'
-                                      ? 'success'
-                                      : page.type === 'page'
-                                      ? 'primary'
-                                      : 'none'
+                                    page.type === "node"
+                                      ? "success"
+                                      : page.type === "page"
+                                        ? "primary"
+                                        : "none"
                                   }
                                 >
                                   {page.type}
@@ -180,7 +180,7 @@ export const App: React.FC = () => {
                               <td
                                 style={{
                                   maxWidth: 200,
-                                  wordWrap: 'break-word',
+                                  wordWrap: "break-word",
                                 }}
                               >
                                 {page.title}
@@ -191,17 +191,17 @@ export const App: React.FC = () => {
                                   rightIcon="share"
                                   onClick={() => {
                                     ipcRenderer.send(
-                                      'openWindow',
+                                      "openWindow",
                                       page.devtoolsFrontendUrl
                                         .replace(
                                           /^\/devtools/,
-                                          'devtools://devtools/bundled'
+                                          "devtools://devtools/bundled",
                                         )
                                         .replace(
                                           /^chrome-devtools:\/\//,
-                                          'devtools://'
-                                        )
-                                    )
+                                          "devtools://",
+                                        ),
+                                    );
                                   }}
                                 >
                                   Inspect
@@ -216,10 +216,10 @@ export const App: React.FC = () => {
                     <Pre
                       style={{
                         flexGrow: 1,
-                        overflow: 'auto',
-                        userSelect: 'text',
+                        overflow: "auto",
+                        userSelect: "text",
                         fontFamily:
-                          'SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace',
+                          "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
                       }}
                     >
                       {session.log}
@@ -233,11 +233,11 @@ export const App: React.FC = () => {
           <div
             style={{
               fontSize: 24,
-              color: '#bbb',
-              width: '100%',
-              height: '100%',
+              color: "#bbb",
+              width: "100%",
+              height: "100%",
               paddingTop: 100,
-              textAlign: 'center',
+              textAlign: "center",
             }}
           >
             Click App icon to debug
@@ -245,5 +245,5 @@ export const App: React.FC = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,1 +1,1 @@
-require('electron-redux/preload')
+require("electron-redux/preload");

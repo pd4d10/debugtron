@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from "vite";
 
 export default defineConfig({
   define: {
@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     minify: false,
     rollupOptions: {
-      external: ['devtron', 'registry-js', 'simple-plist'],
+      external: ["devtron", "registry-js", "simple-plist"],
     },
   },
-})
+});

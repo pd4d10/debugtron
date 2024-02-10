@@ -7,94 +7,94 @@ import {
   MenuItem,
   shell,
   nativeImage,
-} from 'electron'
-import path from 'path'
-import { composeWithStateSync } from 'electron-redux/main'
-import { applyMiddleware, createStore } from 'redux'
-import thunk from 'redux-thunk'
-import { addTempApp } from './reducers/app'
-import reducers, { State } from './reducers'
-import { Adapter } from './main/adapter'
-import { WinAdapter } from './main/win'
-import { MacosAdapter } from './main/macos'
-import { startDebugging, fetchPages, detectApps } from './main/actions'
-import { LinuxAdapter } from './main/linux'
-import { setUpdater, setReporter } from './main/utils'
+} from "electron";
+import path from "path";
+import { composeWithStateSync } from "electron-redux/main";
+import { applyMiddleware, createStore } from "redux";
+import thunk from "redux-thunk";
+import { addTempApp } from "./reducers/app";
+import reducers, { State } from "./reducers";
+import { Adapter } from "./main/adapter";
+import { WinAdapter } from "./main/win";
+import { MacosAdapter } from "./main/macos";
+import { startDebugging, fetchPages, detectApps } from "./main/actions";
+import { LinuxAdapter } from "./main/linux";
+import { setUpdater, setReporter } from "./main/utils";
 
 const store = createStore<State, any, {}, {}>(
   reducers,
-  composeWithStateSync(applyMiddleware(thunk))
-)
+  composeWithStateSync(applyMiddleware(thunk)),
+);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  app.quit()
+if (require("electron-squirrel-startup")) {
+  app.quit();
 }
 
-let mainWindow: BrowserWindow | null = null
+let mainWindow: BrowserWindow | null = null;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     icon:
-      process.platform === 'linux'
-        ? nativeImage.createFromDataURL(require('../../assets/icon.png'))
+      process.platform === "linux"
+        ? nativeImage.createFromDataURL(require("../../assets/icon.png"))
         : undefined,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false, // for `require`
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
     },
-  })
+  });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-    )
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
   }
 
   if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
-  })
-}
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+};
 
-const gotTheLock = app.requestSingleInstanceLock()
+const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-  app.quit()
+  app.quit();
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
     if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
     }
-  })
+  });
 
-  let adapter: Adapter
+  let adapter: Adapter;
   switch (process.platform) {
-    case 'win32':
-      adapter = new WinAdapter()
-      break
-    case 'darwin':
-      adapter = new MacosAdapter()
-      break
-    case 'linux':
-      adapter = new LinuxAdapter()
-      break
+    case "win32":
+      adapter = new WinAdapter();
+      break;
+    case "darwin":
+      adapter = new MacosAdapter();
+      break;
+    case "linux":
+      adapter = new LinuxAdapter();
+      break;
     default:
-      throw new Error('platform not supported')
+      throw new Error("platform not supported");
   }
 
-  app.on('ready', async () => {
+  app.on("ready", async () => {
     if (app.isPackaged) {
-      setReporter()
+      setReporter();
     } else {
       // TODO: electron 9
       // const installer = require('electron-devtools-installer')
@@ -106,86 +106,86 @@ if (!gotTheLock) {
       // require('devtron').install()
     }
 
-    const defaultMenu = Menu.getApplicationMenu()
+    const defaultMenu = Menu.getApplicationMenu();
     if (defaultMenu) {
       defaultMenu.append(
         new MenuItem({
-          label: 'About',
+          label: "About",
           submenu: [
             {
-              label: 'Source Code',
+              label: "Source Code",
               click() {
-                shell.openExternal('https://github.com/bytedance/debugtron')
+                shell.openExternal("https://github.com/bytedance/debugtron");
               },
             },
             {
-              label: 'Submit an Issue',
+              label: "Submit an Issue",
               click() {
                 shell.openExternal(
-                  'https://github.com/bytedance/debugtron/issues/new'
-                )
+                  "https://github.com/bytedance/debugtron/issues/new",
+                );
               },
             },
           ],
-        })
-      )
+        }),
+      );
     }
 
-    setUpdater()
-    createWindow()
-    store.dispatch(detectApps(adapter))
+    setUpdater();
+    createWindow();
+    store.dispatch(detectApps(adapter));
     setInterval(() => {
-      store.dispatch(fetchPages())
-    }, 3000)
-  })
+      store.dispatch(fetchPages());
+    }, 3000);
+  });
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit()
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
     }
-  })
+  });
 
-  app.on('activate', () => {
+  app.on("activate", () => {
     if (mainWindow === null) {
-      createWindow()
+      createWindow();
     }
-  })
+  });
 
   ipcMain.on(
-    'startDebuggingWithExePath',
+    "startDebuggingWithExePath",
     async (e: Electron.Event, p: string) => {
-      const { appInfo } = store.getState()
-      const duplicated = Object.values(appInfo).find((a) => a.exePath === p)
+      const { appInfo } = store.getState();
+      const duplicated = Object.values(appInfo).find((a) => a.exePath === p);
       if (duplicated) {
-        store.dispatch(startDebugging(duplicated))
-        return
+        store.dispatch(startDebugging(duplicated));
+        return;
       }
 
-      const current = await adapter.readAppByPath(p)
+      const current = await adapter.readAppByPath(p);
       if (current) {
-        store.dispatch(addTempApp(current)) // TODO: Remove it after session closed
-        store.dispatch(startDebugging(current))
+        store.dispatch(addTempApp(current)); // TODO: Remove it after session closed
+        store.dispatch(startDebugging(current));
       } else {
         dialog.showErrorBox(
-          'Invalid application path',
-          `${p} is not an Electron-based application`
-        )
+          "Invalid application path",
+          `${p} is not an Electron-based application`,
+        );
       }
-    }
-  )
+    },
+  );
 
-  ipcMain.on('startDebugging', async (e: Electron.Event, id: string) => {
-    const { appInfo } = store.getState()
-    store.dispatch(startDebugging(appInfo[id]))
-  })
+  ipcMain.on("startDebugging", async (e: Electron.Event, id: string) => {
+    const { appInfo } = store.getState();
+    store.dispatch(startDebugging(appInfo[id]));
+  });
 
-  ipcMain.on('detectApps', async () => {
-    store.dispatch(detectApps(adapter))
-  })
+  ipcMain.on("detectApps", async () => {
+    store.dispatch(detectApps(adapter));
+  });
 
-  ipcMain.on('openWindow', (e: Electron.Event, url: string) => {
-    const win = new BrowserWindow()
+  ipcMain.on("openWindow", (e: Electron.Event, url: string) => {
+    const win = new BrowserWindow();
     // console.log(url)
-    win.loadURL(url)
-  })
+    win.loadURL(url);
+  });
 }
