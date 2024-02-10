@@ -58,6 +58,8 @@ export class WinAdapter extends Adapter {
     iconPath: string,
     values: readonly RegistryValue[],
   ): Promise<AppInfo> {
+    const { RegistryValueType } = await import("registry-js");
+
     const displayName = values.find(
       (v): v is RegistryStringEntry =>
         v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayName",
@@ -106,6 +108,8 @@ export class WinAdapter extends Adapter {
     let iconPath = "";
 
     // Try to find executable path of Electron app
+    const { RegistryValueType } = await import("registry-js");
+
     const displayIcon = values.find(
       (v): v is RegistryStringEntry =>
         v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayIcon",
