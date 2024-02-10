@@ -68,7 +68,6 @@ if (!gotTheLock) {
     mainWindow?.webContents.send("app-dispatch", action);
   };
   const sessionDispatch: SessionDispatch = (action) => {
-    console.log(action);
     mainWindow?.webContents.send("session-dispatch", action);
   };
 
@@ -161,15 +160,14 @@ if (!gotTheLock) {
     );
 
     const sessionId = v4();
-    sp.on("spawn", () => {
-      sessionDispatch({
-        type: "add",
-        sessionId,
-        appId: app.id,
-        nodePort,
-        windowPort,
-      });
+    sessionDispatch({
+      type: "add",
+      sessionId,
+      appId: app.id,
+      nodePort,
+      windowPort,
     });
+
     sp.on("error", (err) => {
       dialog.showErrorBox(`Error: ${app.name}`, err.message);
     });

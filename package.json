@@ -19,7 +19,8 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "registry-js": "^1.15.1",
-    "simple-plist": "1.3.1"
+    "simple-plist": "1.3.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@blueprintjs/core": "^5.9.1",
@@ -52,8 +53,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "typescript": "^5.3.3",
-    "universal-analytics": "^0.5.3",
-    "uuid": "^9.0.1"
+    "universal-analytics": "^0.5.3"
   },
   "packageManager": "yarn@4.1.0+sha256.81a00df816059803e6b5148acf03ce313cad36b7f6e5af6efa040a15981a6ffb"
 }
