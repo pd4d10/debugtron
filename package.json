@@ -3,7 +3,7 @@
   "productName": "Debugtron",
   "version": "0.5.0",
   "description": "Debug in-production Electron based App",
-  "main": ".webpack/main",
+  "main": ".vite/build/main.js",
   "repository": "bytedance/debugtron",
   "scripts": {
     "start": "electron-forge start",
@@ -16,72 +16,21 @@
   "keywords": [],
   "author": "Rongjian Zhang <pd4d10@gmail.com>",
   "license": "MIT",
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "appBundleId": "io.github.pd4d10.debugtron",
-        "icon": "assets/icon"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip"
-        },
-        {
-          "name": "@electron-forge/maker-squirrel"
-        },
-        {
-          "name": "@electron-forge/maker-dmg"
-        }
-      ],
-      "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
-            "mainConfig": "./webpack.main.config.js",
-            "renderer": {
-              "nodeIntegration": true,
-              "config": "./webpack.renderer.config.js",
-              "entryPoints": [
-                {
-                  "html": "./src/index.html",
-                  "js": "./src/renderer.js",
-                  "name": "main_window",
-                  "preload": {
-                    "js": "./src/preload.js"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      ],
-      "publishers": [
-        {
-          "name": "@electron-forge/publisher-github",
-          "config": {
-            "repository": {
-              "owner": "bytedance",
-              "name": "debugtron"
-            }
-          }
-        }
-      ]
-    }
-  },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "registry-js": "^1.9.0"
   },
   "devDependencies": {
     "@blueprintjs/core": "^4.2.1",
-    "@electron-forge/cli": "6.0.0-beta.65",
-    "@electron-forge/maker-deb": "6.0.0-beta.65",
-    "@electron-forge/maker-dmg": "6.0.0-beta.65",
-    "@electron-forge/maker-rpm": "6.0.0-beta.65",
-    "@electron-forge/maker-squirrel": "6.0.0-beta.65",
-    "@electron-forge/maker-zip": "6.0.0-beta.65",
-    "@electron-forge/plugin-webpack": "6.0.0-beta.65",
-    "@electron-forge/publisher-github": "6.0.0-beta.65",
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-dmg": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+    "@electron-forge/plugin-vite": "^7.2.0",
+    "@electron-forge/publisher-github": "^7.2.0",
     "@types/ini": "^1.3.30",
     "@types/lodash-es": "^4.17.3",
     "@types/react": "^18.0.8",
@@ -89,7 +38,6 @@
     "@types/react-redux": "^7.1.4",
     "@types/universal-analytics": "^0.4.3",
     "@types/uuid": "^8.3.4",
-    "@vercel/webpack-asset-relocator-loader": "^1.7.2",
     "css-loader": "^6.7.1",
     "devtron": "^1.4.0",
     "electron": "^20.1.1",
@@ -100,7 +48,6 @@
     "ini": "^3.0.0",
     "lodash-es": "^4.17.11",
     "node-fetch": "^3.2.10",
-    "node-loader": "^2.0.0",
     "node-machine-id": "^1.1.12",
     "normalize.css": "^8.0.1",
     "path-browserify": "^1.0.1",
@@ -111,11 +58,8 @@
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
     "simple-plist": "^1.1.0",
-    "style-loader": "^3.3.1",
-    "ts-loader": "^9.3.0",
     "typescript": "^4.6.4",
     "universal-analytics": "^0.5.3",
-    "url-loader": "^4.1.1",
     "uuid": "^9.0.0"
   },
   "packageManager": "yarn@4.1.0+sha256.81a00df816059803e6b5148acf03ce313cad36b7f6e5af6efa040a15981a6ffb"

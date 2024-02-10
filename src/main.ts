@@ -8,17 +8,18 @@ import {
   shell,
   nativeImage,
 } from 'electron'
+import path from 'path'
 import { composeWithStateSync } from 'electron-redux/main'
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import { addTempApp } from '../reducers/app'
-import reducers, { State } from '../reducers'
-import { Adapter } from './adapter'
-import { WinAdapter } from './win'
-import { MacosAdapter } from './macos'
-import { startDebugging, fetchPages, detectApps } from './actions'
-import { LinuxAdapter } from './linux'
-import { setUpdater, setReporter } from './utils'
+import { addTempApp } from './reducers/app'
+import reducers, { State } from './reducers'
+import { Adapter } from './main/adapter'
+import { WinAdapter } from './main/win'
+import { MacosAdapter } from './main/macos'
+import { startDebugging, fetchPages, detectApps } from './main/actions'
+import { LinuxAdapter } from './main/linux'
+import { setUpdater, setReporter } from './main/utils'
 
 const store = createStore<State, any, {}, {}>(
   reducers,
@@ -32,8 +33,6 @@ if (require('electron-squirrel-startup')) {
 
 let mainWindow: BrowserWindow | null = null
 
-console.log(MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY)
-
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -45,11 +44,18 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false, // for `require`
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: path.join(__dirname, 'preload.js'),
     },
   })
 
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+  } else {
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+    )
+  }
+
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools()
   }

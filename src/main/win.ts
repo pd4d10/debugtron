@@ -1,10 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import { AppInfo } from '../types'
-import {
-  enumerateKeys,
+import type {
+  // enumerateKeys,
   HKEY,
-  enumerateValues,
+  // enumerateValues,
   RegistryValue,
   RegistryValueType,
   RegistryStringEntry,
@@ -12,7 +12,7 @@ import {
 import { Adapter } from './adapter'
 import { readdirSafe } from './utils'
 
-const noop = () => require('registry-js/build/Release/registry.node')
+// const noop = () => require('registry-js/build/Release/registry.node')
 
 export class WinAdapter extends Adapter {
   async readApps() {
@@ -49,9 +49,10 @@ export class WinAdapter extends Adapter {
   }
 
   private enumRegeditItems(key: HKEY, subkey: string) {
-    return enumerateKeys(key, subkey).map((k) =>
-      enumerateValues(key, subkey + '\\' + k)
-    )
+    return [] // TODO:
+    // return enumerateKeys(key, subkey).map((k) =>
+    //   enumerateValues(key, subkey + '\\' + k)
+    // )
   }
 
   private async getAppInfoByExePath(

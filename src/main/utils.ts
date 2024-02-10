@@ -1,6 +1,6 @@
 import fs from 'fs'
 import os from 'os'
-import { setUpdateNotification } from 'electron-update-notification'
+// import { setUpdateNotification } from 'electron-update-notification' // TODO:
 import plist from 'simple-plist'
 import { MacosAppInfo } from '../types'
 import { machineId } from 'node-machine-id'

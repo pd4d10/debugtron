@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { ipcRenderer } from 'electron'
 import { useDropzone } from 'react-dropzone'
 import {
   Tabs,
@@ -13,7 +12,10 @@ import {
 } from '@blueprintjs/core'
 import { useSelector } from 'react-redux'
 import { State } from '../reducers'
+import defaultImage from './images/electron.png'
 import './app.css'
+
+const { ipcRenderer } = require('electron')
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState('')
@@ -96,7 +98,7 @@ export const App: React.FC = () => {
                   className="hoverable"
                 >
                   <img
-                    src={app.icon || require('./images/electron.png')}
+                    src={app.icon || defaultImage}
                     style={{ width: 64, height: 64 }}
                   />
                   <div style={{ wordBreak: 'break-word' }}>{app.name}</div>
