@@ -1,4 +1,4 @@
-import { AppInfo } from "../types";
+import { AppInfo } from "../renderer/app-context";
 
 export abstract class Adapter {
   abstract readApps(): Promise<(AppInfo | undefined)[]>;

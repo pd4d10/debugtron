@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Tabs,
@@ -10,23 +10,49 @@ import {
   HTMLTable,
   Button,
 } from "@blueprintjs/core";
-import { useSelector } from "react-redux";
-import { State } from "../reducers";
 import defaultImage from "./images/electron.png";
 import "./app.css";
+import { AppContext, AppInfo } from "./app-context";
+import { PageInfo, SessionContext } from "./session-context";
 
 const { ipcRenderer } = require("electron");
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState("");
-  const { appInfo, sessionInfo, appLoading } = useSelector<State, State>(
-    (s) => s,
-  );
+  const app = useContext(AppContext);
+  const session = useContext(SessionContext);
+
+  const readApps = async () => {
+    app.dispatch({ type: "apps_start" });
+    const apps: AppInfo[] = await ipcRenderer.invoke("read-apps");
+    app.dispatch({ type: "apps_succeed", apps });
+  };
+
   const { getRootProps, getInputProps } = useDropzone({
     noClick: process.platform === "darwin",
-    onDropAccepted(files) {
+    onDropAccepted: async (files) => {
       if (files.length === 0) return;
-      ipcRenderer.send("startDebuggingWithExePath", files[0].path);
+      const p = files[0].path;
+      const duplicated = Object.values(app.state.info).find(
+        (a) => a.exePath === p,
+      );
+      if (duplicated) {
+        ipcRenderer.send("debug", duplicated);
+      } else {
+        const current: AppInfo | undefined = await ipcRenderer.invoke(
+          "read-app-by-path",
+          p,
+        );
+        if (current) {
+          app.dispatch({ type: "temp_app", info: current }); // TODO: Remove it after session closed
+          ipcRenderer.send("debug", duplicated);
+        } else {
+          alert(
+            "Invalid application path: " +
+              `${p} is not an Electron-based application`,
+          );
+        }
+      }
     },
     async getFilesFromEvent(e: any) {
       // Drop
@@ -46,16 +72,55 @@ export const App: React.FC = () => {
   });
 
   useEffect(() => {
-    const sessionIds = Object.keys(sessionInfo);
+    const sessionIds = Object.keys(session.state);
 
     // Ensure there always be one tab active
     if (!sessionIds.includes(activeId) && sessionIds.length) {
       setActiveId(sessionIds[0]);
     }
-  }, [activeId, sessionInfo]);
+  }, [activeId, session.state]);
 
-  const sessionEntries = Object.entries(sessionInfo);
-  // console.log(appInfo, sessionInfo)
+  useEffect(() => {
+    // listen to main process
+    ipcRenderer.on("app-dispatch", (e, action) => {
+      app.dispatch(action);
+    });
+    ipcRenderer.on("session-dispatch", (e, action) => {
+      session.dispatch(action);
+    });
+
+    // read apps
+    readApps();
+
+    // set timer
+    const fetchPages = async () => {
+      for (let [id, info] of Object.entries(session.state)) {
+        const ports: number[] = [];
+        if (info.nodePort) ports.push(info.nodePort);
+        if (info.windowPort) ports.push(info.windowPort);
+
+        const payloads = await Promise.allSettled<PageInfo>(
+          ports.map((port) =>
+            fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
+          ),
+        );
+
+        const pages = payloads.flatMap((p) =>
+          p.status === "fulfilled" ? p.value : [],
+        );
+        if (pages.length === 0) return;
+
+        session.dispatch({ type: "pages", sessionId: id, pages: pages });
+      }
+    };
+    const timer = setInterval(fetchPages, 3000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  const sessionEntries = Object.entries(session.state);
+  // console.log(app, session)
 
   return (
     <div
@@ -72,18 +137,18 @@ export const App: React.FC = () => {
           small
           icon="refresh"
           onClick={() => {
-            ipcRenderer.send("detectApps");
+            readApps();
           }}
         >
           Refresh
         </Button>
       </h3>
       <div style={{ display: "flex" }}>
-        {appLoading ? (
+        {app.state.loading ? (
           <Spinner />
         ) : (
           <div style={{ display: "flex", flexGrow: 1, overflowX: "auto" }}>
-            {Object.entries(appInfo).map(([id, app]) => {
+            {Object.entries(app.state.info).map(([id, app]) => {
               if (app.hidden) return null;
 
               return (
@@ -92,7 +157,7 @@ export const App: React.FC = () => {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    ipcRenderer.send("startDebugging", app.id);
+                    ipcRenderer.send("debug", app);
                   }}
                   style={{ padding: 4, textAlign: "center", width: 100 }}
                   className="hoverable"
@@ -148,7 +213,7 @@ export const App: React.FC = () => {
               <Tab
                 id={id}
                 key={id}
-                title={appInfo[session.appId].name}
+                title={app.state.info[session.appId].name}
                 panel={
                   <div style={{ display: "flex", marginTop: -20 }}>
                     <div>
@@ -191,7 +256,7 @@ export const App: React.FC = () => {
                                   rightIcon="share"
                                   onClick={() => {
                                     ipcRenderer.send(
-                                      "openWindow",
+                                      "open-window",
                                       page.devtoolsFrontendUrl
                                         .replace(
                                           /^\/devtools/,

@@ -9,22 +9,16 @@ import {
   nativeImage,
 } from "electron";
 import path from "path";
-import { composeWithStateSync } from "electron-redux/main";
-import { applyMiddleware, createStore } from "redux";
-import thunk from "redux-thunk";
-import { addTempApp } from "./reducers/app";
-import reducers, { State } from "./reducers";
+import { spawn } from "child_process";
 import { Adapter } from "./main/adapter";
 import { WinAdapter } from "./main/win";
 import { MacosAdapter } from "./main/macos";
-import { startDebugging, fetchPages, detectApps } from "./main/actions";
 import { LinuxAdapter } from "./main/linux";
 import { setUpdater, setReporter } from "./main/utils";
-
-const store = createStore<State, any, {}, {}>(
-  reducers,
-  composeWithStateSync(applyMiddleware(thunk)),
-);
+import { AppDispatch, AppInfo } from "./renderer/app-context";
+import { SessionDispatch } from "./renderer/session-context";
+import getPort from "get-port";
+import { v4 } from "uuid";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -66,10 +60,18 @@ const createWindow = () => {
 };
 
 const gotTheLock = app.requestSingleInstanceLock();
-
 if (!gotTheLock) {
   app.quit();
 } else {
+  // send action to renderer
+  const appDispatch: AppDispatch = (action) => {
+    mainWindow?.webContents.send("app-dispatch", action);
+  };
+  const sessionDispatch: SessionDispatch = (action) => {
+    console.log(action);
+    mainWindow?.webContents.send("session-dispatch", action);
+  };
+
   app.on("second-instance", (event, commandLine, workingDirectory) => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
@@ -132,10 +134,6 @@ if (!gotTheLock) {
 
     setUpdater();
     createWindow();
-    store.dispatch(detectApps(adapter));
-    setInterval(() => {
-      store.dispatch(fetchPages());
-    }, 3000);
   });
 
   app.on("window-all-closed", () => {
@@ -150,39 +148,60 @@ if (!gotTheLock) {
     }
   });
 
-  ipcMain.on(
-    "startDebuggingWithExePath",
-    async (e: Electron.Event, p: string) => {
-      const { appInfo } = store.getState();
-      const duplicated = Object.values(appInfo).find((a) => a.exePath === p);
-      if (duplicated) {
-        store.dispatch(startDebugging(duplicated));
-        return;
-      }
+  ipcMain.on("debug", async (e, app: AppInfo) => {
+    const nodePort = await getPort();
+    const windowPort = await getPort();
 
-      const current = await adapter.readAppByPath(p);
-      if (current) {
-        store.dispatch(addTempApp(current)); // TODO: Remove it after session closed
-        store.dispatch(startDebugging(current));
-      } else {
-        dialog.showErrorBox(
-          "Invalid application path",
-          `${p} is not an Electron-based application`,
-        );
-      }
-    },
-  );
+    const sp = spawn(
+      app.exePath,
+      [`--inspect=${nodePort}`, `--remote-debugging-port=${windowPort}`],
+      {
+        cwd: process.platform === "win32" ? path.dirname(app.exePath) : "/",
+      },
+    );
 
-  ipcMain.on("startDebugging", async (e: Electron.Event, id: string) => {
-    const { appInfo } = store.getState();
-    store.dispatch(startDebugging(appInfo[id]));
+    const sessionId = v4();
+    sp.on("spawn", () => {
+      sessionDispatch({
+        type: "add",
+        sessionId,
+        appId: app.id,
+        nodePort,
+        windowPort,
+      });
+    });
+    sp.on("error", (err) => {
+      dialog.showErrorBox(`Error: ${app.name}`, err.message);
+    });
+    sp.on("close", (code) => {
+      // console.log(`child process exited with code ${code}`)
+      sessionDispatch({ type: "remove", sessionId });
+      // TODO: Remove temp app
+    });
+
+    const handleStdout =
+      (isError = false) =>
+      (chunk: Buffer) => {
+        // TODO: stderr colors
+        sessionDispatch({ type: "log", sessionId, text: chunk.toString() });
+      };
+
+    if (sp.stdout) {
+      sp.stdout.on("data", handleStdout());
+    }
+    if (sp.stderr) {
+      sp.stderr.on("data", handleStdout(true));
+    }
   });
-
-  ipcMain.on("detectApps", async () => {
-    store.dispatch(detectApps(adapter));
+  ipcMain.handle("read-apps", () => {
+    return adapter
+      .readApps()
+      .then((apps) => apps.filter((a) => typeof a !== "undefined"));
   });
-
-  ipcMain.on("openWindow", (e: Electron.Event, url: string) => {
+  ipcMain.handle("read-app-by-path", (e, p) => {
+    return adapter.readAppByPath(p);
+  });
+  ipcMain.on("open-window", (e, url: string) => {
     const win = new BrowserWindow();
     // console.log(url)
     win.loadURL(url);

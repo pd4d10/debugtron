@@ -1,14 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { AppInfo } from "../types";
-import type {
-  HKEY,
-  RegistryValue,
-  RegistryValueType,
-  RegistryStringEntry,
-} from "registry-js";
+import type { HKEY, RegistryValue, RegistryStringEntry } from "registry-js";
 import { Adapter } from "./adapter";
 import { readdirSafe } from "./utils";
+import { AppInfo } from "../renderer/app-context";
 
 export class WinAdapter extends Adapter {
   async readApps() {
