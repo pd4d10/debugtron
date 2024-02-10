@@ -84,14 +84,14 @@ export class WinAdapter extends Adapter {
   private async findExeFile(dir: string) {
     if (this.isElectronApp(dir)) {
       const files = await readdirSafe(dir);
-      const exeFiles = files.filter((file) => {
+      const [exeFile] = files.filter((file) => {
         const lc = file.toLowerCase();
         return (
           lc.endsWith(".exe") &&
           !["uninstall", "update"].some((keyword) => lc.includes(keyword))
         );
       });
-      if (exeFiles.length) return path.join(dir, exeFiles[0]);
+      if (exeFile) return path.join(dir, exeFile);
     }
   }
 
@@ -111,11 +111,11 @@ export class WinAdapter extends Adapter {
     );
 
     if (displayIcon) {
-      const icon = displayIcon.data.split(",")[0];
-      if (icon.toLowerCase().endsWith(".exe")) {
+      const [icon] = displayIcon.data.split(",");
+      if (icon?.toLowerCase().endsWith(".exe")) {
         if (!this.isElectronApp(path.dirname(icon))) return;
         return this.getAppInfoByExePath(icon, iconPath, values);
-      } else if (icon.toLowerCase().endsWith(".ico")) {
+      } else if (icon?.toLowerCase().endsWith(".ico")) {
         iconPath = icon;
       }
     }

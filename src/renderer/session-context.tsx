@@ -67,9 +67,9 @@ const reducer: Reducer<State, Action> = (state, action) => {
           return {
             ...s,
             [action.sessionId]: {
-              ...s[action.sessionId],
+              ...s[action.sessionId]!,
               pages: {
-                ...s[action.sessionId].pages,
+                ...s[action.sessionId]!.pages,
                 [page.id]: page,
               },
             },
@@ -80,8 +80,8 @@ const reducer: Reducer<State, Action> = (state, action) => {
       return {
         ...state,
         [action.sessionId]: {
-          ...state[action.sessionId],
-          log: state[action.sessionId].log + action.text,
+          ...state[action.sessionId]!,
+          log: state[action.sessionId]!.log + action.text,
         },
       };
     default:

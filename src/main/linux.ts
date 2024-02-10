@@ -42,7 +42,7 @@ export class LinuxAdapter extends Adapter {
       exePath = entry.Exec.replace(/^"(.*)".*/, "$1");
     } else {
       // Remove arg
-      exePath = entry.Exec.split(/\s+/)[0];
+      exePath = entry.Exec.split(/\s+/)[0] ?? "";
     }
 
     if (!exePath.startsWith("/")) return;

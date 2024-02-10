@@ -51,9 +51,10 @@ export const App: React.FC = () => {
 
   const { getRootProps, getInputProps } = useDropzone({
     noClick: process.platform === "darwin",
-    onDropAccepted: async (files) => {
-      if (files.length === 0) return;
-      const p = files[0].path;
+    onDropAccepted: async ([file]) => {
+      if (!file) return;
+
+      const p = file.path;
       const duplicated = Object.values(appState.info).find(
         (a) => a.exePath === p,
       );
@@ -96,7 +97,7 @@ export const App: React.FC = () => {
     const sessionIds = Object.keys(sessionState);
 
     // Ensure there always be one tab active
-    if (!sessionIds.includes(activeId) && sessionIds.length) {
+    if (!sessionIds.includes(activeId) && sessionIds[0]) {
       setActiveId(sessionIds[0]);
     }
   }, [activeId, sessionState]);
@@ -218,7 +219,7 @@ export const App: React.FC = () => {
               <Tab
                 id={id}
                 key={id}
-                title={appState.info[session.appId].name}
+                title={appState.info[session.appId]?.name}
                 panel={
                   <div style={{ display: "flex", marginTop: -20 }}>
                     <div>

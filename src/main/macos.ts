@@ -52,8 +52,8 @@ export class MacosAdapter extends Adapter {
     }
 
     icons.sort((a, b) => b.size - a.size);
-    const imageData = icons[0].data;
-    if (imageData.slice(1, 4).toString() === "PNG") {
+    const imageData = icons[0]?.data;
+    if (imageData?.slice(1, 4).toString() === "PNG") {
       return "data:image/png;base64," + imageData.toString("base64");
     }
 

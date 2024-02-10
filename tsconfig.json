@@ -9,7 +9,7 @@
     "isolatedModules": true,
 
     "strict": true,
-    // "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true,
 
     "moduleResolution": "Bundler",
     "module": "ESNext",
