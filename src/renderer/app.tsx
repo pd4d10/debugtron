@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Tabs,
@@ -12,32 +12,18 @@ import {
 } from "@blueprintjs/core";
 import defaultImage from "./images/electron.png";
 import "./app.css";
-import { AppContext, AppInfo } from "./app-context";
-import { SessionContext } from "./session-context";
+import { AppInfo, appSlice } from "../reducers/app";
+import { useDispatch, useSelector } from "../reducers";
+import { sessionSlice } from "../reducers/session";
 
 const { ipcRenderer } = require("electron");
 
 export const App: React.FC = () => {
   const [activeId, setActiveId] = useState("");
-  const [appState, appDispatch] = useContext(AppContext);
-  const [sessionState, sessionDispatch] = useContext(SessionContext);
 
-  const readApps = useCallback(async () => {
-    appDispatch({ type: "apps_start" });
-    const apps: AppInfo[] = await ipcRenderer.invoke("read-apps");
-    appDispatch({ type: "apps_succeed", apps });
-  }, [appDispatch]);
-
-  const fetchPages = useCallback(async () => {
-    for (let [id, info] of Object.entries(sessionState)) {
-      const ports: number[] = [];
-      if (info.nodePort) ports.push(info.nodePort);
-      if (info.windowPort) ports.push(info.windowPort);
-
-      const pages = await ipcRenderer.invoke("fetch-pages", ports);
-      sessionDispatch({ type: "pages", sessionId: id, pages: pages });
-    }
-  }, [sessionDispatch, sessionState]);
+  const dispatch = useDispatch();
+  const appState = useSelector((s) => s.app);
+  const sessionState = useSelector((s) => s.session);
 
   const { getRootProps, getInputProps } = useDropzone({
     noClick: process.platform === "darwin",
@@ -56,8 +42,8 @@ export const App: React.FC = () => {
           p,
         );
         if (current) {
-          appDispatch({ type: "temp_app", info: current }); // TODO: Remove it after session closed
-          ipcRenderer.send("debug", duplicated);
+          dispatch(appSlice.actions.addTemp(current)); // TODO: Remove it after session closed
+          ipcRenderer.send("debug", current);
         } else {
           alert(
             "Invalid application path: " +
@@ -91,31 +77,39 @@ export const App: React.FC = () => {
     }
   }, [activeId, sessionState]);
 
+  // listen to main process
   useEffect(() => {
-    // listen to main process
-    // ipcRenderer.on("app-dispatch", (e, action) => {
-    //   appDispatch(action);
-    // });
-    ipcRenderer.on("session-dispatch", (e, action) => {
-      sessionDispatch(action);
+    ipcRenderer.on("dispatch", (e, action) => {
+      dispatch(action);
     });
-  }, [sessionDispatch]);
+  }, [dispatch]);
 
-  // only first time
+  // read apps at first
   useEffect(() => {
-    readApps();
-  }, [readApps]);
+    dispatch(appSlice.actions.read(null));
+  }, [dispatch]);
 
-  // set timer
+  // session page fetch timer
   useEffect(() => {
-    const timer = setInterval(fetchPages, 3000);
+    const updatePages = async () => {
+      for (let [id, info] of Object.entries(sessionState)) {
+        dispatch(
+          sessionSlice.actions.updatePages({
+            sessionId: id,
+            ports: [info.nodePort, info.windowPort],
+          }),
+        );
+      }
+    };
+
+    const timer = setInterval(updatePages, 3000);
     return () => {
       clearInterval(timer);
     };
-  }, [fetchPages]);
+  }, [dispatch, sessionState]);
 
   const sessionEntries = Object.entries(sessionState);
-  // console.log(app, session)
+  console.log(appState, sessionState);
 
   return (
     <div
@@ -132,14 +126,14 @@ export const App: React.FC = () => {
           small
           icon="refresh"
           onClick={() => {
-            readApps();
+            dispatch(appSlice.actions.read(null));
           }}
         >
           Refresh
         </Button>
       </h3>
       <div style={{ display: "flex" }}>
-        {appState.loading ? (
+        {appState.status === "loading" ? (
           <Spinner />
         ) : (
           <div style={{ display: "flex", flexGrow: 1, overflowX: "auto" }}>

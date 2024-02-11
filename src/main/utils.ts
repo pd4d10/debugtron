@@ -2,9 +2,15 @@ import fs from "fs";
 import os from "os";
 // import { setUpdateNotification } from 'electron-update-notification' // TODO:
 import plist from "simple-plist";
-import { MacosAppInfo } from "../types";
 import { machineId } from "node-machine-id";
 import ua from "universal-analytics";
+
+interface MacosAppInfo {
+  CFBundleIdentifier: string;
+  CFBundleName: string;
+  CFBundleExecutable: string;
+  CFBundleIconFile: string;
+}
 
 export async function readdirSafe(p: string) {
   try {

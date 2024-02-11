@@ -15,10 +15,11 @@ import { WinAdapter } from "./main/win";
 import { MacosAdapter } from "./main/macos";
 import { LinuxAdapter } from "./main/linux";
 import { setUpdater, setReporter } from "./main/utils";
-import { AppInfo } from "./renderer/app-context";
-import { PageInfo, SessionDispatch } from "./renderer/session-context";
+import { AppInfo } from "./reducers/app";
+import { PageInfo, sessionSlice } from "./reducers/session";
 import getPort from "get-port";
 import { v4 } from "uuid";
+import { Dispatch } from "./reducers";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -64,12 +65,9 @@ if (!gotTheLock) {
   app.quit();
 } else {
   // send action to renderer
-  // const appDispatch: AppDispatch = (action) => {
-  //   mainWindow?.webContents.send("app-dispatch", action);
-  // };
-  const sessionDispatch: SessionDispatch = (action) => {
-    mainWindow?.webContents.send("session-dispatch", action);
-  };
+  const dispatch = ((action: unknown) => {
+    mainWindow?.webContents.send("dispatch", action);
+  }) as Dispatch;
 
   app.on("second-instance", () => {
     if (mainWindow) {
@@ -160,20 +158,21 @@ if (!gotTheLock) {
     );
 
     const sessionId = v4();
-    sessionDispatch({
-      type: "add",
-      sessionId,
-      appId: app.id,
-      nodePort,
-      windowPort,
-    });
+    dispatch(
+      sessionSlice.actions.add({
+        sessionId,
+        appId: app.id,
+        nodePort,
+        windowPort,
+      }),
+    );
 
     sp.on("error", (err) => {
       dialog.showErrorBox(`Error: ${app.name}`, err.message);
     });
     sp.on("close", () => {
       // console.log(`child process exited with code ${code}`)
-      sessionDispatch({ type: "remove", sessionId });
+      dispatch(sessionSlice.actions.remove(sessionId));
       // TODO: Remove temp app
     });
 
@@ -182,7 +181,12 @@ if (!gotTheLock) {
       (chunk: Buffer) => {
         // TODO: stderr colors
         console.log(isError);
-        sessionDispatch({ type: "log", sessionId, text: chunk.toString() });
+        dispatch(
+          sessionSlice.actions.updateLog({
+            sessionId,
+            text: chunk.toString(),
+          }),
+        );
       };
 
     if (sp.stdout) {
@@ -201,6 +205,7 @@ if (!gotTheLock) {
     const pages = payloads.flatMap((p) =>
       p.status === "fulfilled" ? p.value : [],
     );
+    console.log(ports, pages);
     return pages;
   });
   ipcMain.handle("read-apps", () => {

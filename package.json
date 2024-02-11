@@ -33,6 +33,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
     "@electron-forge/plugin-vite": "^7.2.0",
     "@electron-forge/publisher-github": "^7.2.0",
+    "@reduxjs/toolkit": "^2.1.0",
     "@types/eslint": "^8",
     "@types/ini": "^4.1.0",
     "@types/lodash-es": "^4.17.12",
@@ -59,6 +60,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-redux": "^9.1.0",
     "typescript": "^5.3.3",
     "universal-analytics": "^0.5.3"
   },

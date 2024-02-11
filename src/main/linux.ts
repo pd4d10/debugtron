@@ -3,7 +3,7 @@ import ini from "ini";
 import fs from "fs";
 import { Adapter } from "./adapter";
 import { readdirSafe, readFileSafe } from "./utils";
-import { AppInfo } from "../renderer/app-context";
+import { AppInfo } from "../reducers/app";
 
 const desktopFilesDir = "/usr/share/applications";
 
