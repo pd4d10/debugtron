@@ -13,7 +13,7 @@ import {
 import defaultImage from "./images/electron.png";
 import "./app.css";
 import { AppInfo, appSlice } from "../reducers/app";
-import { useDispatch, useSelector } from "../reducers";
+import { useDispatch, useSelector } from "./hooks";
 import { sessionSlice } from "../reducers/session";
 
 const { ipcRenderer } = require("electron");
