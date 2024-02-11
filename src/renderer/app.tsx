@@ -13,7 +13,7 @@ import {
 import defaultImage from "./images/electron.png";
 import "./app.css";
 import { AppContext, AppInfo } from "./app-context";
-import { PageInfo, SessionContext } from "./session-context";
+import { SessionContext } from "./session-context";
 
 const { ipcRenderer } = require("electron");
 
@@ -34,17 +34,7 @@ export const App: React.FC = () => {
       if (info.nodePort) ports.push(info.nodePort);
       if (info.windowPort) ports.push(info.windowPort);
 
-      const payloads = await Promise.allSettled<PageInfo>(
-        ports.map((port) =>
-          fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
-        ),
-      );
-
-      const pages = payloads.flatMap((p) =>
-        p.status === "fulfilled" ? p.value : [],
-      );
-      if (pages.length === 0) return;
-
+      const pages = await ipcRenderer.invoke("fetch-pages", ports);
       sessionDispatch({ type: "pages", sessionId: id, pages: pages });
     }
   }, [sessionDispatch, sessionState]);

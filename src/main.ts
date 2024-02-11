@@ -16,7 +16,7 @@ import { MacosAdapter } from "./main/macos";
 import { LinuxAdapter } from "./main/linux";
 import { setUpdater, setReporter } from "./main/utils";
 import { AppInfo } from "./renderer/app-context";
-import { SessionDispatch } from "./renderer/session-context";
+import { PageInfo, SessionDispatch } from "./renderer/session-context";
 import getPort from "get-port";
 import { v4 } from "uuid";
 
@@ -191,6 +191,17 @@ if (!gotTheLock) {
     if (sp.stderr) {
       sp.stderr.on("data", handleStdout(true));
     }
+  });
+  ipcMain.handle("fetch-pages", async (e, ports: number[]) => {
+    const payloads = await Promise.allSettled<PageInfo>(
+      ports.map((port) =>
+        fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
+      ),
+    );
+    const pages = payloads.flatMap((p) =>
+      p.status === "fulfilled" ? p.value : [],
+    );
+    return pages;
   });
   ipcMain.handle("read-apps", () => {
     return adapter
