@@ -1,4 +1,4 @@
-import { AppInfo } from "../reducers/app";
+import type { AppInfo } from "../reducers/app";
 
 export abstract class Adapter {
   abstract readApps(): Promise<(AppInfo | undefined)[]>;

@@ -3,9 +3,9 @@ import { LinuxAdapter } from "./main/linux";
 import { MacosAdapter } from "./main/macos";
 import { setUpdater, setReporter } from "./main/utils";
 import { WinAdapter } from "./main/win";
-import { Dispatch } from "./reducers";
-import { AppInfo } from "./reducers/app";
-import { PageInfo, sessionSlice } from "./reducers/session";
+import type { Dispatch } from "./reducers";
+import type { AppInfo } from "./reducers/app";
+import { type PageInfo, sessionSlice } from "./reducers/session";
 import { spawn } from "child_process";
 import {
   app,

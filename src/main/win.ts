@@ -1,4 +1,4 @@
-import { AppInfo } from "../reducers/app";
+import type { AppInfo } from "../reducers/app";
 import { Adapter } from "./adapter";
 import { readdirSafe } from "./utils";
 import fs from "fs";

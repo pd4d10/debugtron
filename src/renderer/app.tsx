@@ -1,4 +1,4 @@
-import { AppInfo, appSlice } from "../reducers/app";
+import { type AppInfo, appSlice } from "../reducers/app";
 import { sessionSlice } from "../reducers/session";
 import "./app.css";
 import { useDispatch, useSelector } from "./hooks";
