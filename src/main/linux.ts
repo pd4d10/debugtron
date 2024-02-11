@@ -1,9 +1,9 @@
-import path from "path";
-import ini from "ini";
-import fs from "fs";
+import { AppInfo } from "../reducers/app";
 import { Adapter } from "./adapter";
 import { readdirSafe, readFileSafe } from "./utils";
-import { AppInfo } from "../reducers/app";
+import fs from "fs";
+import ini from "ini";
+import path from "path";
 
 const desktopFilesDir = "/usr/share/applications";
 

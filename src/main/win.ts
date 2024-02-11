@@ -1,9 +1,9 @@
+import { AppInfo } from "../reducers/app";
+import { Adapter } from "./adapter";
+import { readdirSafe } from "./utils";
 import fs from "fs";
 import path from "path";
 import type { HKEY, RegistryValue, RegistryStringEntry } from "registry-js";
-import { Adapter } from "./adapter";
-import { readdirSafe } from "./utils";
-import { AppInfo } from "../reducers/app";
 
 export class WinAdapter extends Adapter {
   async readApps() {

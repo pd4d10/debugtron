@@ -1,21 +1,26 @@
 {
   "name": "debugtron",
-  "productName": "Debugtron",
   "version": "0.5.0",
   "description": "Debug in-production Electron based App",
-  "main": ".vite/build/main.js",
-  "repository": "pd4d10/debugtron",
-  "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "npx prettier --check src/**/*.{ts,tsx,js,jsx}",
-    "lint-fix": "npx prettier --write src/**/*.{ts,tsx,js,jsx}"
-  },
   "keywords": [],
-  "author": "Rongjian Zhang <pd4d10@gmail.com>",
+  "repository": "pd4d10/debugtron",
   "license": "MIT",
+  "author": "Rongjian Zhang <pd4d10@gmail.com>",
+  "main": ".vite/build/main.js",
+  "scripts": {
+    "lint": "npx prettier --check src/**/*.{ts,tsx,js,jsx}",
+    "lint-fix": "npx prettier --write src/**/*.{ts,tsx,js,jsx}",
+    "make": "electron-forge make",
+    "package": "electron-forge package",
+    "publish": "electron-forge publish",
+    "start": "electron-forge start"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-packagejson",
+      "@trivago/prettier-plugin-sort-imports"
+    ]
+  },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "registry-js": "^1.15.1",
@@ -34,6 +39,7 @@
     "@electron-forge/plugin-vite": "^7.2.0",
     "@electron-forge/publisher-github": "^7.2.0",
     "@reduxjs/toolkit": "^2.1.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/eslint": "^8",
     "@types/ini": "^4.1.0",
     "@types/lodash-es": "^4.17.12",
@@ -57,6 +63,7 @@
     "normalize.css": "^8.0.1",
     "path-browserify": "^1.0.1",
     "prettier": "^3.2.5",
+    "prettier-plugin-packagejson": "^2.4.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
@@ -64,5 +71,6 @@
     "typescript": "^5.3.3",
     "universal-analytics": "^0.5.3"
   },
-  "packageManager": "yarn@4.1.0+sha256.81a00df816059803e6b5148acf03ce313cad36b7f6e5af6efa040a15981a6ffb"
+  "packageManager": "yarn@4.1.0+sha256.81a00df816059803e6b5148acf03ce313cad36b7f6e5af6efa040a15981a6ffb",
+  "productName": "Debugtron"
 }

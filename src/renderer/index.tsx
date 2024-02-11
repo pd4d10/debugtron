@@ -1,9 +1,9 @@
-import "normalize.css/normalize.css";
-import "@blueprintjs/core/lib/css/blueprint.css";
-import { createRoot } from "react-dom/client";
-import { App } from "./app";
-import { Provider } from "react-redux";
 import { store } from "../reducers";
+import { App } from "./app";
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "normalize.css/normalize.css";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
 
 // @ts-expect-error for debug
 window.electron = require("electron");

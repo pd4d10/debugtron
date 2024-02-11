@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
 import { Adapter } from "./adapter";
 import { readdirSafe, readFileAsBufferSafe, readPlistFile } from "./utils";
+import fs from "fs";
+import path from "path";
 
 export class MacosAdapter extends Adapter {
   async readApps() {

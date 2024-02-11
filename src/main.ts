@@ -1,3 +1,12 @@
+import { Adapter } from "./main/adapter";
+import { LinuxAdapter } from "./main/linux";
+import { MacosAdapter } from "./main/macos";
+import { setUpdater, setReporter } from "./main/utils";
+import { WinAdapter } from "./main/win";
+import { Dispatch } from "./reducers";
+import { AppInfo } from "./reducers/app";
+import { PageInfo, sessionSlice } from "./reducers/session";
+import { spawn } from "child_process";
 import {
   app,
   BrowserWindow,
@@ -8,18 +17,9 @@ import {
   shell,
   nativeImage,
 } from "electron";
-import path from "path";
-import { spawn } from "child_process";
-import { Adapter } from "./main/adapter";
-import { WinAdapter } from "./main/win";
-import { MacosAdapter } from "./main/macos";
-import { LinuxAdapter } from "./main/linux";
-import { setUpdater, setReporter } from "./main/utils";
-import { AppInfo } from "./reducers/app";
-import { PageInfo, sessionSlice } from "./reducers/session";
 import getPort from "get-port";
+import path from "path";
 import { v4 } from "uuid";
-import { Dispatch } from "./reducers";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {

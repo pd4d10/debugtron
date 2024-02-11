@@ -1,8 +1,8 @@
 import fs from "fs";
+import { machineId } from "node-machine-id";
 import os from "os";
 // import { setUpdateNotification } from 'electron-update-notification' // TODO:
 import plist from "simple-plist";
-import { machineId } from "node-machine-id";
 import ua from "universal-analytics";
 
 interface MacosAppInfo {

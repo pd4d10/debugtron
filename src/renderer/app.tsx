@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { AppInfo, appSlice } from "../reducers/app";
+import { sessionSlice } from "../reducers/session";
+import "./app.css";
+import { useDispatch, useSelector } from "./hooks";
+import defaultImage from "./images/electron.png";
 import {
   Tabs,
   Tab,
@@ -10,11 +13,8 @@ import {
   HTMLTable,
   Button,
 } from "@blueprintjs/core";
-import defaultImage from "./images/electron.png";
-import "./app.css";
-import { AppInfo, appSlice } from "../reducers/app";
-import { useDispatch, useSelector } from "./hooks";
-import { sessionSlice } from "../reducers/session";
+import React, { useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 
 const { ipcRenderer } = require("electron");
 
