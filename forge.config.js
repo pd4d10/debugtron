@@ -32,7 +32,7 @@ module.exports = {
       name: "@electron-forge/publisher-github",
       config: {
         repository: {
-          owner: "bytedance",
+          owner: "pd4d10",
           name: "debugtron",
         },
       },

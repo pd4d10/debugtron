@@ -115,14 +115,14 @@ if (!gotTheLock) {
             {
               label: "Source Code",
               click() {
-                shell.openExternal("https://github.com/bytedance/debugtron");
+                shell.openExternal("https://github.com/pd4d10/debugtron");
               },
             },
             {
               label: "Submit an Issue",
               click() {
                 shell.openExternal(
-                  "https://github.com/bytedance/debugtron/issues/new",
+                  "https://github.com/pd4d10/debugtron/issues/new",
                 );
               },
             },

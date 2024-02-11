@@ -4,7 +4,7 @@
   "version": "0.5.0",
   "description": "Debug in-production Electron based App",
   "main": ".vite/build/main.js",
-  "repository": "bytedance/debugtron",
+  "repository": "pd4d10/debugtron",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
