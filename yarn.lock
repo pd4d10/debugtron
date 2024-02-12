@@ -228,6 +228,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blueprintjs/select@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@blueprintjs/select@npm:5.1.1"
+  dependencies:
+    "@blueprintjs/core": "npm:^5.9.1"
+    "@blueprintjs/icons": "npm:^5.7.1"
+    classnames: "npm:^2.3.1"
+    tslib: "npm:~2.6.2"
+  peerDependencies:
+    "@types/react": ^16.14.41 || 17 || 18
+    react: ^16.8 || 17 || 18
+    react-dom: ^16.8 || 17 || 18
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/1c93fccf679cafeda600961f7f901d56a296c439c2f1e0c8f366630fb0682bb385ec9e35b07dd25142459d76ef325f2d2d8381e8d2d8113eb91c916d18be979a
+  languageName: node
+  linkType: hard
+
 "@electron-forge/cli@npm:^7.2.0":
   version: 7.2.0
   resolution: "@electron-forge/cli@npm:7.2.0"
@@ -2737,6 +2756,7 @@ __metadata:
   resolution: "debugtron@workspace:."
   dependencies:
     "@blueprintjs/core": "npm:^5.9.1"
+    "@blueprintjs/select": "npm:^5.1.1"
     "@electron-forge/cli": "npm:^7.2.0"
     "@electron-forge/maker-deb": "npm:^7.2.0"
     "@electron-forge/maker-dmg": "npm:^7.2.0"

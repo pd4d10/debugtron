@@ -30,8 +30,10 @@ let mainWindow: BrowserWindow | null = null;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: 800,
+    height: 600,
+    titleBarStyle: "hidden",
+    trafficLightPosition: { x: 14, y: 14 },
     icon:
       process.platform === "linux"
         ? nativeImage.createFromDataURL(require("../../assets/icon.png"))
