@@ -68,6 +68,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-redux": "^9.1.0",
+    "react-use": "^17.5.0",
     "typescript": "^5.3.3",
     "universal-analytics": "^0.5.3"
   },

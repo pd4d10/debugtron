@@ -3,6 +3,14 @@ body {
   user-select: none;
 }
 
-.hoverable:hover {
-  background-color: #eeeeee;
+@media (prefers-color-scheme: dark) {
+  .hoverable:hover {
+    background-color: #394b59;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .hoverable:hover {
+    background-color: #eeeeee;
+  }
 }

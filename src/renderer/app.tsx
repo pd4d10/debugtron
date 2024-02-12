@@ -4,12 +4,15 @@ import { Dnd } from "./dnd";
 import { useDispatch, useSelector } from "./hooks";
 import defaultImage from "./images/electron.png";
 import { Session } from "./session";
-import { Divider, Spinner, Button } from "@blueprintjs/core";
+import { Divider, Spinner, Button, Colors } from "@blueprintjs/core";
 import React, { useEffect } from "react";
+import { useMedia } from "react-use";
 
 const { ipcRenderer } = require("electron");
 
 export const App: React.FC = () => {
+  const darkMode = useMedia("(prefers-color-scheme: dark)");
+
   const dispatch = useDispatch();
   const appState = useSelector((s) => s.app);
   const sessionState = useSelector((s) => s.session);
@@ -36,7 +39,9 @@ export const App: React.FC = () => {
         padding: "1px 8px",
         display: "flex",
         flexDirection: "column",
+        backgroundColor: darkMode ? Colors.DARK_GRAY2 : undefined,
       }}
+      className={darkMode ? "bp5-dark" : undefined}
     >
       <h3>
         Installed Electron-based App (Click to debug){"  "}
