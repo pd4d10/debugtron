@@ -8,8 +8,8 @@
   "author": "Rongjian Zhang <pd4d10@gmail.com>",
   "main": ".vite/build/main.js",
   "scripts": {
-    "lint": "npx prettier --check src/**/*.{ts,tsx,js,jsx}",
-    "lint-fix": "npx prettier --write src/**/*.{ts,tsx,js,jsx}",
+    "lint": "prettier --check 'src/**/*.{ts,tsx}' && eslint '**/*.{ts,tsx}'",
+    "lint-fix": "prettier --write 'src/**/*.{ts,tsx}' && eslint --fix '**/*.{ts,tsx}'",
     "make": "electron-forge make",
     "package": "electron-forge package",
     "publish": "electron-forge publish",
