@@ -1,6 +1,6 @@
 # Debugtron
 
-[![test](https://github.com/pd4d10/debugtron/workflows/test/badge.svg)](https://github.com/pd4d10/debugtron/actions)
+[![lint](https://github.com/pd4d10/debugtron/workflows/lint/badge.svg)](https://github.com/pd4d10/debugtron/actions)
 
 Debugtron is an app to debug in-production Electron based app. It is also built with Electron.
 
