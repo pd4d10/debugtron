@@ -67,7 +67,6 @@
     "prettier-plugin-packagejson": "^2.4.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-dropzone": "^14.2.3",
     "react-redux": "^9.1.0",
     "react-use": "^17.5.0",
     "typescript": "^5.3.3",

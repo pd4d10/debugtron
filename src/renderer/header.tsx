@@ -1,13 +1,21 @@
-import { appSlice } from "../reducers/app";
+import { appSlice, type AppInfo } from "../reducers/app";
 import { useDispatch, useSelector } from "./hooks";
 import defaultImage from "./images/electron.png";
-import { Button, MenuItem } from "@blueprintjs/core";
+import { noDragStyle } from "./utils";
+import {
+  Button,
+  ControlGroup,
+  InputGroup,
+  MenuItem,
+  Tooltip,
+} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import { useEffect, type FC } from "react";
+import { useEffect, type FC, useState } from "react";
 
 export const Header: FC = () => {
   const dispatch = useDispatch();
   const appState = useSelector((s) => s.app);
+  const [input, setInput] = useState("");
 
   // read apps at first
   useEffect(() => {
@@ -19,7 +27,7 @@ export const Header: FC = () => {
       style={{
         // @ts-expect-error draggable title bar
         "-webkit-app-region": "drag",
-        padding: "10px 0 10px 80px",
+        padding: "10px 10px 10px 80px",
         display: "flex",
       }}
     >
@@ -60,15 +68,54 @@ export const Header: FC = () => {
         }}
       >
         <Button
-          style={{
-            // @ts-expect-error disable drag
-            "-webkit-app-region": "no-drag",
-          }}
+          style={noDragStyle}
           text={"Select an App to debug"}
           icon="build"
           rightIcon="chevron-down"
         />
       </Select>
+      <div
+        style={{
+          flexGrow: 1,
+          textAlign: "center",
+          display: "flex",
+          flexFlow: "column",
+          justifyContent: "center",
+        }}
+      >
+        Debugtron
+      </div>
+      <ControlGroup style={noDragStyle}>
+        <Tooltip content="Input custom path here and click Debug">
+          <InputGroup
+            value={input}
+            placeholder="App not found?"
+            onChange={(e) => {
+              setInput(e.target.value);
+            }}
+          />
+        </Tooltip>
+        <Button
+          text="Debug"
+          icon="build"
+          onClick={async () => {
+            const current: AppInfo | undefined =
+              await require("electron").ipcRenderer.invoke(
+                "read-app-by-path",
+                input,
+              );
+            if (current) {
+              dispatch(appSlice.actions.addTemp(current)); // TODO: Remove it after session closed
+              require("electron").ipcRenderer.send("debug", current);
+            } else {
+              alert(
+                "Invalid application path: " +
+                  `${input} is not an Electron-based application`,
+              );
+            }
+          }}
+        />
+      </ControlGroup>
     </header>
   );
 };
