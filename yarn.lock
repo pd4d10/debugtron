@@ -2772,6 +2772,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^6.21.0"
     electron: "npm:^28.2.2"
     electron-devtools-installer: "npm:^3.2.0"
+    electron-redux: "npm:2.0.0-alpha.9"
     electron-squirrel-startup: "npm:^1.0.0"
     electron-update-notification: "npm:^0.1.0"
     eslint: "npm:^8.56.0"
@@ -3104,6 +3105,19 @@ __metadata:
   bin:
     electron-installer-redhat: src/cli.js
   conditions: (os=darwin | os=linux)
+  languageName: node
+  linkType: hard
+
+"electron-redux@npm:2.0.0-alpha.9":
+  version: 2.0.0-alpha.9
+  resolution: "electron-redux@npm:2.0.0-alpha.9"
+  dependencies:
+    lodash.isplainobject: "npm:^4.0.6"
+    lodash.isstring: "npm:^4.0.1"
+  peerDependencies:
+    electron: ">=8.0.0"
+    redux: ">=4.0.0"
+  checksum: 10c0/04fbee6c48475ad0abd07ebec972fe42ff8e6fe6767677418f298f17c6a75bf6bcc2721503fe52f44eb6ea4cbefb1a72c67cad6f0d34d0aea99b4fcf515f27b8
   languageName: node
   linkType: hard
 
@@ -5464,6 +5478,20 @@ __metadata:
   version: 4.4.2
   resolution: "lodash.get@npm:4.4.2"
   checksum: 10c0/48f40d471a1654397ed41685495acb31498d5ed696185ac8973daef424a749ca0c7871bf7b665d5c14f5cc479394479e0307e781f61d5573831769593411be6e
+  languageName: node
+  linkType: hard
+
+"lodash.isplainobject@npm:^4.0.6":
+  version: 4.0.6
+  resolution: "lodash.isplainobject@npm:4.0.6"
+  checksum: 10c0/afd70b5c450d1e09f32a737bed06ff85b873ecd3d3d3400458725283e3f2e0bb6bf48e67dbe7a309eb371a822b16a26cca4a63c8c52db3fc7dc9d5f9dd324cbb
+  languageName: node
+  linkType: hard
+
+"lodash.isstring@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "lodash.isstring@npm:4.0.1"
+  checksum: 10c0/09eaf980a283f9eef58ef95b30ec7fee61df4d6bf4aba3b5f096869cc58f24c9da17900febc8ffd67819b4e29de29793190e88dc96983db92d84c95fa85d1c92
   languageName: node
   linkType: hard
 

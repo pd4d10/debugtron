@@ -1,4 +1,4 @@
-import { Adapter } from "./adapter";
+import { Adapter } from "./utils";
 import { readdirSafe, readFileAsBufferSafe, readPlistFile } from "./utils";
 import fs from "fs";
 import path from "path";

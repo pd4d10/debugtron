@@ -1,5 +1,5 @@
 import type { AppInfo } from "../reducers/app";
-import { Adapter } from "./adapter";
+import { Adapter } from "./utils";
 import { readdirSafe } from "./utils";
 import fs from "fs";
 import path from "path";

@@ -1,26 +1,16 @@
 import "./app.css";
 import { Header } from "./header";
-import { useDispatch, useSelector } from "./hooks";
 import { Session } from "./session";
+import { useSelector } from "./store";
 import { Colors } from "@blueprintjs/core";
-import React, { useEffect } from "react";
+import React from "react";
 import { useMedia } from "react-use";
-
-const { ipcRenderer } = require("electron");
 
 export const App: React.FC = () => {
   const darkMode = useMedia("(prefers-color-scheme: dark)");
 
-  const dispatch = useDispatch();
   const appState = useSelector((s) => s.app);
   const sessionState = useSelector((s) => s.session);
-
-  // listen to main process
-  useEffect(() => {
-    ipcRenderer.on("dispatch", (e, action) => {
-      dispatch(action);
-    });
-  }, [dispatch]);
 
   const sessionEntries = Object.entries(sessionState);
   console.log(appState, sessionState);

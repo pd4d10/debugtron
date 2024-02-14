@@ -3,3 +3,5 @@
 // contextBridge.exposeInMainWorld("electronAPI", {
 //   openFile: () => ipcRenderer.invoke("openFile"),
 // });
+
+require("electron-redux/preload");

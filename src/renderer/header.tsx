@@ -1,6 +1,6 @@
-import { appSlice, type AppInfo } from "../reducers/app";
-import { useDispatch, useSelector } from "./hooks";
+import { sessionSlice } from "../reducers/session";
 import defaultImage from "./images/electron.png";
+import { useDispatch, useSelector } from "./store";
 import { noDragStyle } from "./utils";
 import {
   Button,
@@ -10,17 +10,12 @@ import {
   Tooltip,
 } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import { useEffect, type FC, useState } from "react";
+import { type FC, useState } from "react";
 
 export const Header: FC = () => {
   const dispatch = useDispatch();
   const appState = useSelector((s) => s.app);
   const [input, setInput] = useState("");
-
-  // read apps at first
-  useEffect(() => {
-    dispatch(appSlice.actions.read(null));
-  }, [dispatch]);
 
   return (
     <header
@@ -63,7 +58,7 @@ export const Header: FC = () => {
         onItemSelect={(item) => {
           const appInfo = appState.info[item.id];
           if (appInfo) {
-            require("electron").ipcRenderer.send("debug", appInfo);
+            dispatch(sessionSlice.actions.debug(appInfo));
           }
         }}
       >
@@ -99,20 +94,7 @@ export const Header: FC = () => {
           text="Debug"
           icon="build"
           onClick={async () => {
-            const current: AppInfo | undefined =
-              await require("electron").ipcRenderer.invoke(
-                "read-app-by-path",
-                input,
-              );
-            if (current) {
-              dispatch(appSlice.actions.addTemp(current)); // TODO: Remove it after session closed
-              require("electron").ipcRenderer.send("debug", current);
-            } else {
-              alert(
-                "Invalid application path: " +
-                  `${input} is not an Electron-based application`,
-              );
-            }
+            dispatch(sessionSlice.actions.debugPath(input));
           }}
         />
       </ControlGroup>

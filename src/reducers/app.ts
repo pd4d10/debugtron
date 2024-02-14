@@ -26,9 +26,17 @@ export const appSlice = buildCreateSlice({
   reducers: (create) => ({
     read: create.asyncThunk(
       async () => {
-        const { ipcRenderer } = require("electron");
-        const apps: AppInfo[] = await ipcRenderer.invoke("read-apps");
-        return apps;
+        if (IN_MAIN_PROCESS) {
+          const { getAdapter } = await import("../main/adapter");
+          const apps = await getAdapter()
+            .readApps()
+            .then((apps) =>
+              apps.filter((a): a is AppInfo => typeof a !== "undefined"),
+            );
+          return apps;
+        } else {
+          return [];
+        }
       },
       {
         pending: (state) => {

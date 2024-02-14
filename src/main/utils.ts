@@ -1,3 +1,4 @@
+import type { AppInfo } from "../reducers/app";
 import fs from "fs";
 import { machineId } from "node-machine-id";
 import os from "os";
@@ -72,4 +73,8 @@ export async function setUpdater() {
     //   token: DEBUGTRON_GITHUB_TOKEN,
     // });
   }
+}
+export abstract class Adapter {
+  abstract readApps(): Promise<(AppInfo | undefined)[]>;
+  abstract readAppByPath(p: string): Promise<AppInfo | undefined>;
 }

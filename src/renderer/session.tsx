@@ -1,5 +1,5 @@
 import { sessionSlice } from "../reducers/session";
-import { useDispatch, useSelector } from "./hooks";
+import { useDispatch, useSelector } from "./store";
 import {
   Tabs,
   Tab,
@@ -14,7 +14,7 @@ import { useEffect, type FC, useState } from "react";
 export const Session: FC = () => {
   const [activeId, setActiveId] = useState("");
   const dispatch = useDispatch();
-  const appState = useSelector((s) => s.app);
+  // const appState = useSelector((s) => s.app);
   const sessionState = useSelector((s) => s.session);
 
   useEffect(() => {
@@ -54,13 +54,14 @@ export const Session: FC = () => {
       }}
     >
       {Object.entries(sessionState).map(([id, session]) => {
-        const appInfo = appState.info[session.appId];
+        // const appInfo = appState.info[session.appId];
 
         return (
           <Tab
             id={id}
             key={id}
-            title={`${appInfo?.name} (${appInfo?.id})`}
+            // title={`${appInfo?.name} (${appInfo?.id})`}
+            title="session" // TODO:
             panel={
               <div style={{ display: "flex", marginTop: -20 }}>
                 <div>
@@ -102,18 +103,17 @@ export const Session: FC = () => {
                               small
                               rightIcon="share"
                               onClick={() => {
-                                require("electron").ipcRenderer.send(
-                                  "open-window",
-                                  page.devtoolsFrontendUrl
-                                    .replace(
-                                      /^\/devtools/,
-                                      "devtools://devtools/bundled",
-                                    )
-                                    .replace(
-                                      /^chrome-devtools:\/\//,
-                                      "devtools://",
-                                    ),
-                                );
+                                const url = page.devtoolsFrontendUrl
+                                  .replace(
+                                    /^\/devtools/,
+                                    "devtools://devtools/bundled",
+                                  )
+                                  .replace(
+                                    /^chrome-devtools:\/\//,
+                                    "devtools://",
+                                  );
+
+                                dispatch(sessionSlice.actions.openWindow(url));
                               }}
                             >
                               Inspect
