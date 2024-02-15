@@ -70,6 +70,7 @@
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",
     "react-use": "^17.5.0",
+    "ts-results": "^3.3.0",
     "typescript": "^5.3.3",
     "universal-analytics": "^0.5.3"
   },

@@ -1,4 +1,3 @@
-import { readdirSafe } from "../main/utils";
 import type { AppInfo } from "../reducers/app";
 import type { AppReader } from "./utils";
 import fs from "fs";
@@ -11,6 +10,7 @@ import {
   enumerateKeys,
   enumerateValues,
 } from "registry-js";
+import { Result } from "ts-results";
 
 async function getAppInfoByExePath(
   exePath: string,
@@ -34,11 +34,9 @@ async function getAppInfoByExePath(
   };
 }
 
-async function getAppInfoFromRegeditItemValues(
+const getAppInfoFromRegeditItemValues = async (
   values: readonly RegistryValue[],
-): Promise<AppInfo | undefined> {
-  if (values.length === 0) return;
-
+) => {
   let iconPath = "";
 
   // Try to find executable path of Electron app
@@ -50,7 +48,9 @@ async function getAppInfoFromRegeditItemValues(
   if (displayIcon) {
     const [icon] = displayIcon.data.split(",");
     if (icon?.toLowerCase().endsWith(".exe")) {
-      if (!isElectronApp(path.dirname(icon))) return;
+      if (!isElectronApp(path.dirname(icon))) {
+        throw new Error("not and electron app");
+      }
       return getAppInfoByExePath(icon, iconPath, values);
     } else if (icon?.toLowerCase().endsWith(".ico")) {
       iconPath = icon;
@@ -70,22 +70,24 @@ async function getAppInfoFromRegeditItemValues(
     installDir = path.dirname(iconPath);
   }
 
-  if (!installDir) return;
-
-  const exeFile = await findExeFile(installDir);
-  if (exeFile) {
-    return getAppInfoByExePath(exeFile, iconPath, values);
-  } else {
-    const files = await readdirSafe(installDir);
-    const semverDir = files.find((file) => /\d+\.\d+\.\d+/.test(file));
-    if (!semverDir) return;
-
-    const exeFile = await findExeFile(path.join(installDir, semverDir));
-    if (!exeFile) return;
-
-    return getAppInfoByExePath(exeFile, iconPath, values);
+  if (installDir) {
+    const exeFile = await findExeFile(installDir);
+    if (exeFile) {
+      return getAppInfoByExePath(exeFile, iconPath, values);
+    } else {
+      const files = await fs.promises.readdir(installDir);
+      const semverDir = files.find((file) => /\d+\.\d+\.\d+/.test(file));
+      if (semverDir) {
+        const exeFile = await findExeFile(path.join(installDir, semverDir));
+        if (exeFile) {
+          return getAppInfoByExePath(exeFile, iconPath, values);
+        }
+      }
+    }
   }
-}
+
+  throw new Error("app not found");
+};
 
 function isElectronApp(installDir: string) {
   return (
@@ -98,7 +100,7 @@ function isElectronApp(installDir: string) {
 
 async function findExeFile(dir: string) {
   if (isElectronApp(dir)) {
-    const files = await readdirSafe(dir);
+    const files = await fs.promises.readdir(dir);
     const [exeFile] = files.filter((file) => {
       const lc = file.toLowerCase();
       return (
@@ -111,40 +113,43 @@ async function findExeFile(dir: string) {
 }
 
 export const adapter: AppReader = {
-  async readAll() {
-    const enumRegeditItems = (key: HKEY, subkey: string) => {
-      return enumerateKeys(key, subkey).map((k) =>
-        enumerateValues(key, subkey + "\\" + k),
+  readAll: () =>
+    Result.wrapAsync(async () => {
+      const enumRegeditItems = (key: HKEY, subkey: string) => {
+        return enumerateKeys(key, subkey).map((k) =>
+          enumerateValues(key, subkey + "\\" + k),
+        );
+      };
+
+      const items = [
+        ...enumRegeditItems(
+          HKEY.HKEY_LOCAL_MACHINE,
+          "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
+        ),
+        ...enumRegeditItems(
+          HKEY.HKEY_LOCAL_MACHINE,
+          "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
+        ),
+        ...enumRegeditItems(
+          HKEY.HKEY_CURRENT_USER,
+          "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
+        ),
+      ];
+      return Promise.all(
+        items.map((itemValues) => getAppInfoFromRegeditItemValues(itemValues)),
       );
-    };
+    }),
 
-    const items = [
-      ...enumRegeditItems(
-        HKEY.HKEY_LOCAL_MACHINE,
-        "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
-      ),
-      ...enumRegeditItems(
-        HKEY.HKEY_LOCAL_MACHINE,
-        "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
-      ),
-      ...enumRegeditItems(
-        HKEY.HKEY_CURRENT_USER,
-        "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
-      ),
-    ];
-    return Promise.all(
-      items.map((itemValues) => getAppInfoFromRegeditItemValues(itemValues)),
-    );
-  },
+  readByPath: (p: string) =>
+    Result.wrapAsync(async () => {
+      if (path.extname(p).toLowerCase() === ".exe")
+        throw new Error("should be suffixed with exe");
 
-  async readByPath(p: string) {
-    if (path.extname(p).toLowerCase() != ".exe") return;
-
-    return {
-      id: p,
-      name: path.basename(p, ".exe"),
-      icon: "",
-      exePath: p,
-    };
-  },
+      return {
+        id: p,
+        name: path.basename(p, ".exe"),
+        icon: "",
+        exePath: p,
+      };
+    }),
 };

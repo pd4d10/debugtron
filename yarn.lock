@@ -2793,6 +2793,7 @@ __metadata:
     react-use: "npm:^17.5.0"
     registry-js: "npm:^1.15.1"
     simple-plist: "npm:1.3.1"
+    ts-results: "npm:^3.3.0"
     typescript: "npm:^5.3.3"
     universal-analytics: "npm:^0.5.3"
     uuid: "npm:^9.0.1"
@@ -8366,6 +8367,13 @@ __metadata:
   version: 0.2.0
   resolution: "ts-easing@npm:0.2.0"
   checksum: 10c0/84ec20192310c697ff890ca2e0625e131a32596a7c5956326c9632faca9037abf2dd3de4d81ac358ae9f26a6a2cfe2300f13756b26995f753d882e3d0463e327
+  languageName: node
+  linkType: hard
+
+"ts-results@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "ts-results@npm:3.3.0"
+  checksum: 10c0/507659005733dd102895e868fe1de6f4c39998bcf188863bdc2d18dc5e8ced57be2e83fe9ee53adbabc414fd53e26e8654c7fa0273d2668decc1731d274dbf74
   languageName: node
   linkType: hard
 

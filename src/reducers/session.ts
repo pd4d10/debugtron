@@ -145,9 +145,10 @@ export const sessionSlice = buildCreateSlice({
       if (IN_MAIN_PROCESS) {
         const { adapter } = await importByPlatform();
         const current = await adapter.readByPath(p);
-        if (current) {
-          dispatch(appSlice.actions.addTemp(current)); // TODO: Remove it after session closed
-          dispatch(sessionSlice.actions.debug(current));
+
+        if (current.ok) {
+          dispatch(appSlice.actions.addTemp(current.unwrap())); // TODO: Remove it after session closed
+          dispatch(sessionSlice.actions.debug(current.unwrap()));
         } else {
           alert(
             "Invalid application path: " +

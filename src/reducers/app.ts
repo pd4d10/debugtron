@@ -29,12 +29,10 @@ export const appSlice = buildCreateSlice({
       async () => {
         if (IN_MAIN_PROCESS) {
           const { adapter } = await importByPlatform();
-          const apps = adapter
-            .readAll()
-            .then((apps) =>
-              apps.filter((a): a is AppInfo => typeof a !== "undefined"),
-            );
-          return apps;
+          const apps = await adapter.readAll();
+
+          if (!apps.ok) throw new Error("Failed to read apps");
+          return apps.unwrap();
         } else {
           return [];
         }
