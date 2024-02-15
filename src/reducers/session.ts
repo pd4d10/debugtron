@@ -1,3 +1,4 @@
+import { importByPlatform } from "../platforms";
 import { appSlice, type AppInfo } from "./app";
 import { asyncThunkCreator, buildCreateSlice } from "@reduxjs/toolkit";
 
@@ -142,9 +143,8 @@ export const sessionSlice = buildCreateSlice({
     }),
     debugPath: create.asyncThunk<void, string>(async (p, { dispatch }) => {
       if (IN_MAIN_PROCESS) {
-        const { getAdapter } = await import("../main/adapter");
-
-        const current = await getAdapter().readAppByPath(p);
+        const { adapter } = await importByPlatform();
+        const current = await adapter.readByPath(p);
         if (current) {
           dispatch(appSlice.actions.addTemp(current)); // TODO: Remove it after session closed
           dispatch(sessionSlice.actions.debug(current));

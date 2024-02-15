@@ -1,3 +1,4 @@
+import { importByPlatform } from "../platforms";
 import { asyncThunkCreator, buildCreateSlice } from "@reduxjs/toolkit";
 
 type AppId = string;
@@ -27,9 +28,9 @@ export const appSlice = buildCreateSlice({
     read: create.asyncThunk(
       async () => {
         if (IN_MAIN_PROCESS) {
-          const { getAdapter } = await import("../main/adapter");
-          const apps = await getAdapter()
-            .readApps()
+          const { adapter } = await importByPlatform();
+          const apps = adapter
+            .readAll()
             .then((apps) =>
               apps.filter((a): a is AppInfo => typeof a !== "undefined"),
             );

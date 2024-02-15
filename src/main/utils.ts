@@ -1,17 +1,8 @@
-import type { AppInfo } from "../reducers/app";
 import fs from "fs";
 import { machineId } from "node-machine-id";
 import os from "os";
 // import { setUpdateNotification } from 'electron-update-notification' // TODO:
-import plist from "simple-plist";
 import ua from "universal-analytics";
-
-interface MacosAppInfo {
-  CFBundleIdentifier: string;
-  CFBundleName: string;
-  CFBundleExecutable: string;
-  CFBundleIconFile: string;
-}
 
 export async function readdirSafe(p: string) {
   try {
@@ -40,20 +31,6 @@ export async function readFileAsBufferSafe(p: string) {
   }
 }
 
-export async function readPlistFile(path: string): Promise<MacosAppInfo> {
-  return new Promise((resolve, reject) => {
-    plist.readFile<MacosAppInfo>(path, (error, data) => {
-      // console.log(error, data)
-
-      if (error || !data) {
-        reject(error);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
-
 export async function setReporter() {
   try {
     const id = await machineId();
@@ -73,8 +50,4 @@ export async function setUpdater() {
     //   token: DEBUGTRON_GITHUB_TOKEN,
     // });
   }
-}
-export abstract class Adapter {
-  abstract readApps(): Promise<(AppInfo | undefined)[]>;
-  abstract readAppByPath(p: string): Promise<AppInfo | undefined>;
 }
