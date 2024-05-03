@@ -12,6 +12,7 @@ import {
 } from "electron";
 import { stateSyncEnhancer } from "electron-redux/main";
 import path from "path";
+import { logger } from "redux-logger";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -60,6 +61,7 @@ if (!gotTheLock) {
 } else {
   const store = configureStore({
     reducer: reducers,
+    middleware: (getDefault) => getDefault().concat(logger),
     enhancers: (getDefault) => getDefault().concat(stateSyncEnhancer()),
   });
   store.dispatch(appSlice.actions.read(null));
