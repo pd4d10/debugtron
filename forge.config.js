@@ -16,13 +16,13 @@ module.exports = {
       name: "@electron-forge/plugin-vite",
       config: {
         build: [
-          { entry: "src/main.ts", config: "vite.main.config.ts" },
+          { entry: "src/main.ts", config: "vite.main.config.mjs" },
           {
             entry: "src/preload.ts",
-            // config: 'vite.preload.config.ts',
+            config: "vite.preload.config.mjs",
           },
         ],
-        renderer: [{ name: "main_window", config: "vite.renderer.config.ts" }],
+        renderer: [{ name: "main_window", config: "vite.renderer.config.mjs" }],
       },
     },
     { name: "@electron-forge/plugin-auto-unpack-natives", config: {} },
