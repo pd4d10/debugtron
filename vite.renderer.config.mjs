@@ -21,5 +21,8 @@ export default defineConfig((env) => {
       preserveSymlinks: true,
     },
     clearScreen: false,
+    define: {
+      IN_MAIN_PROCESS: false,
+    },
   };
 });
