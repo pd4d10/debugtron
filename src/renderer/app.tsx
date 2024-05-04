@@ -1,19 +1,14 @@
 import "./app.css";
 import { Header } from "./header";
 import { Session } from "./session";
-import { useSelector } from "./store";
+import { sessionSelector, useSelector } from "./store";
 import { Colors } from "@blueprintjs/core";
 import React from "react";
 import { useMedia } from "react-use";
 
 export const App: React.FC = () => {
   const darkMode = useMedia("(prefers-color-scheme: dark)");
-
-  const appState = useSelector((s) => s.app);
-  const sessionState = useSelector((s) => s.session);
-
-  const sessionEntries = Object.entries(sessionState);
-  console.log(appState, sessionState);
+  const sessionState = useSelector(sessionSelector);
 
   return (
     <div
@@ -27,7 +22,7 @@ export const App: React.FC = () => {
     >
       <Header />
       <div style={{ overflowY: "auto" }}>
-        {sessionEntries.length ? (
+        {Object.entries(sessionState).length ? (
           <Session />
         ) : (
           <div

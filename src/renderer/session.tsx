@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "./store";
+import { appSelector, sessionSelector, useSelector } from "./store";
 import {
   Tabs,
   Tab,
@@ -12,9 +12,8 @@ import { useEffect, type FC, useState } from "react";
 
 export const Session: FC = () => {
   const [activeId, setActiveId] = useState("");
-  const dispatch = useDispatch();
-  // const appState = useSelector((s) => s.app);
-  const sessionState = useSelector((s) => s.session);
+  const appState = useSelector(appSelector);
+  const sessionState = useSelector(sessionSelector);
 
   useEffect(() => {
     const sessionIds = Object.keys(sessionState);
@@ -27,21 +26,19 @@ export const Session: FC = () => {
 
   return (
     <Tabs
-      vertical
       selectedTabId={activeId}
       onChange={(key) => {
         setActiveId(key as string);
       }}
     >
       {Object.entries(sessionState).map(([id, session]) => {
-        // const appInfo = appState.info[session.appId];
+        const appInfo = appState[session.appId];
 
         return (
           <Tab
             id={id}
             key={id}
-            // title={`${appInfo?.name} (${appInfo?.id})`}
-            title="session" // TODO:
+            title={`${appInfo?.name} (${appInfo?.id})`}
             panel={
               <div style={{ display: "flex", marginTop: -20 }}>
                 <div>

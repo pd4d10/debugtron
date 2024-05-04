@@ -1,5 +1,5 @@
 import defaultImage from "./images/electron.png";
-import { useDispatch, useSelector } from "./store";
+import { appSelector, useSelector } from "./store";
 import { noDragStyle } from "./utils";
 import {
   Button,
@@ -12,8 +12,7 @@ import { Select } from "@blueprintjs/select";
 import { type FC, useState } from "react";
 
 export const Header: FC = () => {
-  const dispatch = useDispatch();
-  const appState = useSelector((s) => s.app);
+  const appState = useSelector(appSelector);
   const [input, setInput] = useState("");
 
   return (
