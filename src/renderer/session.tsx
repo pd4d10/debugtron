@@ -36,77 +36,89 @@ export const Session: FC = () => {
 
         return (
           <Tab
+            style={{ overflowY: "auto" }}
             id={id}
             key={id}
             title={`${appInfo?.name} (${appInfo?.id})`}
             panel={
-              <div style={{ display: "flex", marginTop: -20 }}>
-                <div>
-                  <h3>Sessions (Click to open)</h3>
-                  <HTMLTable compact interactive>
-                    <thead>
-                      <tr>
-                        <th>Type</th>
-                        <th>Title</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(session.page).map(([id, page]) => (
-                        <tr key={id}>
-                          <td>
-                            <Tag
-                              intent={
-                                page.type === "node"
-                                  ? "success"
-                                  : page.type === "page"
-                                    ? "primary"
-                                    : "none"
-                              }
-                            >
-                              {page.type}
-                            </Tag>
-                          </td>
-                          <td
-                            style={{
-                              maxWidth: 200,
-                              wordWrap: "break-word",
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: -20,
+                  overflow: "auto",
+                  maxHeight: "calc(100vh - 100px)", // TODO:
+                }}
+              >
+                <HTMLTable
+                  compact
+                  interactive
+                  style={{
+                    marginTop: 5,
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Title</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(session.page).map(([id, page]) => (
+                      <tr key={id}>
+                        <td>
+                          <Tag
+                            intent={
+                              page.type === "node"
+                                ? "success"
+                                : page.type === "page"
+                                  ? "primary"
+                                  : "none"
+                            }
+                          >
+                            {page.type}
+                          </Tag>
+                        </td>
+                        <td
+                          style={{
+                            maxWidth: 200,
+                            wordWrap: "break-word",
+                          }}
+                        >
+                          {page.title}
+                        </td>
+                        <td>
+                          <Button
+                            small
+                            rightIcon="share"
+                            onClick={() => {
+                              const url = page.devtoolsFrontendUrl
+                                .replace(
+                                  /^\/devtools/,
+                                  "devtools://devtools/bundled",
+                                )
+                                .replace(
+                                  /^chrome-devtools:\/\//,
+                                  "devtools://",
+                                );
+
+                              require("electron").ipcRenderer.send(
+                                "open-window",
+                                url,
+                              );
                             }}
                           >
-                            {page.title}
-                          </td>
-                          <td>
-                            <Button
-                              small
-                              rightIcon="share"
-                              onClick={() => {
-                                const url = page.devtoolsFrontendUrl
-                                  .replace(
-                                    /^\/devtools/,
-                                    "devtools://devtools/bundled",
-                                  )
-                                  .replace(
-                                    /^chrome-devtools:\/\//,
-                                    "devtools://",
-                                  );
-
-                                require("electron").ipcRenderer.send(
-                                  "open-window",
-                                  url,
-                                );
-                              }}
-                            >
-                              Inspect
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </HTMLTable>
-                </div>
+                            Inspect
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </HTMLTable>
                 <Divider />
                 <Pre
                   style={{
+                    marginTop: 5,
                     flexGrow: 1,
                     overflow: "auto",
                     userSelect: "text",

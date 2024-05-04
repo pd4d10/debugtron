@@ -21,7 +21,7 @@ export const App: React.FC = () => {
       className={darkMode ? "bp5-dark" : undefined}
     >
       <Header />
-      <div style={{ overflowY: "auto" }}>
+      <div style={{ flexGrow: 1, paddingLeft: 16, paddingRight: 16 }}>
         {Object.entries(sessionState).length ? (
           <Session />
         ) : (
