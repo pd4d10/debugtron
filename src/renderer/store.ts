@@ -1,16 +1,16 @@
-import { reducers, type RootState } from "../reducers";
-import { configureStore } from "@reduxjs/toolkit";
+import { reducer, type Action, type State } from "../reducer";
+import {
+  applyMiddleware,
+  legacy_createStore,
+  type Dispatch,
+} from "@reduxjs/toolkit";
+import { composeWithStateSync } from "electron-redux/renderer";
 import * as rr from "react-redux";
 
-const { stateSyncEnhancer } =
-  require("electron-redux/renderer") as typeof import("electron-redux/renderer");
+export const store = legacy_createStore(
+  reducer,
+  composeWithStateSync(applyMiddleware()),
+);
 
-export const store = configureStore({
-  reducer: reducers,
-  enhancers: (getDefault) => getDefault().concat(stateSyncEnhancer()),
-});
-
-export type Dispatch = (typeof store)["dispatch"];
-
-export const useDispatch = rr.useDispatch.withTypes<Dispatch>();
-export const useSelector = rr.useSelector.withTypes<RootState>();
+export const useDispatch = rr.useDispatch.withTypes<Dispatch<Action>>();
+export const useSelector = rr.useSelector.withTypes<State>();

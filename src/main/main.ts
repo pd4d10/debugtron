@@ -1,7 +1,7 @@
-import { setUpdater, setReporter } from "./main/utils";
-import { reducers } from "./reducers";
-import { appSlice } from "./reducers/app";
-import { configureStore } from "@reduxjs/toolkit";
+import { reducer, type AppInfo } from "../reducer";
+import { debug, debugPath, init } from "./actions";
+import { setUpdater, setReporter } from "./utils";
+import { applyMiddleware, legacy_createStore } from "@reduxjs/toolkit";
 import {
   app,
   BrowserWindow,
@@ -9,10 +9,12 @@ import {
   MenuItem,
   shell,
   nativeImage,
+  ipcMain,
 } from "electron";
-import { stateSyncEnhancer } from "electron-redux/main";
+import { composeWithStateSync } from "electron-redux/main";
 import path from "path";
-import { logger } from "redux-logger";
+import logger from "redux-logger";
+import { thunk } from "redux-thunk";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -59,12 +61,19 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  const store = configureStore({
-    reducer: reducers,
-    middleware: (getDefault) => getDefault().concat(logger),
-    enhancers: (getDefault) => getDefault().concat(stateSyncEnhancer()),
-  });
-  store.dispatch(appSlice.actions.read(null));
+  const store = legacy_createStore(
+    reducer,
+    composeWithStateSync(
+      applyMiddleware(
+        //logger,
+        thunk,
+      ),
+    ),
+  );
+  store.dispatch(
+    // @ts-ignore
+    init(),
+  );
 
   app.on("second-instance", () => {
     if (mainWindow) {
@@ -111,9 +120,23 @@ if (!gotTheLock) {
       );
     }
 
-    // ipcMain.on("dispatch-from-renderer", () => {
-
-    // })
+    ipcMain.on("debug", (e, appInfo: AppInfo) => {
+      store.dispatch(
+        // @ts-ignore
+        debug(appInfo),
+      );
+    });
+    ipcMain.on("debug-path", (e, path: string) => {
+      store.dispatch(
+        // @ts-ignore
+        debugPath(path),
+      );
+    });
+    ipcMain.on("open-window", (e, url: string) => {
+      const win = new BrowserWindow();
+      // console.log(url)
+      win.loadURL(url);
+    });
 
     setUpdater();
     createWindow();

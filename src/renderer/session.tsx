@@ -1,4 +1,3 @@
-import { sessionSlice } from "../reducers/session";
 import { useDispatch, useSelector } from "./store";
 import {
   Tabs,
@@ -25,25 +24,6 @@ export const Session: FC = () => {
       setActiveId(sessionIds[0]);
     }
   }, [activeId, sessionState]);
-
-  // session page fetch timer
-  useEffect(() => {
-    const updatePages = async () => {
-      for (let [id, info] of Object.entries(sessionState)) {
-        dispatch(
-          sessionSlice.actions.updatePages({
-            sessionId: id,
-            ports: [info.nodePort, info.windowPort],
-          }),
-        );
-      }
-    };
-
-    const timer = setInterval(updatePages, 3000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [dispatch, sessionState]);
 
   return (
     <Tabs
@@ -75,7 +55,7 @@ export const Session: FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(session.pages).map(([id, page]) => (
+                      {Object.entries(session.page).map(([id, page]) => (
                         <tr key={id}>
                           <td>
                             <Tag
@@ -113,7 +93,10 @@ export const Session: FC = () => {
                                     "devtools://",
                                   );
 
-                                dispatch(sessionSlice.actions.openWindow(url));
+                                require("electron").ipcRenderer.send(
+                                  "open-window",
+                                  url,
+                                );
                               }}
                             >
                               Inspect

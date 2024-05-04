@@ -16,7 +16,7 @@ module.exports = {
       name: "@electron-forge/plugin-vite",
       config: {
         build: [
-          { entry: "src/main.ts", config: "vite.main.config.mjs" },
+          { entry: "src/main/main.ts", config: "vite.main.config.mjs" },
           {
             entry: "src/preload.ts",
             config: "vite.preload.config.mjs",

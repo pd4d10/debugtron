@@ -1,4 +1,3 @@
-import { sessionSlice } from "../reducers/session";
 import defaultImage from "./images/electron.png";
 import { useDispatch, useSelector } from "./store";
 import { noDragStyle } from "./utils";
@@ -28,7 +27,7 @@ export const Header: FC = () => {
     >
       <Select
         filterable
-        items={Object.values(appState.info)}
+        items={Object.values(appState)}
         itemPredicate={(query, item) => {
           const lq = query.toLowerCase();
           return (
@@ -56,9 +55,9 @@ export const Header: FC = () => {
           );
         }}
         onItemSelect={(item) => {
-          const appInfo = appState.info[item.id];
+          const appInfo = appState[item.id];
           if (appInfo) {
-            dispatch(sessionSlice.actions.debug(appInfo));
+            require("electron").ipcRenderer.send("debug", appInfo);
           }
         }}
       >
@@ -94,7 +93,7 @@ export const Header: FC = () => {
           text="Debug"
           icon="build"
           onClick={async () => {
-            dispatch(sessionSlice.actions.debugPath(input));
+            require("electron").ipcRenderer.send("debug-path", input);
           }}
         />
       </ControlGroup>

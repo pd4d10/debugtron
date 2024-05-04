@@ -27,10 +27,7 @@ export default defineConfig((env) => {
       },
     },
     plugins: [pluginHotRestart("restart")],
-    define: {
-      ...define,
-      IN_MAIN_PROCESS: true,
-    },
+    define,
     resolve: {
       // Load the Node.js entry.
       mainFields: ["module", "jsnext:main", "jsnext"],

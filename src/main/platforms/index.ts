@@ -1,11 +1,11 @@
 export function importByPlatform() {
   switch (process.platform) {
-    case "win32":
-      return import("../platforms/win");
+    // case "win32":
+    //   return import("../platforms/win");
     case "darwin":
-      return import("../platforms/macos");
+      return import("./macos");
     case "linux":
-      return import("../platforms/linux");
+      return import("./linux");
     default:
       throw new Error("platform not supported");
   }
