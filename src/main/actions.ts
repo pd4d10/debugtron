@@ -3,6 +3,7 @@ import { importByPlatform } from "./platforms";
 import { spawn } from "child_process";
 import { dialog } from "electron";
 import getPort from "get-port";
+import { chunk } from "lodash-es";
 import path from "node:path";
 import { v4 } from "uuid";
 
@@ -23,15 +24,20 @@ export const init: ThunkActionCreator = () => async (dispatch, getState) => {
     const sessions = Object.values(session);
     const ports = sessions.flatMap((s) => [s.nodePort, s.windowPort]);
 
-    const payloads = await Promise.allSettled<PageInfo>(
+    const responses = await Promise.allSettled<PageInfo[]>(
       ports.map((port) =>
         fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
       ),
     );
-    const pages = payloads.flatMap((p) =>
-      p.status === "fulfilled" ? p.value : [],
-    );
-    console.log(ports, pages);
+    const pagess = chunk(
+      responses.map((p) => (p.status === "fulfilled" ? p.value : [])),
+      2,
+    ).map((item) => item.flat());
+    console.log(ports, pagess);
+    dispatch({
+      type: "session/pageUpdated",
+      payload: pagess,
+    });
   }, 3000);
 };
 

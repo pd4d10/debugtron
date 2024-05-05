@@ -1,4 +1,4 @@
-import type { Reducer, ThunkAction } from "@reduxjs/toolkit";
+import type { Reducer, ThunkDispatch } from "@reduxjs/toolkit";
 import { omit } from "lodash-es";
 import { match } from "ts-pattern";
 
@@ -42,14 +42,17 @@ export type Action =
       "session/added",
       { sessionId: string; appId: string; nodePort: number; windowPort: number }
     >
-  | FSA<"session/pageUpdated", { sessionId: string; pages: PageInfo[] }>
+  | FSA<"session/pageUpdated", PageInfo[][]>
   | FSA<"session/logAppended", { sessionId: string; content: string }>
   | FSA<"session/removed", string>;
 
 export type ThunkActionCreator<P1 = void, P2 = void> = (
   p1: P1,
   p2: P2,
-) => ThunkAction<void, State, never, Action>;
+) => (
+  dispatch: ThunkDispatch<State, never, Action>,
+  getState: () => State,
+) => void;
 
 const initialState: State = {
   app: {},
@@ -79,22 +82,26 @@ export const reducer: Reducer<State, Action> = (state, action) => {
       };
     })
     .with({ type: "session/pageUpdated" }, ({ payload }) => {
-      const { sessionId, pages } = payload;
-      const selected = state.session[sessionId];
-      if (!selected) return state;
-      return {
-        ...state,
-        session: {
-          ...state.session,
-          [sessionId]: {
-            ...selected,
-            page: pages
-              .sort((a, b) => (a.id < b.id ? -1 : 1))
-              .reduce<SessionInfo["page"]>((p, pageInfo) => {
+      const sessionNew = Object.keys(state.session).reduce(
+        (p, sessionId, i) => {
+          return {
+            ...p,
+            [sessionId]: {
+              ...p[sessionId]!,
+              page: payload[i]!.sort((a, b) => (a.id < b.id ? -1 : 1)).reduce<
+                SessionInfo["page"]
+              >((p, pageInfo) => {
                 return { ...p, [pageInfo.id]: pageInfo };
               }, {}),
-          },
+            },
+          };
         },
+        state.session,
+      );
+
+      return {
+        ...state,
+        session: sessionNew,
       };
     })
     .with({ type: "session/logAppended" }, ({ payload }) => {
