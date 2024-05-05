@@ -24,6 +24,12 @@ export const Header: FC = () => {
       }}
     >
       <Select
+        menuProps={{
+          style: {
+            maxHeight: "calc(100vh - 100px)", // TODO:
+            overflow: "auto",
+          },
+        }}
         filterable
         items={Object.values(appState)}
         itemPredicate={(query, item) => {
