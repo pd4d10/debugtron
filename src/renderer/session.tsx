@@ -49,72 +49,69 @@ export const Session: FC = () => {
                   maxHeight: "calc(100vh - 100px)", // TODO:
                 }}
               >
-                <HTMLTable
-                  compact
-                  interactive
-                  style={{
-                    marginTop: 5,
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>Type</th>
-                      <th>Title</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(session.page).map(([id, page]) => (
-                      <tr key={id}>
-                        <td>
-                          <Tag
-                            intent={
-                              page.type === "node"
-                                ? "success"
-                                : page.type === "page"
-                                  ? "primary"
-                                  : "none"
-                            }
-                          >
-                            {page.type}
-                          </Tag>
-                        </td>
-                        <td
-                          style={{
-                            maxWidth: 200,
-                            wordWrap: "break-word",
-                          }}
-                        >
-                          {page.title}
-                        </td>
-                        <td>
-                          <Button
-                            small
-                            rightIcon="share"
-                            onClick={() => {
-                              const url = page.devtoolsFrontendUrl
-                                .replace(
-                                  /^\/devtools/,
-                                  "devtools://devtools/bundled",
-                                )
-                                .replace(
-                                  /^chrome-devtools:\/\//,
-                                  "devtools://",
-                                );
-
-                              require("electron").ipcRenderer.send(
-                                "open-window",
-                                url,
-                              );
+                <div style={{ marginTop: 5, overflow: "auto", flexShrink: 0 }}>
+                  <HTMLTable compact interactive>
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th style={{ minWidth: 160, maxWidth: 160 }}>Title</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(session.page).map(([id, page]) => (
+                        <tr key={id}>
+                          <td>
+                            <Tag
+                              intent={
+                                page.type === "node"
+                                  ? "success"
+                                  : page.type === "page"
+                                    ? "primary"
+                                    : "none"
+                              }
+                            >
+                              {page.type}
+                            </Tag>
+                          </td>
+                          <td
+                            style={{
+                              minWidth: 160,
+                              maxWidth: 160,
+                              wordWrap: "break-word",
                             }}
                           >
-                            Inspect
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </HTMLTable>
+                            {page.title}
+                          </td>
+                          <td>
+                            <Button
+                              small
+                              rightIcon="share"
+                              onClick={() => {
+                                const url = page.devtoolsFrontendUrl
+                                  .replace(
+                                    /^\/devtools/,
+                                    "devtools://devtools/bundled",
+                                  )
+                                  .replace(
+                                    /^chrome-devtools:\/\//,
+                                    "devtools://",
+                                  );
+
+                                require("electron").ipcRenderer.send(
+                                  "open-window",
+                                  url,
+                                );
+                              }}
+                            >
+                              Inspect
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </HTMLTable>
+                </div>
                 <Divider />
                 <Pre
                   style={{
