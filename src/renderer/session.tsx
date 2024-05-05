@@ -39,7 +39,7 @@ export const Session: FC = () => {
             style={{ overflowY: "auto" }}
             id={id}
             key={id}
-            title={`${appInfo?.name} (${appInfo?.id})`}
+            title={appInfo?.name}
             panel={
               <div
                 style={{
