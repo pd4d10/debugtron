@@ -18,8 +18,7 @@ export const Header: FC = () => {
   return (
     <header
       style={{
-        // @ts-expect-error draggable title bar
-        "-webkit-app-region": "drag",
+        WebkitAppRegion: "drag",
         padding: "10px 10px 10px 80px",
         display: "flex",
       }}
