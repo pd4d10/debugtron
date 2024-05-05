@@ -72,10 +72,9 @@ export const adapter: AppReader = {
       if (!isElectronBased) throw new Error("Not an electron app");
 
       const info = await readPlistFile(path.join(p, "Contents/Info.plist"));
-      // const icon = await readIcnsAsImageUri(
-      //   path.join(p, "Contents/Resources", info.CFBundleIconFile),
-      // );
-      const icon = "";
+      const icon = await readIcnsAsImageUri(
+        path.join(p, "Contents/Resources", info.CFBundleIconFile),
+      );
 
       return {
         id: info.CFBundleIdentifier,
