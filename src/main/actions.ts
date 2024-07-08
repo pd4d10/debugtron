@@ -47,7 +47,11 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
 
   const sp = spawn(
     app.exePath,
-    [`--inspect=${nodePort}`, `--remote-debugging-port=${windowPort}`],
+    [
+      `--inspect=${nodePort}`,
+      `--remote-debugging-port=${windowPort}`,
+      "--remote-allow-origins=devtools://devtools",
+    ],
     {
       cwd: process.platform === "win32" ? path.dirname(app.exePath) : "/",
     },
