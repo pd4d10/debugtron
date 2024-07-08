@@ -1,4 +1,4 @@
-import type { AppInfo } from "../reducers/app";
+import type { AppInfo } from "../../reducer";
 import type { AppReader } from "./utils";
 import fs from "fs";
 import path from "path";
@@ -135,9 +135,18 @@ export const adapter: AppReader = {
           "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
         ),
       ];
-      return Promise.all(
-        items.map((itemValues) => getAppInfoFromRegeditItemValues(itemValues)),
+
+      const results = await Promise.all(
+        items.map((itemValues) =>
+          Result.wrapAsync(async () =>
+            getAppInfoFromRegeditItemValues(itemValues),
+          ),
+        ),
       );
+
+      const apps = results.flatMap((app) => (app.ok ? [app.unwrap()] : []));
+
+      return apps;
     }),
 
   readByPath: (p: string) =>

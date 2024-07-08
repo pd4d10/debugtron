@@ -1,7 +1,7 @@
 export function importByPlatform() {
   switch (process.platform) {
-    // case "win32":
-    //   return import("../platforms/win");
+    case "win32":
+      return import("../platforms/win");
     case "darwin":
       return import("./macos");
     case "linux":
