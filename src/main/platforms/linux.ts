@@ -1,10 +1,14 @@
 import type { AppReader } from "./utils";
+import os from 'os'
 import fs from "fs";
 import ini from "ini";
 import path from "path";
 import { Result } from "ts-results";
+import { findIconPath } from './linux/find-icon'
+import { findExecPath } from './linux/find-exec'
 
-const desktopFilesDir = "/usr/share/applications";
+const userAppsDir = path.join(os.homedir(), ".local/share/applications")
+const sysAppsDir = "/usr/share/applications";
 
 const readAppInfo = (desktopFile: string) =>
   Result.wrapAsync(async () => {
@@ -29,22 +33,47 @@ const readAppInfo = (desktopFile: string) =>
       exePath = entry.Exec.split(/\s+/)[0] ?? "";
     }
 
-    if (!exePath.startsWith("/")) {
+    // try to find real exec file
+    if (!path.isAbsolute(exePath)) {
+      exePath = findExecPath(exePath) || exePath
+    }
+
+    if (!path.isAbsolute(exePath)) {
       throw new Error("Exec path invalid");
     }
-    if (!fs.existsSync(path.join(exePath, "../resources/electron.asar"))) {
+
+    if (
+      !(
+        fs.existsSync(path.join(exePath, "../resources/electron.asar"))
+        ||
+        fs.existsSync(path.join(exePath, "../LICENSE.electron.txt"))
+        ||
+        fs.existsSync(path.join(exePath, "../chrome-sandbox"))
+      )
+    ) {
       throw new Error("resources/electron.asar not exists");
     }
 
     let icon = "";
+    let iconPath = ""; // todo: set default icon
     if (entry.Icon) {
-      try {
-        const iconBuffer = await fs.promises.readFile(
-          `/usr/share/icons/hicolor/1024x1024/apps/${entry.Icon}.png`,
-        );
-        icon = "data:image/png;base64," + iconBuffer.toString("base64");
-      } catch (err) {
-        console.error(err);
+      if (path.isAbsolute(entry.Icon)) {
+        iconPath = entry.Icon
+      } else {
+        iconPath = findIconPath(entry.Icon) || iconPath
+      }
+
+      if (fs.existsSync(iconPath)) {
+        const base64 = await fs.promises.readFile(iconPath, 'base64')
+
+        const ext = path.extname(iconPath)
+        if (ext === '.svg') {
+          icon = 'data:image/svg+xml;base64,' + base64
+        }
+        if (ext === '.png') {
+          icon = 'data:image/png;base64,' + base64
+        }
+        // todo: if (ext === 'xpm') {}
       }
     }
 
@@ -56,16 +85,22 @@ const readAppInfo = (desktopFile: string) =>
     };
   });
 
+async function readAppDir(dir: string) {
+    const files = await fs.promises.readdir(dir)
+    const apps = await Promise.all(
+        files
+            .filter((f) => f.endsWith(".desktop"))
+            .map((file) => readAppInfo(path.join(dir, file))),
+    );
+    return apps.flatMap((app) => (app.ok ? [app.unwrap()] : []))
+}
+
 export const adapter: AppReader = {
   readAll: () =>
     Result.wrapAsync(async () => {
-      const files = await fs.promises.readdir(desktopFilesDir);
-      const apps = await Promise.all(
-        files
-          .filter((f) => f.endsWith(".desktop"))
-          .map((file) => readAppInfo(path.join(desktopFilesDir, file))),
-      );
-      return apps.flatMap((app) => (app.ok ? [app.unwrap()] : []));
+      const userApps = await readAppDir(userAppsDir)
+      const sysApps = await readAppDir(sysAppsDir)
+      return [...userApps, ...sysApps];
     }),
   readByPath: (p: string) =>
     Result.wrapAsync(async () => {
