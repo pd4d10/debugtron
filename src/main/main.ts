@@ -1,7 +1,7 @@
-import { setUpdater, setReporter } from "./main/utils";
-import { reducers } from "./reducers";
-import { appSlice } from "./reducers/app";
-import { configureStore } from "@reduxjs/toolkit";
+import { reducer, type AppInfo } from "../reducer";
+import { debug, debugPath, init } from "./actions";
+import { setUpdater, setReporter } from "./utils";
+import { applyMiddleware, legacy_createStore } from "@reduxjs/toolkit";
 import {
   app,
   BrowserWindow,
@@ -9,9 +9,12 @@ import {
   MenuItem,
   shell,
   nativeImage,
+  ipcMain,
 } from "electron";
-import { stateSyncEnhancer } from "electron-redux/main";
+import { composeWithStateSync } from "electron-redux/main";
 import path from "path";
+import logger from "redux-logger";
+import { thunk } from "redux-thunk";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -22,8 +25,8 @@ let mainWindow: BrowserWindow | null = null;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1024,
+    height: 768,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 14, y: 14 },
     icon:
@@ -58,11 +61,19 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  const store = configureStore({
-    reducer: reducers,
-    enhancers: (getDefault) => getDefault().concat(stateSyncEnhancer()),
-  });
-  store.dispatch(appSlice.actions.read(null));
+  const store = legacy_createStore(
+    reducer,
+    composeWithStateSync(
+      applyMiddleware(
+        //logger,
+        thunk,
+      ),
+    ),
+  );
+  store.dispatch(
+    // @ts-ignore
+    init(),
+  );
 
   app.on("second-instance", () => {
     if (mainWindow) {
@@ -75,13 +86,9 @@ if (!gotTheLock) {
     if (app.isPackaged) {
       setReporter();
     } else {
-      // TODO: electron 9
-      const installer = require("electron-devtools-installer");
-      await Promise.all(
-        ["REACT_DEVELOPER_TOOLS", "REDUX_DEVTOOLS"].map((name) =>
-          installer.default(installer[name]),
-        ),
-      );
+      const devtools = await import("electron-devtools-installer");
+      devtools.default(devtools.REACT_DEVELOPER_TOOLS);
+      devtools.default(devtools.REDUX_DEVTOOLS);
     }
 
     const defaultMenu = Menu.getApplicationMenu();
@@ -109,9 +116,23 @@ if (!gotTheLock) {
       );
     }
 
-    // ipcMain.on("dispatch-from-renderer", () => {
-
-    // })
+    ipcMain.on("debug", (e, appInfo: AppInfo) => {
+      store.dispatch(
+        // @ts-ignore
+        debug(appInfo),
+      );
+    });
+    ipcMain.on("debug-path", (e, path: string) => {
+      store.dispatch(
+        // @ts-ignore
+        debugPath(path),
+      );
+    });
+    ipcMain.on("open-window", (e, url: string) => {
+      const win = new BrowserWindow();
+      // console.log(url)
+      win.loadURL(url);
+    });
 
     setUpdater();
     createWindow();

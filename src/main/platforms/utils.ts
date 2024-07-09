@@ -1,4 +1,4 @@
-import type { AppInfo } from "../reducers/app";
+import type { AppInfo } from "../../reducer";
 import { Result } from "ts-results";
 
 export interface AppReader {

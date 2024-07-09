@@ -1,5 +1,4 @@
-import { sessionSlice } from "../reducers/session";
-import { useDispatch, useSelector } from "./store";
+import { appSelector, sessionSelector, useSelector } from "./store";
 import {
   Tabs,
   Tab,
@@ -13,9 +12,8 @@ import { useEffect, type FC, useState } from "react";
 
 export const Session: FC = () => {
   const [activeId, setActiveId] = useState("");
-  const dispatch = useDispatch();
-  // const appState = useSelector((s) => s.app);
-  const sessionState = useSelector((s) => s.session);
+  const appState = useSelector(appSelector);
+  const sessionState = useSelector(sessionSelector);
 
   useEffect(() => {
     const sessionIds = Object.keys(sessionState);
@@ -26,56 +24,42 @@ export const Session: FC = () => {
     }
   }, [activeId, sessionState]);
 
-  // session page fetch timer
-  useEffect(() => {
-    const updatePages = async () => {
-      for (let [id, info] of Object.entries(sessionState)) {
-        dispatch(
-          sessionSlice.actions.updatePages({
-            sessionId: id,
-            ports: [info.nodePort, info.windowPort],
-          }),
-        );
-      }
-    };
-
-    const timer = setInterval(updatePages, 3000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [dispatch, sessionState]);
-
   return (
     <Tabs
-      vertical
       selectedTabId={activeId}
       onChange={(key) => {
         setActiveId(key as string);
       }}
     >
       {Object.entries(sessionState).map(([id, session]) => {
-        // const appInfo = appState.info[session.appId];
+        const appInfo = appState[session.appId];
 
         return (
           <Tab
+            style={{ overflowY: "auto" }}
             id={id}
             key={id}
-            // title={`${appInfo?.name} (${appInfo?.id})`}
-            title="session" // TODO:
+            title={appInfo?.name}
             panel={
-              <div style={{ display: "flex", marginTop: -20 }}>
-                <div>
-                  <h3>Sessions (Click to open)</h3>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: -20,
+                  overflow: "auto",
+                  maxHeight: "calc(100vh - 100px)", // TODO:
+                }}
+              >
+                <div style={{ marginTop: 5, overflow: "auto", flexShrink: 0 }}>
                   <HTMLTable compact interactive>
                     <thead>
                       <tr>
                         <th>Type</th>
-                        <th>Title</th>
+                        <th style={{ minWidth: 160, maxWidth: 160 }}>Title</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(session.pages).map(([id, page]) => (
+                      {Object.entries(session.page).map(([id, page]) => (
                         <tr key={id}>
                           <td>
                             <Tag
@@ -92,7 +76,8 @@ export const Session: FC = () => {
                           </td>
                           <td
                             style={{
-                              maxWidth: 200,
+                              minWidth: 160,
+                              maxWidth: 160,
                               wordWrap: "break-word",
                             }}
                           >
@@ -113,7 +98,10 @@ export const Session: FC = () => {
                                     "devtools://",
                                   );
 
-                                dispatch(sessionSlice.actions.openWindow(url));
+                                require("electron").ipcRenderer.send(
+                                  "open-window",
+                                  url,
+                                );
                               }}
                             >
                               Inspect
@@ -127,6 +115,7 @@ export const Session: FC = () => {
                 <Divider />
                 <Pre
                   style={{
+                    marginTop: 5,
                     flexGrow: 1,
                     overflow: "auto",
                     userSelect: "text",

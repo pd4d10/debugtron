@@ -1,6 +1,5 @@
-import { sessionSlice } from "../reducers/session";
 import defaultImage from "./images/electron.png";
-import { useDispatch, useSelector } from "./store";
+import { appSelector, useSelector } from "./store";
 import { noDragStyle } from "./utils";
 import {
   Button,
@@ -13,22 +12,26 @@ import { Select } from "@blueprintjs/select";
 import { type FC, useState } from "react";
 
 export const Header: FC = () => {
-  const dispatch = useDispatch();
-  const appState = useSelector((s) => s.app);
+  const appState = useSelector(appSelector);
   const [input, setInput] = useState("");
 
   return (
     <header
       style={{
-        // @ts-expect-error draggable title bar
-        "-webkit-app-region": "drag",
+        WebkitAppRegion: "drag",
         padding: "10px 10px 10px 80px",
         display: "flex",
       }}
     >
       <Select
+        menuProps={{
+          style: {
+            maxHeight: "calc(100vh - 100px)", // TODO:
+            overflow: "auto",
+          },
+        }}
         filterable
-        items={Object.values(appState.info)}
+        items={Object.values(appState)}
         itemPredicate={(query, item) => {
           const lq = query.toLowerCase();
           return (
@@ -56,9 +59,9 @@ export const Header: FC = () => {
           );
         }}
         onItemSelect={(item) => {
-          const appInfo = appState.info[item.id];
+          const appInfo = appState[item.id];
           if (appInfo) {
-            dispatch(sessionSlice.actions.debug(appInfo));
+            require("electron").ipcRenderer.send("debug", appInfo);
           }
         }}
       >
@@ -94,7 +97,7 @@ export const Header: FC = () => {
           text="Debug"
           icon="build"
           onClick={async () => {
-            dispatch(sessionSlice.actions.debugPath(input));
+            require("electron").ipcRenderer.send("debug-path", input);
           }}
         />
       </ControlGroup>
