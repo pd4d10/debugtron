@@ -92,9 +92,13 @@ const getAppInfoFromRegeditItemValues = async (
 function isElectronApp(installDir: string) {
   return (
     fs.existsSync(path.join(installDir, "resources")) &&
-    ["default_app.asar", "app.asar", "app.asar.unpacked"].some((file) =>
-      fs.existsSync(path.join(installDir, "resources", file)),
-    )
+    [
+      "electron.asar",
+      // https://github.com/pd4d10/debugtron/pull/26
+      "default_app.asar",
+      "app.asar",
+      "app.asar.unpacked",
+    ].some((file) => fs.existsSync(path.join(installDir, "resources", file)))
   );
 }
 
