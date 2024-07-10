@@ -1,101 +1,99 @@
-import { v4 } from 'uuid'
-import path from 'path'
-import { spawn } from 'child_process'
-import { updatePages } from '../reducers/session'
-import { PageInfo, Dict, AppInfo } from '../types'
-import fetch from 'node-fetch'
-import { addSession, updateLog, removeSession } from '../reducers/session'
-import { State } from '../reducers'
-import { dialog } from 'electron'
-import getPort from 'get-port'
-import { ThunkAction } from 'redux-thunk'
-import { Adapter } from './adapter'
-import { getApps, getAppStart } from '../reducers/app'
+import type { AppInfo, PageInfo, ThunkActionCreator } from "../reducer";
+import { importByPlatform } from "./platforms";
+import { spawn } from "child_process";
+import { dialog } from "electron";
+import getPort from "get-port";
+import { chunk } from "lodash-es";
+import path from "node:path";
+import { v4 } from "uuid";
 
-export const fetchPages =
-  (): ThunkAction<any, State, any, any> => async (dispatch, getState) => {
-    const { sessionInfo } = getState()
-    for (let [id, info] of Object.entries(sessionInfo)) {
-      const ports: string[] = []
-      if (info.nodePort) ports.push(info.nodePort)
-      if (info.windowPort) ports.push(info.windowPort)
+export const init: ThunkActionCreator = () => async (dispatch, getState) => {
+  // first load
+  const { adapter } = await importByPlatform();
+  const apps = await adapter.readAll();
 
-      const payloads = await Promise.allSettled<PageInfo>(
-        ports.map((port) =>
-          fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())
-        ) as any
-      )
+  if (!apps.ok) throw new Error("Failed to read apps");
+  dispatch({
+    type: "app/loaded",
+    payload: apps.unwrap(),
+  });
 
-      const pages = payloads.flatMap((p) =>
-        p.status === 'fulfilled' ? p.value : []
-      )
-      if (pages.length === 0) return
+  // timer
+  setInterval(async () => {
+    const { session } = getState();
+    const sessions = Object.values(session);
+    const ports = sessions.flatMap((s) => [s.nodePort, s.windowPort]);
 
-      const pageDict = {} as Dict<PageInfo>
-      pages
-        .sort((a, b) => (a.id < b.id ? -1 : 1))
-        .forEach((page) => {
-          pageDict[page.id] = page
-        })
+    const responses = await Promise.allSettled<PageInfo[]>(
+      ports.map((port) =>
+        fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
+      ),
+    );
+    const pagess = chunk(
+      responses.map((p) => (p.status === "fulfilled" ? p.value : [])),
+      2,
+    ).map((item) => item.flat());
+    console.log(ports, pagess);
+    dispatch({
+      type: "session/pageUpdated",
+      payload: pagess,
+    });
+  }, 3000);
+};
 
-      dispatch(updatePages(id, pageDict))
-    }
+export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
+  const nodePort = await getPort();
+  const windowPort = await getPort();
+
+  const sp = spawn(
+    app.exePath,
+    [
+      `--inspect=${nodePort}`,
+      `--remote-debugging-port=${windowPort}`,
+      "--remote-allow-origins=devtools://devtools",
+    ],
+    {
+      cwd: process.platform === "win32" ? path.dirname(app.exePath) : "/",
+    },
+  );
+
+  const sessionId = v4();
+  dispatch({
+    type: "session/added",
+    payload: { sessionId, appId: app.id, nodePort, windowPort },
+  });
+
+  sp.on("error", (err) => {
+    dialog.showErrorBox(`Error: ${app.name}`, err.message);
+  });
+  sp.on("close", () => {
+    // console.log(`child process exited with code ${code}`)
+    dispatch({ type: "session/removed", payload: sessionId });
+  });
+
+  const handleStdout =
+    (isError = false) =>
+    (chunk: Buffer) => {
+      // TODO: stderr colors
+      console.log(isError);
+      dispatch({
+        type: "session/logAppended",
+        payload: {
+          sessionId,
+          content: chunk.toString(),
+        },
+      });
+    };
+
+  if (sp.stdout) {
+    sp.stdout.on("data", handleStdout());
   }
-
-export const startDebugging =
-  (app: AppInfo): ThunkAction<any, State, any, any> =>
-  async (dispatch, getState) => {
-    const nodePort = await getPort()
-    const windowPort = await getPort()
-
-    const sp = spawn(
-      app.exePath,
-      [`--inspect=${nodePort}`, `--remote-debugging-port=${windowPort}`],
-      {
-        cwd: process.platform === 'win32' ? path.dirname(app.exePath) : '/',
-      }
-    )
-
-    const id = v4()
-    dispatch(addSession(id, app.id, nodePort, windowPort))
-
-    sp.on('error', (err) => {
-      dialog.showErrorBox(`Error: ${app.name}`, err.message)
-    })
-
-    sp.on('close', (code) => {
-      // console.log(`child process exited with code ${code}`)
-      dispatch(removeSession(id))
-      // TODO: Remove temp app
-    })
-
-    const handleStdout =
-      (isError = false) =>
-      (chunk: Buffer) => {
-        const data = chunk.toString()
-        // TODO: stderr colors
-        dispatch(updateLog(id, data))
-      }
-
-    if (sp.stdout) {
-      sp.stdout.on('data', handleStdout())
-    }
-    if (sp.stderr) {
-      sp.stderr.on('data', handleStdout(true))
-    }
+  if (sp.stderr) {
+    sp.stderr.on("data", handleStdout(true));
   }
+};
 
-export const detectApps =
-  (adapter: Adapter): ThunkAction<any, State, any, any> =>
-  async (dispatch) => {
-    dispatch(getAppStart())
-    const apps = await adapter.readApps()
-    const appInfo = {} as Dict<AppInfo>
-    apps
-      .filter((app): app is AppInfo => typeof app !== 'undefined')
-      .sort((a, b) => (a.id < b.id ? -1 : 1))
-      .forEach((app) => {
-        appInfo[app.id] = app
-      })
-    dispatch(getApps(appInfo))
-  }
+export const debugPath: ThunkActionCreator<string> =
+  (path) => async (dispatch) => {
+    // TODO:
+  };

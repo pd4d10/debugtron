@@ -1,22 +1,15 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import { App } from './app'
-import reducers from '../reducers'
-import { createStore, applyMiddleware } from 'redux'
-import { composeWithStateSync } from 'electron-redux/renderer'
-import { Provider } from 'react-redux'
-import thunk from 'redux-thunk'
+import { App } from "./app";
+import { store } from "./store";
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "normalize.css/normalize.css";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
 
-// For debug
-;(window as any).electron = require('electron')
+// @ts-expect-error for debug
+window.electron = require("electron");
 
-const store = createStore(
-  reducers,
-  composeWithStateSync(applyMiddleware(thunk))
-)
-
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <App />
-  </Provider>
-)
+  </Provider>,
+);

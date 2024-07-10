@@ -1,41 +1,13 @@
-import fs from 'fs'
-import os from 'os'
-import { setUpdateNotification } from 'electron-update-notification'
-import { machineId } from 'node-machine-id'
-import ua from 'universal-analytics'
-
-export async function readdirSafe(p: string) {
-  try {
-    return await fs.promises.readdir(p)
-  } catch (err) {
-    console.error(err)
-    return []
-  }
-}
-
-export async function readFileSafe(p: string) {
-  try {
-    return await fs.promises.readFile(p, { encoding: 'utf8' })
-  } catch (err) {
-    console.error(err)
-    return ''
-  }
-}
-
-export async function readFileAsBufferSafe(p: string) {
-  try {
-    return await fs.promises.readFile(p)
-  } catch (err) {
-    console.error(err)
-    return
-  }
-}
+import { machineId } from "node-machine-id";
+import os from "os";
+// import { setUpdateNotification } from 'electron-update-notification' // TODO:
+import ua from "universal-analytics";
 
 export async function setReporter() {
   try {
-    const id = await machineId()
-    const client = ua('UA-145047249-4', id, { strictCidFormat: false })
-    client.pageview('/' + require('../../package.json').version).send()
+    const id = await machineId();
+    const client = ua("UA-145047249-4", id, { strictCidFormat: false });
+    client.pageview("/" + require("../../package.json").version).send();
   } catch (err) {}
 }
 
@@ -46,8 +18,6 @@ export async function setUpdater() {
     //   break
     // TODO: macOS: Make code sign work then use update-electron-app
     default:
-      setUpdateNotification({
-        token: DEBUGTRON_GITHUB_TOKEN,
-      })
+    // setUpdateNotification();
   }
 }
