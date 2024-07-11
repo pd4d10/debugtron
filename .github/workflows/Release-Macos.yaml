@@ -1,0 +1,78 @@
+name: Release-Macos
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag to release'
+        required: true
+
+jobs:
+  release:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        architecture: [x64, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Verify Python Version
+        run: python --version
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set Yarn Version
+        run: corepack prepare yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint code
+        run: |
+          yarn lint || (echo "Linting issues found, trying to fix..." && yarn lint-fix)
+
+      - name: Build the project for x64
+        if: matrix.architecture == 'x64'
+        run: yarn make --arch=x64 --verbose
+
+      - name: Build the project for arm64
+        if: matrix.architecture == 'arm64'
+        run: yarn make --arch=arm64 --verbose
+
+      - name: Find built asset on macOS
+        id: find_asset
+        run: |
+          ASSET_PATH=$(find ./out/make -path './node_modules' -prune -o -name '*.dmg' -print | head -n 1)
+          ABSOLUTE_ASSET_PATH=$(realpath "$ASSET_PATH")
+          echo "ASSET_PATH=$ABSOLUTE_ASSET_PATH" >> $GITHUB_ENV
+          BASENAME=$(basename "$ASSET_PATH")
+          echo "ASSET_BASENAME=$BASENAME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_BASENAME }}
+          path: ${{ env.ASSET_PATH }}
+          overwrite: true
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag_name }}
+          name: ${{ env.ASSET_BASENAME }}
+          files: ${{ env.ASSET_PATH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
