@@ -3,6 +3,7 @@ module.exports = {
     asar: true,
     appBundleId: "io.github.pd4d10.debugtron",
     icon: "assets/icon",
+    executableName: "debugtron"
   },
   makers: [
     { name: "@electron-forge/maker-squirrel", config: {} },
