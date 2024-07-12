@@ -1,6 +1,9 @@
 name: Release-Linux
 
 on:
+  push:
+    tags:
+      - "v*.*.*" # 监听所有以 'v' 开头的标签
   workflow_dispatch:
     inputs:
       tag_name:
@@ -91,15 +94,15 @@ jobs:
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tag_name }}
-          name: ${{ env.ASSET_RPM_BASENAME }}
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
           files: ${{ env.ASSET_RPM_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tag_name }}
-          name: ${{ env.ASSET_DEB_BASENAME }}
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
           files: ${{ env.ASSET_DEB_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}

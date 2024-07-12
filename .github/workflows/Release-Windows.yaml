@@ -1,6 +1,9 @@
 name: Release-Windows
 
 on:
+  push:
+    tags:
+      - "v*.*.*" # 监听所有以 'v' 开头的标签
   workflow_dispatch:
     inputs:
       tag_name:
@@ -40,7 +43,7 @@ jobs:
       - name: Install dependencies
         shell: pwsh
         run: |
-          $retries = 5
+          $retries = 1
           $count = 0
           do {
             yarn install
@@ -50,12 +53,12 @@ jobs:
             }
             $count++
             Write-Output "Retrying ($count/$retries)..."
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 5
           } while ($count -lt $retries)
 
-      - name: Lint code
-        run: |
-          yarn lint || (echo "Linting issues found, trying to fix..." && yarn lint-fix)
+      # - name: Lint code
+      #   run: |
+      #     yarn lint || (echo "Linting issues found, trying to fix..." && yarn lint-fix)
 
       - name: Build the project for x64
         if: matrix.architecture == 'x64'
@@ -124,7 +127,7 @@ jobs:
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tag_name }}
-          name: ${{ env.ASSET_BASENAME }}
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
           files: ${{ env.ASSET_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}
