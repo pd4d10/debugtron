@@ -1,6 +1,9 @@
 name: Release-Macos
 
 on:
+  push:
+    tags:
+      - "v*.*.*" # 监听所有以 'v' 开头的标签
   workflow_dispatch:
     inputs:
       tag_name:
@@ -72,7 +75,7 @@ jobs:
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tag_name }}
-          name: ${{ env.ASSET_BASENAME }}
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
           files: ${{ env.ASSET_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}
