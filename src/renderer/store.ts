@@ -1,7 +1,7 @@
 import { reducer, type State } from "../reducer";
-import { applyMiddleware, legacy_createStore } from "@reduxjs/toolkit";
 import { composeWithStateSync } from "electron-redux/renderer";
 import * as rr from "react-redux";
+import { applyMiddleware, legacy_createStore } from "redux";
 
 export const store = legacy_createStore(
   reducer,

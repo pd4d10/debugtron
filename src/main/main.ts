@@ -1,7 +1,6 @@
 import { reducer, type AppInfo } from "../reducer";
 import { debug, debugPath, init } from "./actions";
 import { setUpdater, setReporter } from "./utils";
-import { applyMiddleware, legacy_createStore } from "@reduxjs/toolkit";
 import {
   app,
   BrowserWindow,
@@ -13,6 +12,7 @@ import {
 } from "electron";
 import { composeWithStateSync } from "electron-redux/main";
 import path from "path";
+import { applyMiddleware, legacy_createStore } from "redux";
 import logger from "redux-logger";
 import { thunk } from "redux-thunk";
 

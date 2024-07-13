@@ -1,5 +1,6 @@
-import type { Reducer, ThunkDispatch } from "@reduxjs/toolkit";
 import { produce } from "immer";
+import type { Reducer } from "redux";
+import type { ThunkDispatch } from "redux-thunk";
 import { match } from "ts-pattern";
 
 export type AppInfo = {
