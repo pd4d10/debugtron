@@ -1,5 +1,5 @@
 import type { Reducer, ThunkDispatch } from "@reduxjs/toolkit";
-import { omit } from "lodash-es";
+import { produce } from "immer";
 import { match } from "ts-pattern";
 
 export type AppInfo = {
@@ -64,66 +64,44 @@ export const reducer: Reducer<State, Action> = (state, action) => {
 
   return match(action)
     .with({ type: "app/loaded" }, ({ payload }) => {
-      payload.sort((a, b) => (a.id < b.id ? -1 : 1));
-      const record = payload.reduce<State["app"]>((p, appInfo) => {
-        return { ...p, [appInfo.id]: appInfo };
-      }, {});
-
-      return { ...state, app: record };
+      return produce(state, (s) => {
+        s.app = {};
+        payload
+          .sort((a, b) => (a.id < b.id ? -1 : 1))
+          .forEach((appInfo) => {
+            s.app[appInfo.id] = appInfo;
+          });
+      });
     })
-    .with({ type: "session/added" }, ({ payload }) => {
-      const { sessionId, ...rest } = payload;
-      return {
-        ...state,
-        session: {
-          ...state.session,
-          [sessionId]: { ...rest, page: {}, log: "" },
-        },
-      };
+    .with({ type: "session/added" }, ({ payload: { sessionId, ...rest } }) => {
+      return produce(state, (s) => {
+        s.session[sessionId] = { ...rest, page: {}, log: "" };
+      });
     })
     .with({ type: "session/pageUpdated" }, ({ payload }) => {
-      const sessionNew = Object.keys(state.session).reduce(
-        (p, sessionId, i) => {
-          return {
-            ...p,
-            [sessionId]: {
-              ...p[sessionId]!,
-              page: payload[i]!.sort((a, b) => (a.id < b.id ? -1 : 1)).reduce<
-                SessionInfo["page"]
-              >((p, pageInfo) => {
-                return { ...p, [pageInfo.id]: pageInfo };
-              }, {}),
-            },
-          };
-        },
-        state.session,
-      );
+      return produce(state, (s) => {
+        Object.keys(s.session).forEach((sessionId, i) => {
+          s.session[sessionId]!.page = {};
 
-      return {
-        ...state,
-        session: sessionNew,
-      };
+          payload[i]!.sort((a, b) => (a.id < b.id ? -1 : 1)).forEach((p) => {
+            s.session[sessionId]!.page[p.id] = p;
+          });
+        });
+      });
     })
-    .with({ type: "session/logAppended" }, ({ payload }) => {
-      const { sessionId, content } = payload;
-      const selected = state.session[sessionId];
-      if (!selected) return state;
-      return {
-        ...state,
-        session: {
-          ...state.session,
-          [sessionId]: {
-            ...selected,
-            log: selected.log + content,
-          },
-        },
-      };
-    })
+    .with(
+      { type: "session/logAppended" },
+      ({ payload: { sessionId, content } }) => {
+        return produce(state, (s) => {
+          const selected = s.session[sessionId];
+          if (selected) selected.log += content;
+        });
+      },
+    )
     .with({ type: "session/removed" }, ({ payload }) => {
-      return {
-        ...state,
-        session: omit(state.session, payload),
-      };
+      return produce(state, (s) => {
+        delete s.session[payload];
+      });
     })
 
     .otherwise(() => {
