@@ -1,4 +1,5 @@
 import { appSelector, sessionSelector, useSelector } from "./store";
+import { Xterm } from "./xterm";
 import {
   Tabs,
   Tab,
@@ -113,18 +114,22 @@ export const Session: FC = () => {
                   </HTMLTable>
                 </div>
                 <Divider />
-                <Pre
+                <div
                   style={{
                     marginTop: 5,
                     flexGrow: 1,
                     overflow: "auto",
-                    userSelect: "text",
-                    fontFamily:
-                      "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
                   }}
                 >
-                  {session.log}
-                </Pre>
+                  <Xterm
+                    content={session.log}
+                    options={{
+                      fontFamily:
+                        "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
+                      convertEol: true,
+                    }}
+                  />
+                </div>
               </div>
             }
           />

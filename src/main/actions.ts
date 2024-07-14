@@ -75,7 +75,6 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
     (isError = false) =>
     (chunk: Buffer) => {
       // TODO: stderr colors
-      console.log(isError);
       dispatch({
         type: "session/logAppended",
         payload: {
