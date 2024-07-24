@@ -1,5 +1,5 @@
+import { appSlice } from "../reducers/app";
 import defaultImage from "./images/electron.png";
-import { appSelector, useSelector } from "./store";
 import { noDragStyle } from "./utils";
 import {
   Button,
@@ -10,9 +10,10 @@ import {
 } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import { type FC, useState } from "react";
+import { useSelector } from "react-redux";
 
 export const Header: FC = () => {
-  const appState = useSelector(appSelector);
+  const appState = useSelector(appSlice.selectSlice);
   const [input, setInput] = useState("");
 
   return (

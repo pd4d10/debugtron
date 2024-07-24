@@ -1,4 +1,5 @@
-import { appSelector, sessionSelector, useSelector } from "./store";
+import { appSlice } from "../reducers/app";
+import { sessionSlice } from "../reducers/session";
 import { Xterm } from "./xterm";
 import {
   Tabs,
@@ -10,20 +11,21 @@ import {
   Button,
 } from "@blueprintjs/core";
 import { useEffect, type FC, useState } from "react";
+import { useSelector } from "react-redux";
 
 export const Session: FC = () => {
   const [activeId, setActiveId] = useState("");
-  const appState = useSelector(appSelector);
-  const sessionState = useSelector(sessionSelector);
+  const appStore = useSelector(appSlice.selectSlice);
+  const sessionStore = useSelector(sessionSlice.selectSlice);
 
   useEffect(() => {
-    const sessionIds = Object.keys(sessionState);
+    const sessionIds = Object.keys(sessionStore);
 
     // Ensure there always be one tab active
     if (!sessionIds.includes(activeId) && sessionIds[0]) {
       setActiveId(sessionIds[0]);
     }
-  }, [activeId, sessionState]);
+  }, [activeId, sessionStore]);
 
   return (
     <Tabs
@@ -32,8 +34,8 @@ export const Session: FC = () => {
         setActiveId(key as string);
       }}
     >
-      {Object.entries(sessionState).map(([id, session]) => {
-        const appInfo = appState[session.appId];
+      {Object.entries(sessionStore).map(([id, session]) => {
+        const appInfo = appStore[session.appId];
 
         return (
           <Tab

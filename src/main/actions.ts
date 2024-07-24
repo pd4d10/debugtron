@@ -1,4 +1,6 @@
 import type { AppInfo, PageInfo, ThunkActionCreator } from "../reducer";
+import { appSlice } from "../reducers/app";
+import { sessionSlice } from "../reducers/session";
 import { importByPlatform } from "./platforms";
 import { spawn } from "child_process";
 import { dialog } from "electron";
@@ -13,10 +15,7 @@ export const init: ThunkActionCreator = () => async (dispatch, getState) => {
   const apps = await adapter.readAll();
 
   if (!apps.ok) throw new Error("Failed to read apps");
-  dispatch({
-    type: "app/loaded",
-    payload: apps.unwrap(),
-  });
+  dispatch(appSlice.actions.found(apps.unwrap()));
 
   // timer
   setInterval(async () => {
@@ -34,10 +33,8 @@ export const init: ThunkActionCreator = () => async (dispatch, getState) => {
       2,
     ).map((item) => item.flat());
     console.log(ports, pagess);
-    dispatch({
-      type: "session/pageUpdated",
-      payload: pagess,
-    });
+
+    dispatch(sessionSlice.actions.pageUpdated(pagess));
   }, 3000);
 };
 
@@ -58,30 +55,33 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
   );
 
   const sessionId = v4();
-  dispatch({
-    type: "session/added",
-    payload: { sessionId, appId: app.id, nodePort, windowPort },
-  });
+  dispatch(
+    sessionSlice.actions.added({
+      sessionId,
+      appId: app.id,
+      nodePort,
+      windowPort,
+    }),
+  );
 
   sp.on("error", (err) => {
     dialog.showErrorBox(`Error: ${app.name}`, err.message);
   });
   sp.on("close", () => {
     // console.log(`child process exited with code ${code}`)
-    dispatch({ type: "session/removed", payload: sessionId });
+    dispatch(sessionSlice.actions.removed(sessionId));
   });
 
   const handleStdout =
     (isError = false) =>
     (chunk: Buffer) => {
       // TODO: stderr colors
-      dispatch({
-        type: "session/logAppended",
-        payload: {
+      dispatch(
+        sessionSlice.actions.logAppended({
           sessionId,
           content: chunk.toString(),
-        },
-      });
+        }),
+      );
     };
 
   if (sp.stdout) {

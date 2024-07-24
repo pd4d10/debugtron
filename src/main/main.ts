@@ -1,5 +1,6 @@
-import { reducer, type AppInfo } from "../reducer";
+import { type AppInfo } from "../reducer";
 import { debug, debugPath, init } from "./actions";
+import { store } from "./store";
 import { setUpdater, setReporter } from "./utils";
 import {
   app,
@@ -10,11 +11,7 @@ import {
   nativeImage,
   ipcMain,
 } from "electron";
-import { composeWithStateSync } from "electron-redux/main";
 import path from "path";
-import { applyMiddleware, legacy_createStore } from "redux";
-import logger from "redux-logger";
-import { thunk } from "redux-thunk";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -61,15 +58,6 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  const store = legacy_createStore(
-    reducer,
-    composeWithStateSync(
-      applyMiddleware(
-        //logger,
-        thunk,
-      ),
-    ),
-  );
   store.dispatch(
     // @ts-ignore
     init(),

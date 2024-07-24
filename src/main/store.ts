@@ -1,7 +1,7 @@
 import { appSlice } from "../reducers/app";
 import { sessionSlice } from "../reducers/session";
 import { configureStore } from "@reduxjs/toolkit";
-import { stateSyncEnhancer } from "electron-redux/renderer";
+import { stateSyncEnhancer } from "electron-redux/types/main";
 
 export const store = configureStore({
   reducer: {
