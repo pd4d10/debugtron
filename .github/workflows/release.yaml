@@ -1,0 +1,295 @@
+name: release
+on:
+  push:
+    tags:
+      - v*.*.*
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag to release"
+        required: true
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [x64, arm64] # 添加架构
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Verify Python Version
+        run: python --version
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set Yarn Version
+        run: corepack prepare yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint code
+        run: |
+          yarn lint || (echo "Linting issues found, trying to fix..." && yarn lint-fix)
+
+      - name: Build the project for x64
+        if: matrix.architecture == 'x64'
+        run: yarn make --arch=x64 --verbose
+
+      - name: Build the project for arm64
+        if: matrix.architecture == 'arm64'
+        run: yarn make --arch=arm64 --verbose
+
+      - name: Find built assets RPM
+        id: find_assets_rpm
+        run: |
+          ASSET_PATH=$(find ./out/make -path './node_modules' -prune -o -name '*.rpm' -print | head -n 1)
+          ABSOLUTE_ASSET_PATH=$(realpath "$ASSET_PATH")
+          echo "ASSET_RPM_PATH=$ABSOLUTE_ASSET_PATH" >> $GITHUB_ENV
+          BASENAME=$(basename "$ASSET_PATH")
+          echo "ASSET_RPM_BASENAME=$BASENAME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Find built assets DEB
+        id: find_assets_deb
+        run: |
+          ASSET_PATH=$(find ./out/make -path './node_modules' -prune -o -name '*.deb' -print | head -n 1)
+          ABSOLUTE_ASSET_PATH=$(realpath "$ASSET_PATH")
+          echo "ASSET_DEB_PATH=$ABSOLUTE_ASSET_PATH" >> $GITHUB_ENV
+          BASENAME=$(basename "$ASSET_PATH")
+          echo "ASSET_DEB_BASENAME=$BASENAME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Upload Artifacts RPM
+        id: upload-artifact-rpm
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_RPM_BASENAME }}
+          path: ${{ env.ASSET_RPM_PATH }}
+          overwrite: true
+
+      - name: Upload Artifacts DEB
+        id: upload-artifact-deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_DEB_BASENAME }}
+          path: ${{ env.ASSET_DEB_PATH }}
+          overwrite: true
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          files: ${{ env.ASSET_RPM_PATH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          files: ${{ env.ASSET_DEB_PATH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        architecture: [x64, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Verify Python Version
+        run: python --version
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set Yarn Version
+        run: corepack prepare yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint code
+        run: |
+          yarn lint || (echo "Linting issues found, trying to fix..." && yarn lint-fix)
+
+      - name: Build the project for x64
+        if: matrix.architecture == 'x64'
+        run: yarn make --arch=x64 --verbose
+
+      - name: Build the project for arm64
+        if: matrix.architecture == 'arm64'
+        run: yarn make --arch=arm64 --verbose
+
+      - name: Find built asset on macOS
+        id: find_asset
+        run: |
+          ASSET_PATH=$(find ./out/make -path './node_modules' -prune -o -name '*.dmg' -print | head -n 1)
+          ABSOLUTE_ASSET_PATH=$(realpath "$ASSET_PATH")
+          echo "ASSET_PATH=$ABSOLUTE_ASSET_PATH" >> $GITHUB_ENV
+          BASENAME=$(basename "$ASSET_PATH")
+          echo "ASSET_BASENAME=$BASENAME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_BASENAME }}
+          path: ${{ env.ASSET_PATH }}
+          overwrite: true
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          files: ${{ env.ASSET_PATH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        architecture: [x64, arm64, i386] # Add architecture
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Verify Python Version
+        run: python --version
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set Yarn Version
+        run: corepack prepare yarn
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          $retries = 1
+          $count = 0
+          do {
+            yarn install
+            $exitCode = $?
+            if ($exitCode -eq 0) {
+              break
+            }
+            $count++
+            Write-Output "Retrying ($count/$retries)..."
+            Start-Sleep -Seconds 5
+          } while ($count -lt $retries)
+
+      # - name: Lint code
+      #   run: |
+      #     yarn lint || (echo "Linting issues found, trying to fix..." && yarn lint-fix)
+
+      - name: Build the project for x64
+        if: matrix.architecture == 'x64'
+        run: yarn make --arch=x64 --verbose
+
+      - name: Build the project for arm64
+        if: matrix.architecture == 'arm64'
+        run: yarn make --arch=arm64 --verbose
+
+      - name: Build the project for arm64
+        if: matrix.architecture == 'i386'
+        run: yarn make --arch=ia32 --verbose
+
+      - name: Find built asset on Windows arm64
+        if: matrix.architecture == 'arm64'
+        id: find_asset_arm64
+        run: |
+          $assetPath = (Get-ChildItem -Path out/make -Recurse -Filter *.exe | Select-Object -First 1).FullName
+          $basename = [System.IO.Path]::GetFileNameWithoutExtension($assetPath)
+          $extension = [System.IO.Path]::GetExtension($assetPath)
+          $newBasename = ($basename -replace ' ', '-') + "-arm64" + $extension
+          $newFilePath = (Join-Path -Path (Get-Item $assetPath).DirectoryName -ChildPath $newBasename)
+          Rename-Item -Path $assetPath -NewName $newBasename
+          $escapedFilePath = $newFilePath -replace '\\', '\\\\'
+          echo "ASSET_BASENAME=$newBasename" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "ASSET_PATH=$escapedFilePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Find built asset on Windows x64
+        if: matrix.architecture == 'x64'
+        id: find_asset_x64
+        run: |
+          $assetPath = (Get-ChildItem -Path out/make -Recurse -Filter *.exe | Select-Object -First 1).FullName
+          $basename = [System.IO.Path]::GetFileNameWithoutExtension($assetPath)
+          $extension = [System.IO.Path]::GetExtension($assetPath)
+          $newBasename = ($basename -replace ' ', '-') + "-x64" + $extension
+          $newFilePath = (Join-Path -Path (Get-Item $assetPath).DirectoryName -ChildPath $newBasename)
+          Rename-Item -Path $assetPath -NewName $newBasename
+          $escapedFilePath = $newFilePath -replace '\\', '\\\\'
+          echo "ASSET_BASENAME=$newBasename" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "ASSET_PATH=$escapedFilePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Find built asset on Windows x86
+        if: matrix.architecture == 'i386'
+        id: find_asset_x86
+        run: |
+          $assetPath = (Get-ChildItem -Path out/make -Recurse -Filter *.exe | Select-Object -First 1).FullName
+          $basename = [System.IO.Path]::GetFileNameWithoutExtension($assetPath)
+          $extension = [System.IO.Path]::GetExtension($assetPath)
+          $newBasename = ($basename -replace ' ', '-') + "-x86" + $extension
+          $newFilePath = (Join-Path -Path (Get-Item $assetPath).DirectoryName -ChildPath $newBasename)
+          Rename-Item -Path $assetPath -NewName $newBasename
+          $escapedFilePath = $newFilePath -replace '\\', '\\\\'
+          echo "ASSET_BASENAME=$newBasename" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "ASSET_PATH=$escapedFilePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_BASENAME }}
+          path: ${{ env.ASSET_PATH }}
+          overwrite: true
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          files: ${{ env.ASSET_PATH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
