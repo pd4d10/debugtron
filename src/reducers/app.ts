@@ -11,7 +11,9 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     found: (state, { payload }: PayloadAction<AppInfo[]>) => {
-      state = {};
+      Object.keys(state).forEach((key) => {
+        delete state[key];
+      });
       payload
         .sort((a, b) => (a.id < b.id ? -1 : 1))
         .forEach((appInfo) => {
