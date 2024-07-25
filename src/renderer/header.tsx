@@ -1,16 +1,10 @@
-import { appSlice } from "../reducers/app";
-import defaultImage from "./images/electron.png";
-import { noDragStyle } from "./utils";
-import {
-  Button,
-  ControlGroup,
-  InputGroup,
-  MenuItem,
-  Tooltip,
-} from "@blueprintjs/core";
+import { Button, ControlGroup, InputGroup, MenuItem, Tooltip } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import { type FC, useState } from "react";
 import { useSelector } from "react-redux";
+import { appSlice } from "../reducers/app";
+import defaultImage from "./images/electron.png";
+import { noDragStyle } from "./utils";
 
 export const Header: FC = () => {
   const appState = useSelector(appSlice.selectSlice);
@@ -36,8 +30,8 @@ export const Header: FC = () => {
         itemPredicate={(query, item) => {
           const lq = query.toLowerCase();
           return (
-            item.name.toLowerCase().includes(lq) ||
-            item.id.toLowerCase().includes(lq)
+            item.name.toLowerCase().includes(lq)
+            || item.id.toLowerCase().includes(lq)
           );
         }}
         itemRenderer={(item, { modifiers, handleClick, handleFocus }) => {

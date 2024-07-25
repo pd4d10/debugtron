@@ -1,7 +1,3 @@
-import { appSlice, type AppInfo } from "../reducers/app";
-import { sessionSlice, type PageInfo } from "../reducers/session";
-import { importByPlatform } from "./platforms";
-import type { State } from "./store";
 import type { ThunkDispatch } from "@reduxjs/toolkit";
 import { spawn } from "child_process";
 import { dialog } from "electron";
@@ -9,6 +5,10 @@ import getPort from "get-port";
 import { chunk } from "lodash-es";
 import path from "node:path";
 import { v4 } from "uuid";
+import { type AppInfo, appSlice } from "../reducers/app";
+import { type PageInfo, sessionSlice } from "../reducers/session";
+import { importByPlatform } from "./platforms";
+import type { State } from "./store";
 
 type ThunkActionCreator<P1 = void, P2 = void> = (
   p1: P1,
@@ -33,9 +33,7 @@ export const init: ThunkActionCreator = () => async (dispatch, getState) => {
     const ports = sessions.flatMap((s) => [s.nodePort, s.windowPort]);
 
     const responses = await Promise.allSettled<PageInfo[]>(
-      ports.map((port) =>
-        fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json()),
-      ),
+      ports.map((port) => fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())),
     );
     const pagess = chunk(
       responses.map((p) => (p.status === "fulfilled" ? p.value : [])),
@@ -81,17 +79,15 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
     dispatch(sessionSlice.actions.removed(sessionId));
   });
 
-  const handleStdout =
-    (isError = false) =>
-    (chunk: Buffer) => {
-      // TODO: stderr colors
-      dispatch(
-        sessionSlice.actions.logAppended({
-          sessionId,
-          content: chunk.toString(),
-        }),
-      );
-    };
+  const handleStdout = (isError = false) => (chunk: Buffer) => {
+    // TODO: stderr colors
+    dispatch(
+      sessionSlice.actions.logAppended({
+        sessionId,
+        content: chunk.toString(),
+      }),
+    );
+  };
 
   if (sp.stdout) {
     sp.stdout.on("data", handleStdout());
@@ -101,7 +97,6 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
   }
 };
 
-export const debugPath: ThunkActionCreator<string> =
-  (path) => async (dispatch) => {
-    // TODO:
-  };
+export const debugPath: ThunkActionCreator<string> = (path) => async (dispatch) => {
+  // TODO:
+};

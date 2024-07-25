@@ -1,5 +1,5 @@
-import pkg from "./package.json";
 import { builtinModules } from "node:module";
+import pkg from "./package.json";
 
 export const builtins = [
   "electron",
@@ -54,10 +54,9 @@ export const getBuildDefine = (env) => {
   const define = Object.entries(defineKeys).reduce((acc, [name, keys]) => {
     const { VITE_DEV_SERVER_URL, VITE_NAME } = keys;
     const def = {
-      [VITE_DEV_SERVER_URL]:
-        command === "serve"
-          ? JSON.stringify(process.env[VITE_DEV_SERVER_URL])
-          : undefined,
+      [VITE_DEV_SERVER_URL]: command === "serve"
+        ? JSON.stringify(process.env[VITE_DEV_SERVER_URL])
+        : undefined,
       [VITE_NAME]: JSON.stringify(name),
     };
     return { ...acc, ...def };
@@ -81,8 +80,7 @@ export const pluginExposeRenderer = (name) => {
         /** @type {import('node:net').AddressInfo} */
         const addressInfo = server.httpServer?.address();
         // Expose env constant for main process use.
-        process.env[VITE_DEV_SERVER_URL] =
-          `http://localhost:${addressInfo?.port}`;
+        process.env[VITE_DEV_SERVER_URL] = `http://localhost:${addressInfo?.port}`;
       });
     },
   };

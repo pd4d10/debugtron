@@ -1,8 +1,8 @@
 import { CanvasAddon } from "@xterm/addon-canvas";
 import { FitAddon } from "@xterm/addon-fit";
-import { Terminal, type ITerminalOptions } from "@xterm/xterm";
+import { type ITerminalOptions, Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
-import { useEffect, useRef, type FC } from "react";
+import { type FC, useEffect, useRef } from "react";
 
 export const Xterm: FC<{ content: string; options?: ITerminalOptions }> = ({
   content,

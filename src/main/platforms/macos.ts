@@ -1,8 +1,8 @@
-import type { AppReader } from "./utils";
 import fs from "fs";
 import path from "path";
 import plist from "simple-plist";
 import { Result } from "ts-results";
+import type { AppReader } from "./utils";
 
 interface MacosAppInfo {
   CFBundleIdentifier: string;

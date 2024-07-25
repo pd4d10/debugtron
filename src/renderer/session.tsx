@@ -1,17 +1,9 @@
+import { Button, Divider, HTMLTable, Pre, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { type FC, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { appSlice } from "../reducers/app";
 import { sessionSlice } from "../reducers/session";
 import { Xterm } from "./xterm";
-import {
-  Tabs,
-  Tab,
-  Divider,
-  Pre,
-  Tag,
-  HTMLTable,
-  Button,
-} from "@blueprintjs/core";
-import { useEffect, type FC, useState } from "react";
-import { useSelector } from "react-redux";
 
 export const Session: FC = () => {
   const [activeId, setActiveId] = useState("");
@@ -66,13 +58,11 @@ export const Session: FC = () => {
                         <tr key={id}>
                           <td>
                             <Tag
-                              intent={
-                                page.type === "node"
-                                  ? "success"
-                                  : page.type === "page"
-                                    ? "primary"
-                                    : "none"
-                              }
+                              intent={page.type === "node"
+                                ? "success"
+                                : page.type === "page"
+                                ? "primary"
+                                : "none"}
                             >
                               {page.type}
                             </Tag>
@@ -126,8 +116,7 @@ export const Session: FC = () => {
                   <Xterm
                     content={session.log}
                     options={{
-                      fontFamily:
-                        "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
+                      fontFamily: "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
                       convertEol: true,
                     }}
                   />

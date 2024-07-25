@@ -1,16 +1,16 @@
-import type { AppInfo } from "../../reducers/app";
-import type { AppReader } from "./utils";
 import fs from "fs";
 import path from "path";
 import {
-  HKEY,
-  type RegistryValue,
-  type RegistryStringEntry,
-  RegistryValueType,
   enumerateKeys,
   enumerateValues,
+  HKEY,
+  type RegistryStringEntry,
+  type RegistryValue,
+  RegistryValueType,
 } from "registry-js";
 import { Result } from "ts-results";
+import type { AppInfo } from "../../reducers/app";
+import type { AppReader } from "./utils";
 
 async function getAppInfoByExePath(
   exePath: string,
@@ -18,8 +18,7 @@ async function getAppInfoByExePath(
   values: readonly RegistryValue[],
 ): Promise<AppInfo> {
   const displayName = values.find(
-    (v): v is RegistryStringEntry =>
-      v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayName",
+    (v): v is RegistryStringEntry => v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayName",
   );
   let icon = "";
   if (iconPath) {
@@ -41,8 +40,7 @@ const getAppInfoFromRegeditItemValues = async (
 
   // Try to find executable path of Electron app
   const displayIcon = values.find(
-    (v): v is RegistryStringEntry =>
-      v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayIcon",
+    (v): v is RegistryStringEntry => v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayIcon",
   );
 
   if (displayIcon) {
@@ -60,8 +58,7 @@ const getAppInfoFromRegeditItemValues = async (
   let installDir = "";
 
   const installLocation = values.find(
-    (v): v is RegistryStringEntry =>
-      v && v.type === RegistryValueType.REG_SZ && v.name === "InstallLocation",
+    (v): v is RegistryStringEntry => v && v.type === RegistryValueType.REG_SZ && v.name === "InstallLocation",
   );
 
   if (installLocation && installLocation.data) {
@@ -91,8 +88,8 @@ const getAppInfoFromRegeditItemValues = async (
 
 function isElectronApp(installDir: string) {
   return (
-    fs.existsSync(path.join(installDir, "resources")) &&
-    [
+    fs.existsSync(path.join(installDir, "resources"))
+    && [
       "electron.asar",
       // https://github.com/pd4d10/debugtron/pull/26
       "default_app.asar",
@@ -108,8 +105,8 @@ async function findExeFile(dir: string) {
     const [exeFile] = files.filter((file) => {
       const lc = file.toLowerCase();
       return (
-        lc.endsWith(".exe") &&
-        !["uninstall", "update"].some((keyword) => lc.includes(keyword))
+        lc.endsWith(".exe")
+        && !["uninstall", "update"].some((keyword) => lc.includes(keyword))
       );
     });
     if (exeFile) return path.join(dir, exeFile);
@@ -120,9 +117,7 @@ export const adapter: AppReader = {
   readAll: () =>
     Result.wrapAsync(async () => {
       const enumRegeditItems = (key: HKEY, subkey: string) => {
-        return enumerateKeys(key, subkey).map((k) =>
-          enumerateValues(key, subkey + "\\" + k),
-        );
+        return enumerateKeys(key, subkey).map((k) => enumerateValues(key, subkey + "\\" + k));
       };
 
       const items = [
@@ -141,11 +136,7 @@ export const adapter: AppReader = {
       ];
 
       const results = await Promise.all(
-        items.map((itemValues) =>
-          Result.wrapAsync(async () =>
-            getAppInfoFromRegeditItemValues(itemValues),
-          ),
-        ),
+        items.map((itemValues) => Result.wrapAsync(async () => getAppInfoFromRegeditItemValues(itemValues))),
       );
 
       const apps = results.flatMap((app) => (app.ok ? [app.unwrap()] : []));
@@ -155,8 +146,9 @@ export const adapter: AppReader = {
 
   readByPath: (p: string) =>
     Result.wrapAsync(async () => {
-      if (path.extname(p).toLowerCase() === ".exe")
+      if (path.extname(p).toLowerCase() === ".exe") {
         throw new Error("should be suffixed with exe");
+      }
 
       return {
         id: p,

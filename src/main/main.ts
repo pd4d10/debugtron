@@ -1,17 +1,9 @@
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, nativeImage, shell } from "electron";
+import path from "path";
 import type { AppInfo } from "../reducers/app";
 import { debug, debugPath, init } from "./actions";
 import { store } from "./store";
-import { setUpdater, setReporter } from "./utils";
-import {
-  app,
-  BrowserWindow,
-  Menu,
-  MenuItem,
-  shell,
-  nativeImage,
-  ipcMain,
-} from "electron";
-import path from "path";
+import { setReporter, setUpdater } from "./utils";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -26,10 +18,9 @@ const createWindow = () => {
     height: 768,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 14, y: 14 },
-    icon:
-      process.platform === "linux"
-        ? nativeImage.createFromDataURL(require("../../assets/icon.png"))
-        : undefined,
+    icon: process.platform === "linux"
+      ? nativeImage.createFromDataURL(require("../../assets/icon.png"))
+      : undefined,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false, // for `require`

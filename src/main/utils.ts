@@ -18,6 +18,6 @@ export async function setUpdater() {
     //   break
     // TODO: macOS: Make code sign work then use update-electron-app
     default:
-    // setUpdateNotification();
+      // setUpdateNotification();
   }
 }

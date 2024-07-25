@@ -18,21 +18,20 @@ const themeIconBases = (
   process.env.XDG_DATA_DIRS?.split(path.delimiter) || DEFAULT_XDG_DATA_DIRS
 )
   // If dir is not named with 'icons', append 'icons'
-  .map((dir) =>
-    path.basename(dir) === "icons" ? dir : path.join(dir, "icons"),
-  );
+  .map((dir) => path.basename(dir) === "icons" ? dir : path.join(dir, "icons"));
 
 const backwards_userIconBase = path.join(os.homedir(), ".icons");
 // for backwards compatibility
 if (
-  !themeIconBases.includes(backwards_userIconBase) &&
-  !themeIconBases.includes(backwards_userIconBase + "/")
+  !themeIconBases.includes(backwards_userIconBase)
+  && !themeIconBases.includes(backwards_userIconBase + "/")
 ) {
   themeIconBases.unshift(backwards_userIconBase);
 }
 
 const themeLeveledBase = [
-  /* 'xxx', */ // todo: get current theme
+  /* 'xxx', */
+  // todo: get current theme
   "hicolor",
   "Papirus",
   "default",
@@ -44,9 +43,7 @@ function initThemeLeveledNames() {
     if (!fs.existsSync(base)) return [];
 
     const files = fs.readdirSync(base);
-    return files.filter((name) =>
-      fs.statSync(path.join(base, name)).isDirectory(),
-    );
+    return files.filter((name) => fs.statSync(path.join(base, name)).isDirectory());
   }
 
   const themeNames = themeIconBases.map(findThemeNames).flat();
@@ -65,9 +62,7 @@ const themeSortedDirs = new Map<string, SizeDir[]>(
   themeLeveledNames.map((theme) => [
     theme,
     themeIconBases
-      .map((base) =>
-        iconDirSortBySize(findAllIconDirs(base, path.join(base, theme))),
-      )
+      .map((base) => iconDirSortBySize(findAllIconDirs(base, path.join(base, theme))))
       .flat(),
   ]),
 );

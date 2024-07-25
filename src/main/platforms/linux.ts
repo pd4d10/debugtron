@@ -1,11 +1,11 @@
-import { findExecPath } from "./linux/find-exec";
-import { findIconPath } from "./linux/find-icon";
-import type { AppReader } from "./utils";
 import fs from "fs";
 import ini from "ini";
 import os from "os";
 import path from "path";
 import { Result } from "ts-results";
+import { findExecPath } from "./linux/find-exec";
+import { findIconPath } from "./linux/find-icon";
+import type { AppReader } from "./utils";
 
 const userAppsDir = path.join(os.homedir(), ".local/share/applications");
 const sysAppsDir = "/usr/share/applications";
@@ -17,16 +17,16 @@ const readAppInfo = (desktopFile: string) =>
     });
     const entry = ini.parse(content)["Desktop Entry"] as
       | {
-          Name?: string;
-          Icon?: string;
-          Exec?: string;
-        }
+        Name?: string;
+        Icon?: string;
+        Exec?: string;
+      }
       | undefined;
 
     if (!entry?.Exec) throw new Error("Exec not found");
 
     let exePath = "";
-    if (entry.Exec.startsWith('"')) {
+    if (entry.Exec.startsWith("\"")) {
       exePath = entry.Exec.replace(/^"(.*)".*/, "$1");
     } else {
       // Remove arg
@@ -44,9 +44,9 @@ const readAppInfo = (desktopFile: string) =>
 
     if (
       !(
-        fs.existsSync(path.join(exePath, "../resources/electron.asar")) ||
-        fs.existsSync(path.join(exePath, "../LICENSE.electron.txt")) ||
-        fs.existsSync(path.join(exePath, "../chrome-sandbox"))
+        fs.existsSync(path.join(exePath, "../resources/electron.asar"))
+        || fs.existsSync(path.join(exePath, "../LICENSE.electron.txt"))
+        || fs.existsSync(path.join(exePath, "../chrome-sandbox"))
       )
     ) {
       throw new Error("resources/electron.asar not exists");

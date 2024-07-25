@@ -1,10 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const pathDirs =
-  process.env.PATH?.split(path.delimiter)?.filter((dir) =>
-    fs.existsSync(dir),
-  ) || [];
+const pathDirs = process.env.PATH?.split(path.delimiter)?.filter((dir) => fs.existsSync(dir)) || [];
 
 export function findExecPath(command: string) {
   for (const pathDir of pathDirs) {
