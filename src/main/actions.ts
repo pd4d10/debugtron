@@ -1,13 +1,22 @@
-import type { AppInfo, PageInfo, ThunkActionCreator } from "../reducer";
-import { appSlice } from "../reducers/app";
-import { sessionSlice } from "../reducers/session";
+import { appSlice, type AppInfo } from "../reducers/app";
+import { sessionSlice, type PageInfo } from "../reducers/session";
 import { importByPlatform } from "./platforms";
+import type { State } from "./store";
+import type { ThunkDispatch } from "@reduxjs/toolkit";
 import { spawn } from "child_process";
 import { dialog } from "electron";
 import getPort from "get-port";
 import { chunk } from "lodash-es";
 import path from "node:path";
 import { v4 } from "uuid";
+
+type ThunkActionCreator<P1 = void, P2 = void> = (
+  p1: P1,
+  p2: P2,
+) => (
+  dispatch: ThunkDispatch<State, never, any>,
+  getState: () => State,
+) => void;
 
 export const init: ThunkActionCreator = () => async (dispatch, getState) => {
   // first load

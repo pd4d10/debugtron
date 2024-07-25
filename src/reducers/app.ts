@@ -1,6 +1,12 @@
-import type { AppInfo } from "../reducer";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+
+export type AppInfo = {
+  id: string;
+  name: string;
+  icon: string;
+  exePath: string;
+};
 
 export const appSlice = createSlice({
   name: "app",

@@ -1,4 +1,4 @@
-import { type AppInfo } from "../reducer";
+import type { AppInfo } from "../reducers/app";
 import { debug, debugPath, init } from "./actions";
 import { store } from "./store";
 import { setUpdater, setReporter } from "./utils";

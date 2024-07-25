@@ -1,6 +1,22 @@
-import type { PageInfo, SessionInfo } from "../reducer";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+
+export type PageInfo = {
+  description: string;
+  devtoolsFrontendUrl: string;
+  id: string;
+  title: string;
+  type: "node" | "page" | "webview";
+  url: string;
+};
+
+export type SessionInfo = {
+  appId: string;
+  page: Record<string, PageInfo>;
+  log: string;
+  nodePort: number;
+  windowPort: number;
+};
 
 export const sessionSlice = createSlice({
   name: "session",

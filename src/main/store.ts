@@ -10,3 +10,5 @@ export const store = configureStore({
   },
   enhancers: (g) => g().concat(stateSyncEnhancer()),
 });
+
+export type State = ReturnType<typeof store.getState>;

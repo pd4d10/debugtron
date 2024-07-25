@@ -1,4 +1,4 @@
-import type { AppInfo } from "../../reducer";
+import type { AppInfo } from "../../reducers/app";
 import type { AppReader } from "./utils";
 import fs from "fs";
 import path from "path";
