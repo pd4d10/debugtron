@@ -2,13 +2,9 @@ import type { AppInfo } from "../reducer";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type AppState = Record<string, AppInfo>;
-
-const initialState: AppState = {};
-
 export const appSlice = createSlice({
   name: "app",
-  initialState,
+  initialState: {} as Record<string, AppInfo>,
   reducers: {
     found: (state, { payload }: PayloadAction<AppInfo[]>) => {
       Object.keys(state).forEach((key) => {

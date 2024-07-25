@@ -1,14 +1,10 @@
-import type { AppInfo, PageInfo, SessionInfo } from "../reducer";
+import type { PageInfo, SessionInfo } from "../reducer";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type SessionState = Record<string, SessionInfo>;
-
-const initialState: SessionState = {};
-
 export const sessionSlice = createSlice({
   name: "session",
-  initialState,
+  initialState: {} as Record<string, SessionInfo>,
   reducers: {
     added: (
       state,
