@@ -8,18 +8,10 @@
   "author": "Rongjian Zhang <pd4d10@gmail.com>",
   "main": ".vite/build/main.js",
   "scripts": {
-    "lint": "prettier --ignore-unknown --check '**/*'",
-    "lint-fix": "prettier --ignore-unknown --write '**/*'",
     "make": "electron-forge make",
     "package": "electron-forge package",
     "publish": "electron-forge publish",
     "start": "electron-forge start"
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-packagejson",
-      "@trivago/prettier-plugin-sort-imports"
-    ]
   },
   "dependencies": {
     "electron-redux": "2.0.0-alpha.9",
@@ -41,7 +33,6 @@
     "@electron-forge/plugin-vite": "^7.4.0",
     "@electron-forge/publisher-github": "^7.4.0",
     "@reduxjs/toolkit": "^2.2.6",
-    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/ini": "^4.1.0",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.1",
@@ -61,8 +52,6 @@
     "node-machine-id": "^1.1.12",
     "normalize.css": "^8.0.1",
     "path-browserify": "^1.0.1",
-    "prettier": "^3.2.5",
-    "prettier-plugin-packagejson": "^2.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2",
