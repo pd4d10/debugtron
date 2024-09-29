@@ -4,6 +4,7 @@ import type { AppInfo } from "../reducers/app";
 import { debug, debugPath, init } from "./actions";
 import { store } from "./store";
 import { setReporter, setUpdater } from "./utils";
+import DebugronIcon from "../../assets/icon.png";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -19,7 +20,7 @@ const createWindow = () => {
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 14, y: 14 },
     icon: process.platform === "linux"
-      ? nativeImage.createFromDataURL(require("../../assets/icon.png"))
+      ? nativeImage.createFromDataURL(DebugronIcon)
       : undefined,
     webPreferences: {
       nodeIntegration: true,

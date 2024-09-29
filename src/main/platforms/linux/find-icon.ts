@@ -72,7 +72,7 @@ function parseSize(name: string): number {
   if (name === "symbolic") return 0.8;
   if (!sizeReg.test(name)) return -1;
   let [pixel, scala] = name.split("@");
-  let size = Number(pixel.replace(pixelIgnoreReg, ""));
+  let size = Number(pixel?.replace(pixelIgnoreReg, ""));
   let wight = Number(scala?.replace(scalaIgnoreReg, ""));
   return (isNaN(size) ? 0 : size) + (isNaN(wight) ? 0 : wight) / 100;
 }
@@ -83,7 +83,7 @@ function findAllIconDirs(base: string, parent = base): SizeDir[] {
   const files = fs.readdirSync(parent);
   const dirs = files
     .map((name) => path.join(parent, name))
-    .filter((path) => fs.statSync(path).isDirectory());
+    .filter((path) => accessSync(path) && isDirectory(path));
   if (dirs.length) {
     return dirs.map(findAllIconDirs.bind(void 0, base)).flat();
   }
@@ -94,7 +94,7 @@ function findAllIconDirs(base: string, parent = base): SizeDir[] {
   if (!pathNames.includes("apps")) return [];
   // remove that path with 'apps' compatible theme/size/apps and theme/apps/size
   const [_theme, size] = relative.split("/").filter((name) => name !== "apps");
-  return [{ path: parent, size: parseSize(size) }];
+  return [{ path: parent, size: parseSize(size || '0') }];
 }
 
 function findThemeIconDirs(theme: string) {
@@ -105,6 +105,15 @@ function findThemeIconDirs(theme: string) {
 function iconDirSortBySize(dirs: SizeDir[]): SizeDir[] {
   return dirs.sort((a, b) => b.size - a.size);
 }
+
+function isDirectory(path: string): boolean {
+    try {
+      return fs.statSync(path).isDirectory();
+    } catch(e) {
+      console.error("can't read " + path);
+    }
+    return false;
+  }
 
 function accessSync(path: string): boolean {
   try {
