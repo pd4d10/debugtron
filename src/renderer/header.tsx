@@ -1,4 +1,10 @@
-import { Button, ControlGroup, InputGroup, MenuItem, Tooltip } from "@blueprintjs/core";
+import {
+  Button,
+  ControlGroup,
+  InputGroup,
+  MenuItem,
+  Tooltip
+} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import { type FC, useState } from "react";
 import { useSelector } from "react-redux";
@@ -15,23 +21,23 @@ export const Header: FC = () => {
       style={{
         WebkitAppRegion: "drag",
         padding: "10px 10px 10px 80px",
-        display: "flex",
+        display: "flex"
       }}
     >
       <Select
         menuProps={{
           style: {
             maxHeight: "calc(100vh - 100px)", // TODO:
-            overflow: "auto",
-          },
+            overflow: "auto"
+          }
         }}
         filterable
         items={Object.values(appState)}
         itemPredicate={(query, item) => {
           const lq = query.toLowerCase();
           return (
-            item.name.toLowerCase().includes(lq)
-            || item.id.toLowerCase().includes(lq)
+            item.name.toLowerCase().includes(lq) ||
+            item.id.toLowerCase().includes(lq)
           );
         }}
         itemRenderer={(item, { modifiers, handleClick, handleFocus }) => {
@@ -73,7 +79,7 @@ export const Header: FC = () => {
           textAlign: "center",
           display: "flex",
           flexFlow: "column",
-          justifyContent: "center",
+          justifyContent: "center"
         }}
       >
         Debugtron
