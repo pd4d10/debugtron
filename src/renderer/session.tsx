@@ -1,4 +1,12 @@
-import { Button, Divider, HTMLTable, Pre, Tab, Tabs, Tag } from "@blueprintjs/core";
+import {
+  Button,
+  Divider,
+  HTMLTable,
+  Pre,
+  Tab,
+  Tabs,
+  Tag
+} from "@blueprintjs/core";
 import { type FC, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { appSlice } from "../reducers/app";
@@ -18,6 +26,8 @@ export const Session: FC = () => {
       setActiveId(sessionIds[0]);
     }
   }, [activeId, sessionStore]);
+
+  console.log(666644, appStore, sessionStore);
 
   return (
     <Tabs
@@ -41,7 +51,7 @@ export const Session: FC = () => {
                   display: "flex",
                   marginTop: -20,
                   overflow: "auto",
-                  maxHeight: "calc(100vh - 100px)", // TODO:
+                  maxHeight: "calc(100vh - 100px)" // TODO:
                 }}
               >
                 <div style={{ marginTop: 5, overflow: "auto", flexShrink: 0 }}>
@@ -58,11 +68,13 @@ export const Session: FC = () => {
                         <tr key={id}>
                           <td>
                             <Tag
-                              intent={page.type === "node"
-                                ? "success"
-                                : page.type === "page"
-                                ? "primary"
-                                : "none"}
+                              intent={
+                                page.type === "node"
+                                  ? "success"
+                                  : page.type === "page"
+                                  ? "primary"
+                                  : "none"
+                              }
                             >
                               {page.type}
                             </Tag>
@@ -71,7 +83,7 @@ export const Session: FC = () => {
                             style={{
                               minWidth: 160,
                               maxWidth: 160,
-                              wordWrap: "break-word",
+                              wordWrap: "break-word"
                             }}
                           >
                             {page.title}
@@ -84,16 +96,16 @@ export const Session: FC = () => {
                                 const url = page.devtoolsFrontendUrl
                                   .replace(
                                     /^\/devtools/,
-                                    "devtools://devtools/bundled",
+                                    "devtools://devtools/bundled"
                                   )
                                   .replace(
                                     /^chrome-devtools:\/\//,
-                                    "devtools://",
+                                    "devtools://"
                                   );
 
                                 require("electron").ipcRenderer.send(
                                   "open-window",
-                                  url,
+                                  url
                                 );
                               }}
                             >
@@ -110,14 +122,15 @@ export const Session: FC = () => {
                   style={{
                     marginTop: 5,
                     flexGrow: 1,
-                    overflow: "auto",
+                    overflow: "auto"
                   }}
                 >
                   <Xterm
                     content={session.log}
                     options={{
-                      fontFamily: "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
-                      convertEol: true,
+                      fontFamily:
+                        "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
+                      convertEol: true
                     }}
                   />
                 </div>

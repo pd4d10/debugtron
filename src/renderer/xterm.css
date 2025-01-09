@@ -1,0 +1,37 @@
+.xterm-search-panel {
+    position: fixed;
+    width: 250px;
+    top: 100px;
+    right: 30px;
+    padding: 8px;
+    background-color: #fff;
+    z-index: 999;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.xterm-search-panel-input{
+    display: block;
+    z-index: 999;
+}
+
+.xterm-search-panel-close {
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.xterm-search-panel-up{
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.xterm-search-panel-down{
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
