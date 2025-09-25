@@ -93,10 +93,7 @@ export const Session: FC = () => {
                                     "devtools://",
                                   );
 
-                                require("electron").ipcRenderer.send(
-                                  "open-window",
-                                  url,
-                                );
+                                window.debugtronAPI.openDevTools(url);
                               }}
                             >
                               Inspect

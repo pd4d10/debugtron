@@ -1,5 +1,6 @@
 {
   "name": "debugtron",
+  "productName": "Debugtron",
   "version": "1.0.0-alpha.0",
   "description": "Debug in-production Electron based App",
   "repository": "pd4d10/debugtron",
@@ -15,7 +16,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "electron-redux": "^2.0.0",
     "electron-squirrel-startup": "^1.0.1",
     "redux": "^5.0.1",
     "registry-js": "^1.16.1",
@@ -27,15 +27,17 @@
     "@blueprintjs/select": "^5.3.21",
     "@electron-forge/cli": "^7.9.0",
     "@electron-forge/maker-deb": "^7.9.0",
-    "@electron-forge/maker-dmg": "^7.9.0",
     "@electron-forge/maker-rpm": "^7.9.0",
     "@electron-forge/maker-squirrel": "^7.9.0",
     "@electron-forge/maker-zip": "^7.9.0",
     "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
+    "@electron-forge/plugin-fuses": "^7.9.0",
     "@electron-forge/plugin-vite": "^7.9.0",
     "@electron-forge/publisher-github": "^7.9.0",
+    "@electron/fuses": "^1.8.0",
     "@reduxjs/toolkit": "^2.9.0",
     "@stylistic/eslint-plugin": "^5.4.0",
+    "@types/electron-squirrel-startup": "^1.0.2",
     "@types/ini": "^4.1.0",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.24",
@@ -50,6 +52,7 @@
     "@xterm/xterm": "^5.5.0",
     "electron": "^31.7.7",
     "electron-devtools-installer": "^3.2.1",
+    "electron-redux": "^2.0.0",
     "electron-update-notification": "^0.1.0",
     "eslint": "^9.36.0",
     "eslint-plugin-react": "^7.37.5",
@@ -72,6 +75,5 @@
     "universal-analytics": "^0.5.3",
     "vite": "^5.4.20"
   },
-  "packageManager": "yarn@1.22.22",
-  "productName": "Debugtron"
+  "packageManager": "yarn@1.22.22"
 }

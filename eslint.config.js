@@ -7,6 +7,15 @@ import stylistic from "@stylistic/eslint-plugin";
 
 export default [
   {
+    // Ignore build and generated files
+    ignores: [
+      ".vite/**/*",
+      "out/**/*",
+      "node_modules/**/*",
+      "dist/**/*"
+    ],
+  },
+  {
     files: ["src/**/*.{ts,tsx}"],
     languageOptions: {
       parser,
@@ -37,7 +46,6 @@ export default [
 
       // TODO: re-enable these rules
       "@typescript-eslint/unbound-method": "off",
-      "@typescript-eslint/no-require-imports": "off",
 
       // Disable conflicting base ESLint rules
       "no-unused-vars": "off",
@@ -110,9 +118,6 @@ export default [
       "@stylistic/jsx-closing-bracket-location": ["error", "line-aligned"],
       "@stylistic/jsx-max-props-per-line": ["error", { maximum: 1, when: "multiline" }],
       "@stylistic/jsx-first-prop-new-line": ["error", "multiline-multiprop"],
-
-      // Electron-specific exceptions
-      "@typescript-eslint/no-var-requires": "off", // Allow require() in Electron main process
 
       // Project-specific adjustments for Electron/React app
       "@typescript-eslint/no-unsafe-member-access": "off", // Electron IPC and external APIs

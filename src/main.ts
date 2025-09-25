@@ -1,15 +1,20 @@
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, nativeImage, shell } from "electron";
 
-import type { AppInfo } from "../reducers/app";
+import type { AppInfo } from "./reducers/app";
 
-import { debug, debugPath, init } from "./actions";
-import { store } from "./store";
-import { setReporter, setUpdater } from "./utils";
+import { debug, debugPath, init } from "./main/actions";
+import { store } from "./main/store";
+import { setReporter, setUpdater } from "./main/utils";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require("electron-squirrel-startup")) {
+import squirrelStartup from "electron-squirrel-startup";
+if (squirrelStartup) {
   app.quit();
 }
 
@@ -22,11 +27,9 @@ const createWindow = () => {
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 14, y: 14 },
     icon: process.platform === "linux"
-      ? nativeImage.createFromDataURL(require("../../assets/icon.png"))
+      ? nativeImage.createFromPath(path.join(__dirname, "../../assets/icon.png"))
       : undefined,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false, // for `require`
       preload: path.join(__dirname, "preload.js"),
     },
   });
@@ -40,7 +43,7 @@ const createWindow = () => {
   }
 
   if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 
   mainWindow.on("closed", () => {
@@ -109,7 +112,7 @@ if (!gotTheLock) {
         debugPath(path),
       );
     });
-    ipcMain.on("open-window", (_, url: string) => {
+    ipcMain.on("open-devtools", (_, url: string) => {
       const win = new BrowserWindow();
       // console.log(url)
       void win.loadURL(url);

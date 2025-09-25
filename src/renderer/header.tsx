@@ -58,7 +58,7 @@ export const Header: FC = () => {
         onItemSelect={(item) => {
           const appInfo = appState[item.id];
           if (appInfo) {
-            require("electron").ipcRenderer.send("debug", appInfo);
+            window.debugtronAPI.debug(appInfo);
           }
         }}
       >
@@ -101,7 +101,7 @@ export const Header: FC = () => {
           text="Debug"
           icon="build"
           onClick={() => {
-            require("electron").ipcRenderer.send("debug-path", input);
+            window.debugtronAPI.debugPath(input);
           }}
         />
       </ControlGroup>
