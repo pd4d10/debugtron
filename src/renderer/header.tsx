@@ -2,9 +2,10 @@ import { Button, ControlGroup, InputGroup, MenuItem, Tooltip } from "@blueprintj
 import { Select } from "@blueprintjs/select";
 import { type FC, useState } from "react";
 import { useSelector } from "react-redux";
+
 import { appSlice } from "../reducers/app";
+
 import defaultImage from "./images/electron.png";
-import { noDragStyle } from "./utils";
 
 export const Header: FC = () => {
   const appState = useSelector(appSlice.selectSlice);
@@ -13,9 +14,10 @@ export const Header: FC = () => {
   return (
     <header
       style={{
-        WebkitAppRegion: "drag",
         padding: "10px 10px 10px 80px",
         display: "flex",
+        // @ts-expect-error - Non-standard property
+        WebkitAppRegion: "drag",
       }}
     >
       <Select
@@ -61,10 +63,13 @@ export const Header: FC = () => {
         }}
       >
         <Button
-          style={noDragStyle}
-          text={"Select an App to debug"}
+          style={{
+            // @ts-expect-error - Non-standard property
+            WebkitAppRegion: "no-drag",
+          }}
+          text="Select an App to debug"
           icon="build"
-          rightIcon="chevron-down"
+          endIcon="chevron-down"
         />
       </Select>
       <div
@@ -78,7 +83,11 @@ export const Header: FC = () => {
       >
         Debugtron
       </div>
-      <ControlGroup style={noDragStyle}>
+      <ControlGroup style={{
+        // @ts-expect-error - Non-standard property
+        WebkitAppRegion: "no-drag",
+      }}
+      >
         <Tooltip content="Input custom path here and click Debug">
           <InputGroup
             value={input}
@@ -91,7 +100,7 @@ export const Header: FC = () => {
         <Button
           text="Debug"
           icon="build"
-          onClick={async () => {
+          onClick={() => {
             require("electron").ipcRenderer.send("debug-path", input);
           }}
         />

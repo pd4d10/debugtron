@@ -1,8 +1,10 @@
 import fs from "fs";
-import ini from "ini";
 import os from "os";
 import path from "path";
+
+import ini from "ini";
 import { Result } from "ts-results";
+
 import { findExecPath } from "./linux/find-exec";
 import { findIconPath } from "./linux/find-icon";
 import type { AppReader } from "./utils";
@@ -35,7 +37,7 @@ const readAppInfo = (desktopFile: string) =>
 
     // try to find real exec file
     if (!path.isAbsolute(exePath)) {
-      exePath = findExecPath(exePath) || exePath;
+      exePath = findExecPath(exePath) ?? exePath;
     }
 
     if (!path.isAbsolute(exePath)) {
@@ -58,7 +60,7 @@ const readAppInfo = (desktopFile: string) =>
       if (path.isAbsolute(entry.Icon)) {
         iconPath = entry.Icon;
       } else {
-        iconPath = findIconPath(entry.Icon) || iconPath;
+        iconPath = findIconPath(entry.Icon) ?? iconPath;
       }
 
       if (fs.existsSync(iconPath)) {
@@ -78,7 +80,7 @@ const readAppInfo = (desktopFile: string) =>
     return {
       id: exePath,
       icon: icon, // TODO: Read icon
-      name: entry.Name || path.basename(exePath),
+      name: entry.Name ?? path.basename(exePath),
       exePath: exePath,
     };
   });
@@ -101,6 +103,7 @@ export const adapter: AppReader = {
       return [...userApps, ...sysApps];
     }),
   readByPath: (p: string) =>
+    // eslint-disable-next-line @typescript-eslint/require-await
     Result.wrapAsync(async () => {
       // TODO:
       return {

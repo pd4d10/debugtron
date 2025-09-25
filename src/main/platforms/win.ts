@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+
 import {
   enumerateKeys,
   enumerateValues,
@@ -9,7 +10,9 @@ import {
   RegistryValueType,
 } from "registry-js";
 import { Result } from "ts-results";
+
 import type { AppInfo } from "../../reducers/app";
+
 import type { AppReader } from "./utils";
 
 async function getAppInfoByExePath(
@@ -18,7 +21,7 @@ async function getAppInfoByExePath(
   values: readonly RegistryValue[],
 ): Promise<AppInfo> {
   const displayName = values.find(
-    (v): v is RegistryStringEntry => v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayName",
+    (v): v is RegistryStringEntry => v.type === RegistryValueType.REG_SZ && v.name === "DisplayName",
   );
   let icon = "";
   if (iconPath) {
@@ -40,7 +43,7 @@ const getAppInfoFromRegeditItemValues = async (
 
   // Try to find executable path of Electron app
   const displayIcon = values.find(
-    (v): v is RegistryStringEntry => v && v.type === RegistryValueType.REG_SZ && v.name === "DisplayIcon",
+    (v): v is RegistryStringEntry => v.type === RegistryValueType.REG_SZ && v.name === "DisplayIcon",
   );
 
   if (displayIcon) {
@@ -58,10 +61,10 @@ const getAppInfoFromRegeditItemValues = async (
   let installDir = "";
 
   const installLocation = values.find(
-    (v): v is RegistryStringEntry => v && v.type === RegistryValueType.REG_SZ && v.name === "InstallLocation",
+    (v): v is RegistryStringEntry => v.type === RegistryValueType.REG_SZ && v.name === "InstallLocation",
   );
 
-  if (installLocation && installLocation.data) {
+  if (installLocation?.data) {
     installDir = installLocation.data;
   } else if (iconPath) {
     installDir = path.dirname(iconPath);
@@ -145,6 +148,7 @@ export const adapter: AppReader = {
     }),
 
   readByPath: (p: string) =>
+    // eslint-disable-next-line @typescript-eslint/require-await
     Result.wrapAsync(async () => {
       if (path.extname(p).toLowerCase() === ".exe") {
         throw new Error("should be suffixed with exe");

@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
+
 import plist from "simple-plist";
 import { Result } from "ts-results";
+
 import type { AppReader } from "./utils";
 
 interface MacosAppInfo {
@@ -17,7 +19,7 @@ async function readPlistFile(path: string) {
       // console.log(error, data)
 
       if (error || !data) {
-        reject(error);
+        reject(error ?? new Error("No data"));
       } else {
         resolve(data);
       }
@@ -27,7 +29,6 @@ async function readPlistFile(path: string) {
 
 async function readIcnsAsImageUri(file: string) {
   let buf = await fs.promises.readFile(file);
-  if (!buf) return "";
 
   const totalSize = buf.readInt32BE(4) - 8;
   buf = buf.subarray(8);

@@ -1,19 +1,23 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice,
+  type PayloadAction,
 
-export type AppInfo = {
+} from "@reduxjs/toolkit";
+
+export interface AppInfo {
   id: string;
   name: string;
   icon: string;
   exePath: string;
-};
+}
 
 export const appSlice = createSlice({
   name: "app",
   initialState: {} as Record<string, AppInfo>,
   reducers: {
     found: (state, { payload }: PayloadAction<AppInfo[]>) => {
+      // Clear existing state
       Object.keys(state).forEach((key) => {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete state[key];
       });
       payload

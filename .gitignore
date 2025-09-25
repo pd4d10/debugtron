@@ -1,5 +1,60 @@
-node_modules
-out
-.vite/
-tmp.iconset/
+# Dependencies
+node_modules/
 .yarn/
+yarn-error.log
+npm-debug.log*
+.pnpm-debug.log*
+
+# Build outputs
+out/
+dist/
+.vite/
+build/
+
+# Electron-specific
+.electron-gyp/
+tmp.iconset/
+
+# Package outputs
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.exe
+*.msi
+*.zip
+*.tar.gz
+
+# Development
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Temporary folders
+tmp/
+temp/
+
+.cursorrules
+memory-bank/

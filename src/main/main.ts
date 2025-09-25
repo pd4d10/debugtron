@@ -1,6 +1,9 @@
-import { app, BrowserWindow, ipcMain, Menu, MenuItem, nativeImage, shell } from "electron";
 import path from "path";
+
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, nativeImage, shell } from "electron";
+
 import type { AppInfo } from "../reducers/app";
+
 import { debug, debugPath, init } from "./actions";
 import { store } from "./store";
 import { setReporter, setUpdater } from "./utils";
@@ -29,9 +32,9 @@ const createWindow = () => {
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    void mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(
+    void mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
@@ -50,7 +53,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   store.dispatch(
-    // @ts-ignore
+    // @ts-expect-error - Redux thunk action dispatch
     init(),
   );
 
@@ -61,13 +64,14 @@ if (!gotTheLock) {
     }
   });
 
-  app.on("ready", async () => {
+  app.on("ready", () => {
     if (app.isPackaged) {
-      setReporter();
+      void setReporter();
     } else {
-      const devtools = await import("electron-devtools-installer");
-      devtools.default(devtools.REACT_DEVELOPER_TOOLS);
-      devtools.default(devtools.REDUX_DEVTOOLS);
+      void import("electron-devtools-installer").then((devtools) => {
+        void devtools.default(devtools.REACT_DEVELOPER_TOOLS);
+        void devtools.default(devtools.REDUX_DEVTOOLS);
+      });
     }
 
     const defaultMenu = Menu.getApplicationMenu();
@@ -79,15 +83,13 @@ if (!gotTheLock) {
             {
               label: "Source Code",
               click() {
-                shell.openExternal("https://github.com/pd4d10/debugtron");
+                void shell.openExternal("https://github.com/pd4d10/debugtron");
               },
             },
             {
               label: "Submit an Issue",
               click() {
-                shell.openExternal(
-                  "https://github.com/pd4d10/debugtron/issues/new",
-                );
+                void shell.openExternal("https://github.com/pd4d10/debugtron/issues/new");
               },
             },
           ],
@@ -97,20 +99,20 @@ if (!gotTheLock) {
 
     ipcMain.on("debug", (e, appInfo: AppInfo) => {
       store.dispatch(
-        // @ts-ignore
+        // @ts-expect-error - Redux thunk action dispatch
         debug(appInfo),
       );
     });
-    ipcMain.on("debug-path", (e, path: string) => {
+    ipcMain.on("debug-path", (_, path: string) => {
       store.dispatch(
-        // @ts-ignore
+        // @ts-expect-error - Redux thunk action dispatch
         debugPath(path),
       );
     });
-    ipcMain.on("open-window", (e, url: string) => {
+    ipcMain.on("open-window", (_, url: string) => {
       const win = new BrowserWindow();
       // console.log(url)
-      win.loadURL(url);
+      void win.loadURL(url);
     });
 
     setUpdater();
@@ -123,7 +125,7 @@ if (!gotTheLock) {
     }
   });
 
-  app.on("activate", () => {
+  app.on("activate",  () => {
     if (mainWindow === null) {
       createWindow();
     }

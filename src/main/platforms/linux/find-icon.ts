@@ -15,18 +15,18 @@ const DEFAULT_XDG_DATA_DIRS = [
 ];
 
 const themeIconBases = (
-  process.env.XDG_DATA_DIRS?.split(path.delimiter) || DEFAULT_XDG_DATA_DIRS
+  process.env.XDG_DATA_DIRS?.split(path.delimiter) ?? DEFAULT_XDG_DATA_DIRS
 )
   // If dir is not named with 'icons', append 'icons'
   .map((dir) => path.basename(dir) === "icons" ? dir : path.join(dir, "icons"));
 
-const backwards_userIconBase = path.join(os.homedir(), ".icons");
+const backwardsUserIconBase = path.join(os.homedir(), ".icons");
 // for backwards compatibility
 if (
-  !themeIconBases.includes(backwards_userIconBase)
-  && !themeIconBases.includes(backwards_userIconBase + "/")
+  !themeIconBases.includes(backwardsUserIconBase)
+  && !themeIconBases.includes(backwardsUserIconBase + "/")
 ) {
-  themeIconBases.unshift(backwards_userIconBase);
+  themeIconBases.unshift(backwardsUserIconBase);
 }
 
 const themeLeveledBase = [
@@ -54,7 +54,7 @@ function initThemeLeveledNames() {
   ];
 }
 
-type SizeDir = { size: number; path: string };
+interface SizeDir { size: number; path: string }
 
 // theme name sorted by leveled
 const themeLeveledNames = initThemeLeveledNames();
@@ -72,7 +72,7 @@ function parseSize(name: string): number {
   if (name === "symbolic") return 0.8;
   if (!sizeReg.test(name)) return -1;
   let [pixel, scala] = name.split("@");
-  let size = Number(pixel.replace(pixelIgnoreReg, ""));
+  let size = Number(pixel?.replace(pixelIgnoreReg, ""));
   let wight = Number(scala?.replace(scalaIgnoreReg, ""));
   return (isNaN(size) ? 0 : size) + (isNaN(wight) ? 0 : wight) / 100;
 }
@@ -93,13 +93,14 @@ function findAllIconDirs(base: string, parent = base): SizeDir[] {
   // ignore dir that do not contain 'apps' in the path
   if (!pathNames.includes("apps")) return [];
   // remove that path with 'apps' compatible theme/size/apps and theme/apps/size
-  const [_theme, size] = relative.split("/").filter((name) => name !== "apps");
+  const [, size] = relative.split("/").filter((name) => name !== "apps");
+  if (!size) return [];
   return [{ path: parent, size: parseSize(size) }];
 }
 
 function findThemeIconDirs(theme: string) {
   // return themeIconBases.map(base => findAllIconDirs(base, path.join(base, theme))).flat()
-  return themeSortedDirs.get(theme) || [];
+  return themeSortedDirs.get(theme) ?? [];
 }
 
 function iconDirSortBySize(dirs: SizeDir[]): SizeDir[] {
@@ -110,7 +111,7 @@ function accessSync(path: string): boolean {
   try {
     fs.accessSync(path);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -138,7 +139,7 @@ function findIconPathFromSizeDir(
 }
 
 function findIconPathByTheme(
-  finder: (dir: SizeDir) => string | void,
+  finder: (dir: SizeDir) => string | undefined,
   theme: string,
 ): string | undefined {
   for (const dir of findThemeIconDirs(theme)) {

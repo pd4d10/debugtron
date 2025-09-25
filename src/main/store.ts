@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/main";
+
 import { appSlice } from "../reducers/app";
 import { sessionSlice } from "../reducers/session";
 

@@ -1,12 +1,15 @@
-import type { ThunkDispatch } from "@reduxjs/toolkit";
 import { spawn } from "child_process";
+import path from "node:path";
+
+import type { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { dialog } from "electron";
 import getPort from "get-port";
 import { chunk } from "lodash-es";
-import path from "node:path";
 import { v4 } from "uuid";
+
 import { type AppInfo, appSlice } from "../reducers/app";
 import { type PageInfo, sessionSlice } from "../reducers/session";
+
 import { importByPlatform } from "./platforms";
 import type { State } from "./store";
 
@@ -14,7 +17,7 @@ type ThunkActionCreator<P1 = void, P2 = void> = (
   p1: P1,
   p2: P2,
 ) => (
-  dispatch: ThunkDispatch<State, never, any>,
+  dispatch: ThunkDispatch<State, never, Action>,
   getState: () => State,
 ) => void;
 
@@ -27,21 +30,23 @@ export const init: ThunkActionCreator = () => async (dispatch, getState) => {
   dispatch(appSlice.actions.found(apps.unwrap()));
 
   // timer
-  setInterval(async () => {
-    const { session } = getState();
-    const sessions = Object.values(session);
-    const ports = sessions.flatMap((s) => [s.nodePort, s.windowPort]);
+  setInterval(() => {
+    void (async () => {
+      const { session } = getState();
+      const sessions = Object.values(session);
+      const ports = sessions.flatMap((s) => [s.nodePort, s.windowPort]);
 
-    const responses = await Promise.allSettled<PageInfo[]>(
-      ports.map((port) => fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())),
-    );
-    const pagess = chunk(
-      responses.map((p) => (p.status === "fulfilled" ? p.value : [])),
-      2,
-    ).map((item) => item.flat());
-    console.log(ports, pagess);
+      const responses = await Promise.allSettled<PageInfo[]>(
+        ports.map((port) => fetch(`http://127.0.0.1:${port}/json`).then((res) => res.json())),
+      );
+      const pagess = chunk(
+        responses.map((p) => (p.status === "fulfilled" ? p.value : [])),
+        2,
+      ).map((item) => item.flat());
+      console.log(ports, pagess);
 
-    dispatch(sessionSlice.actions.pageUpdated(pagess));
+      dispatch(sessionSlice.actions.pageUpdated(pagess));
+    })();
   }, 3000);
 };
 
@@ -79,7 +84,7 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
     dispatch(sessionSlice.actions.removed(sessionId));
   });
 
-  const handleStdout = (isError = false) => (chunk: Buffer) => {
+  const handleStdout = (chunk: Buffer) => {
     // TODO: stderr colors
     dispatch(
       sessionSlice.actions.logAppended({
@@ -89,14 +94,10 @@ export const debug: ThunkActionCreator<AppInfo> = (app) => async (dispatch) => {
     );
   };
 
-  if (sp.stdout) {
-    sp.stdout.on("data", handleStdout());
-  }
-  if (sp.stderr) {
-    sp.stderr.on("data", handleStdout(true));
-  }
+  sp.stdout.on("data", handleStdout);
+  sp.stderr.on("data", handleStdout);
 };
 
-export const debugPath: ThunkActionCreator<string> = (path) => async (dispatch) => {
+export const debugPath: ThunkActionCreator<string> = () => async () => {
   // TODO:
 };

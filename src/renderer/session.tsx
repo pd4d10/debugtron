@@ -1,8 +1,10 @@
-import { Button, Divider, HTMLTable, Pre, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { Button, Divider, HTMLTable, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { type FC, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+
 import { appSlice } from "../reducers/app";
 import { sessionSlice } from "../reducers/session";
+
 import { Xterm } from "./xterm";
 
 export const Session: FC = () => {
@@ -61,8 +63,8 @@ export const Session: FC = () => {
                               intent={page.type === "node"
                                 ? "success"
                                 : page.type === "page"
-                                ? "primary"
-                                : "none"}
+                                  ? "primary"
+                                  : "none"}
                             >
                               {page.type}
                             </Tag>
@@ -78,8 +80,8 @@ export const Session: FC = () => {
                           </td>
                           <td>
                             <Button
-                              small
-                              rightIcon="share"
+                              size="small"
+                              endIcon="share"
                               onClick={() => {
                                 const url = page.devtoolsFrontendUrl
                                   .replace(
