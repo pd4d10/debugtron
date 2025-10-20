@@ -98,6 +98,7 @@ function isElectronApp(installDir: string) {
       "default_app.asar",
       "app.asar",
       "app.asar.unpacked",
+      "app",
     ].some((file) => fs.existsSync(path.join(installDir, "resources", file)))
   );
 }
