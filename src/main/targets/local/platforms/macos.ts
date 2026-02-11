@@ -1,7 +1,6 @@
+import { execFile } from "child_process";
 import fs from "fs";
 import path from "path";
-
-import plist from "simple-plist";
 
 import type { AppReader } from "./utils";
 
@@ -12,17 +11,24 @@ interface MacosAppInfo {
   CFBundleIconFile: string;
 }
 
-async function readPlistFile(path: string) {
+async function readPlistFile(filePath: string): Promise<MacosAppInfo> {
   return new Promise<MacosAppInfo>((resolve, reject) => {
-    plist.readFile<MacosAppInfo>(path, (error, data) => {
-      // console.log(error, data)
-
-      if (error || !data) {
-        reject(error ?? new Error("No data"));
-      } else {
-        resolve(data);
-      }
-    });
+    // Use macOS built-in plutil to convert plist to JSON
+    execFile(
+      "plutil",
+      ["-convert", "json", "-o", "-", filePath],
+      (error, stdout) => {
+        if (error) {
+          reject(error);
+        } else {
+          try {
+            resolve(JSON.parse(stdout) as MacosAppInfo);
+          } catch (parseError) {
+            reject(parseError);
+          }
+        }
+      },
+    );
   });
 }
 
